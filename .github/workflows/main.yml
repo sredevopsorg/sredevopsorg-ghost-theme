@@ -1,0 +1,32 @@
+name: stale repo identifier
+
+on:
+#  push:
+#  pull_request:
+  workflow_dispatch:
+#  schedule:
+#    - cron: '3 2 1 * *'
+
+jobs:
+  build:
+    name: stale repo identifier
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+
+    - name: Run stale_repos tool
+      uses: docker://ghcr.io/github/stale_repos:v1@sha256:fb34ad6da139c145b82951dc06f7662adbcf07f06e525572a2099c89b278adfa
+      env:
+        GH_TOKEN: ${{ secrets.GHCR_PASS }}
+        ORGANIZATION: sredevopsdev
+        INACTIVE_DAYS: 100
+
+    - name: Create issue
+      uses: peter-evans/create-issue-from-file@433e51abf769039ee20ba1293a088ca19d573b7f # v4.0.1
+      with:
+        title: Stale repository report
+        content-filepath: ./stale_repos.md
+        assignees: ${{ secrets.GHCR_USER }}
+        
