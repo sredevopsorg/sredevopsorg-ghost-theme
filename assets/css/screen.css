@@ -27,9 +27,9 @@ a:hover, a:hover h1,a:hover h2,a:hover h3 {
   @apply bg-dark w-2;
 }
 
-ul,li{
+/* ul,li{
   @apply list-outside list-disc;
-}
+} */
 
 
 #main h1,
