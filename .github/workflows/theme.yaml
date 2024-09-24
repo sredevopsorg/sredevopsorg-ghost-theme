@@ -1,0 +1,29 @@
+name: deploy-theme
+on:
+  workflow_run:
+    workflows: ["tests"]
+    branches: [main]
+    types: 
+      - completed
+  workflow_dispatch:
+jobs: 
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Harden Runner
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@v4
+        name: Checkout Repository
+      
+      - name: Deploy Ghost Theme to website
+        uses: TryGhost/action-deploy-theme@v1
+        continue-on-error: false
+        with:
+          api-url: ${{ secrets.SREDEVOPS_API_URL }}
+          api-key: ${{ secrets.SREDEVOPS_ADMIN_API_KEY }}
+          exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md"
+

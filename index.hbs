@@ -1,0 +1,46 @@
+{{!< default}}
+{{!--  --}}
+
+<div class="container mx-auto">
+<!-- Tag Navigation -->
+<div class="space-x-4 mb-6 overflow-x-scroll h-full flex items-center justify-center">
+    {{#get "tags" include="count.posts" order="count.posts desc" limit="50"}}
+        <ul class="flex gap-4 items-center">
+            <span>Tags:</span>
+            {{#foreach tags}}
+            <li class="text-center">
+                <a href="{{url}}">{{name}}</a>
+            </li>
+            {{/foreach}}
+        </ul>
+    {{/get}}
+</div>
+
+
+    {{!-- <!-- Featured Post -->
+    {{#foreach posts}}
+    {{#if @first}}
+    <div class="featured-post mb-12">
+        <img src="{{feature_image}}" alt="{{title}}" class="mb-4">
+        <h2 class="text-2xl font-semibold">{{title}}</h2>
+        <p>{{excerpt}}</p>
+        <a href="{{url}}" class="text-highlight">Read More →</a>
+    </div>
+    {{/if}}
+    {{/foreach}} --}}
+
+    <!-- Post Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {{#foreach posts}}
+        {{!-- {{#unless @first}} --}}
+        <div class="post-item bg-dark p-4 rounded-2xl">
+            <a href="{{url absolute="true"}}">
+                <img src="{{feature_image}}" alt="{{title}}" class="mb-4">
+                <h3 class="text-xl font-bold">{{title}}</h3></a>
+            <p class="text-gray-400">{{excerpt}}</p>
+            <p class="text-gray-500"><a href="{{url absolute="true"}}">{{t "Read More"}}</a></p>
+        </div>
+        {{!-- {{/unless}} --}}
+        {{/foreach}}
+    </div>
+</div>

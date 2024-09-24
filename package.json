@@ -1,0 +1,86 @@
+{
+    "name": "sredevopsorg-ghost-theme",
+    "description": "A Ghost v5 Theme made for SREDevOps.org based on Tailwind CSS with sidebar navigation and dark theme by default",
+    "demo": "https://sredevops.org",
+    "version": "1.0.1",
+    "engines": {
+        "ghost": ">=5.0.0"
+    },
+    "license": "GPL-3.0-only",
+    "scripts": {
+        "install": "yarn install",
+        "dev": "gulp",
+        "build": "gulp build",
+        "test": "gscan .",
+        "test:dev": "npx gscan --verbose .",
+        "test:ci": "gscan --fatal --verbose ."
+    },
+    "author": {
+        "name": "Nicolas Georger",
+        "email": "info@sredevops.org",
+        "url": "https://sredevops.org"
+    },
+    "gpm": {
+        "type": "theme",
+        "categories": [
+            "Dark",
+            "Magazine",
+            "Sidebar navigation"
+        ]
+    },
+    "keywords": [
+        "ghost",
+        "theme",
+        "ghost-theme"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme"
+    },
+    "bugs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme/issues",
+    "contributors": [
+        "SREDevOps.org"
+    ],
+    "devDependencies": {
+        "@tailwindcss/forms": "^0.5.9",
+        "@tailwindcss/typography": "^0.5.15",
+        "autoprefixer": "^10.4.20",
+        "cssnano": "7.0.5",
+        "gulp": "^5.0.0",
+        "gulp-concat": "2.6.1",
+        "gulp-livereload": "4.0.2",
+        "gulp-postcss": "10.0.0",
+        "gulp-uglify": "3.0.2",
+        "postcss": "^8.4.47",
+        "postcss-easy-import": "4.0.0",
+        "pump": "3.0.0",
+        "tailwindcss": "^3.4.12"
+    },
+    "browserslist": [
+        "defaults"
+    ],
+    "config": {
+        "posts_per_page": 12,
+        "card_assets": false,
+        "image_sizes": {
+            "xs": {
+                "width": 160
+            },
+            "s": {
+                "width": 320
+            },
+            "m": {
+                "width": 600
+            },
+            "l": {
+                "width": 960
+            },
+            "xl": {
+                "width": 1200
+            },
+            "xxl": {
+                "width": 2000
+            }
+        }
+    }
+}

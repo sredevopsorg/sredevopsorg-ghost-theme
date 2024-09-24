@@ -1,0 +1,313 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+.kg-width-wide,.kg-width-full.kg-content-wide {
+  @apply max-w-screen-xl;
+}
+html,body{
+  @apply text-light;
+}
+a:hover,h1,h2,h3,h3{
+  @apply text-light;
+}
+#main a{
+  @apply text-light;
+}
+a:hover, a:hover h1,a:hover h2,a:hover h3 {
+  @apply underline;
+}
+::-webkit-scrollbar{
+  @apply bg-darker w-2 h-2;
+}
+::-webkit-scrollbar-thumb{
+@apply bg-dark w-2;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-dark w-2;
+}
+
+ul,li{
+  @apply list-outside list-disc;
+}
+
+
+#main h1,
+#main h2,
+#main h3,
+#main h4,
+#main h5{
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 500;
+}
+
+p {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 400;
+  text-align: justify;
+  hyphens: auto;
+  line-height: 2;
+  @apply max-w-full pt-4 pb-4;
+}
+#id {
+  @apply grid grid-cols-10 mt-10 md:pt-10 max-w-full;
+
+}
+
+/* All Tables */
+#content table {
+  clear:both;
+  display:inline-block;
+  width:95%;
+  @apply overflow-x-scroll place-self-center;
+}
+
+/* Table head */
+table thead {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* tracking-wider */
+  border-bottom-width: 2px;
+  @apply border-dark;
+  /* Default light border */
+}
+
+table th {
+  padding-left: 1.5rem;
+  /* px-6 */
+  padding-right: 1.5rem;
+  /* px-6 */
+  padding-top: 1rem;
+  /* py-4 */
+  padding-bottom: 1rem;
+  /* py-4 */
+}
+
+/* Table body */
+table tbody tr {
+  border-bottom-width: 1px;
+  @apply border-dark;  /* Default light border */
+}
+
+table tbody th,
+table tbody td {
+  padding-left: 1.5rem;
+  /* px-6 */
+  padding-right: 1.5rem;
+  /* px-6 */
+  padding-top: 1rem;
+  /* py-4 */
+  padding-bottom: 1rem;
+  /* py-4 */
+}
+/********** end table ************/
+
+/* Paragraph */
+section p, p {
+  margin-bottom: 1.5rem;
+  /* Optional margin for spacing */
+}
+
+/* Grid layout */
+.grid-container {
+  display: grid;
+  gap: 2rem;
+  /* gap-8 */
+  margin-top: 2.25rem;
+  /* mt-9 */
+}
+
+/* Component headings */
+.component-heading {
+  font-size: 1.125rem;
+  /* text-lg */
+  margin-bottom: 0.5rem;
+  /* mb-2 */
+}
+
+.component-subheading {
+  font-size: 1rem;
+  /* text-base */
+  font-style: italic;
+  /* text-neutral-500 */
+  margin-bottom: 1rem;
+  /* mb-4 */
+}
+#content {
+ @apply mt-4;
+
+}
+#content h1{
+  @apply text-4xl mb-2;
+  font-weight: 500;
+  line-height:2;
+  text-align: left;
+
+}
+#content h2 {
+  @apply text-2xl mb-2;
+  font-weight: 500;
+  line-height:1,5;
+  text-align: left;
+}
+#content h3 {
+  @apply text-xl;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+}
+
+#content ul,#content ul a,#content ul li,
+#content ul li a{
+  margin-bottom: 24px;
+  margin-top: 24px;
+  list-style-position: inside;
+  list-style-type: disc;
+  line-height:2;
+  text-wrap:wrap;
+}
+
+/*** cards ******/
+.gh-viewport {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative
+}
+
+.kg-bookmark-card,
+.kg-bookmark-card * {
+  box-sizing: border-box
+}
+
+.kg-bookmark-card,
+.kg-bookmark-publisher {
+  position: relative
+}
+
+.kg-bookmark-card a.kg-bookmark-container,
+.kg-bookmark-card a.kg-bookmark-container:hover {
+  text-decoration: none;
+  display: flex;
+  border-radius: 6px;
+  border: 1px solid #212121!important;
+  overflow: hidden;
+  color: #fff;
+  background: #212121!important;
+}
+
+.kg-bookmark-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-basis: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 20px;
+  overflow: hidden;
+  color: #f0f0f0!important;
+}
+
+.kg-bookmark-title {
+  font-size: 15px;
+  line-height: 1.4em;
+  font-weight: 600;
+  color: #f0f0f0;
+}
+
+.kg-bookmark-description {
+  display: -webkit-box;
+  font-size: 14px;
+  line-height: 1.5em;
+  margin-top: 3px;
+  font-weight: 400;
+  max-height: 44px;
+  overflow-y: hidden;
+  opacity: .7;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical
+}
+
+.kg-bookmark-metadata {
+  display: flex;
+  align-items: center;
+  margin-top: 22px;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap
+}
+
+.kg-bookmark-metadata>:not(img) {
+  opacity: .7
+}
+
+.kg-bookmark-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px
+}
+
+.kg-bookmark-author {
+  display: inline
+}
+
+.kg-bookmark-publisher {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 240px;
+  white-space: nowrap;
+  display: block;
+  line-height: 1.65em
+}
+
+.kg-bookmark-metadata>span:nth-of-type(2) {
+  font-weight: 400
+}
+
+.kg-bookmark-metadata>span:nth-of-type(2):before {
+  content: "•";
+  margin: 0 6px
+}
+
+.kg-bookmark-metadata>span:last-of-type {
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.kg-bookmark-thumbnail {
+  position: relative;
+  flex-grow: 1;
+  min-width: 33%
+}
+
+.kg-bookmark-thumbnail img,
+.kg-collection-card-img img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover
+}
+
+.kg-bookmark-thumbnail img {
+  top: 0;
+  left: 0;
+  border-radius: 0 2px 2px 0
+}
+
+figcaption{
+  @apply text-gray-400 text-center text-sm text-pretty pl-4 pr-4 mb-4;
+  font-style:italic;
+}
+
+code{
+  @apply font-mono bg-stone-700 text-pretty pr-1 pl-1 rounded-lg;
+}
+
+.kg-card img{
+  margin-left:auto!important;
+  margin-right:auto!important;
+  clear:both;
+  display:block;
+}
+/** end cards ****/

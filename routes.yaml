@@ -1,0 +1,50 @@
+routes:
+  /:
+    controller: channel
+    template: index
+    # rss: true
+    # filter:
+
+  # /recommend/:
+  #   # controller: channel
+  #   # filter: tag:recommended
+  #   template: recommend
+  #   rss: false
+    
+
+collections:
+  # /:
+  #   template: home
+
+  /es/:
+    # template: home-
+    permalink: /es/{slug}/
+    filter: tag:es+tag:-en+tag:-br
+    # order: published_at.asc
+    data: tag.es
+    # rss: true
+
+  /en/:
+    # template: home-en
+    permalink: /en/{slug}/
+    filter: tag:en+tag:-es+tag:-br
+    # order: published_at/.asc
+    data: tag.en
+    # rss: true
+
+  /br/:
+    # template: home-br
+    permalink: /br/{slug}/
+    filter: tag:br+tag:-es+tag:-en
+    # order: published_at.asc
+    data: tag.br
+    # rss: true
+
+
+taxonomies:
+  tag: /tag/{slug}/
+  author: /author/{slug}/
+
+
+
+

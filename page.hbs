@@ -1,0 +1,29 @@
+{{!< default}}
+{{#post}}
+<article class="container mx-auto p-6 md:pl-32">
+
+        {{#match @page.show_title_and_feature_image}}
+    <header>
+        <h1 class="text-4xl font-bold">{{title}}</h1>
+                {{#if custom_excerpt}}
+        <p class="gh-article-excerpt is-body">{{custom_excerpt}}</p>
+                {{/if}}
+    <figure>
+        <img src="{{feature_image}}" alt="{{title}}" class="mb-8">
+    </figure>
+    </header>
+        {{/match}}
+
+    <div id="content">
+
+            {{content}}
+
+    </div>
+  </div>
+</section>
+
+
+
+
+</article>
+{{/post}}

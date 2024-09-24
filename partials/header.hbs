@@ -1,0 +1,28 @@
+<header class="md:hidden p-4 bg-darker flex justify-between items-center">
+    <div class="text-lighter text-lg font-bold"><a href="{{@site.url}}">{{@site.title}}</a></div>
+    <button id="menuButton" class="text-lighter focus:outline-none" onclick="toggleSidebar()">
+        {{!-- Hamburger Icon --}}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+    </button>
+</header>
+
+{{!-- Sidebar --}}
+<aside id="sidebar" class="w-64 bg-darker h-screen p-6 fixed md:block hidden md:w-64 z-10 transform md:translate-x-0 transition-transform duration-300 overflow-y-scroll">
+    {{#if @site.logo}}
+    <div id="logo">
+        <a class="logo" href="{{@site.url}}"><img src="{{@site.logo}}" alt="{{@site.title}}"></a>
+    {{else}}
+        <div class="text-lighter text-lg font-bold mb-6">{{@site.title}}</div>
+    {{/if}}
+    </div>
+    <section id="nav">
+{{navigation}}
+<div class="hidden">
+    {{navigation type="secondary"}}
+</div>
+    </section>
+</aside>
+
+
