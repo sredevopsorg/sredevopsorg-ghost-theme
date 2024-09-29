@@ -1,18 +1,18 @@
 {{!< default}}
 {{#post}}
-<article class="container mx-auto p-6 md:pl-32">
+<article class="container md:ml-32 p-6 md:pl-32">
 
 
 <section class="py-0 md:py-0">
   <div class="px-4">
-    <div class="grid grid-cols-12">
+    <div class="grid grid-cols-12 flex flex-col flex-auto">
       <div class="col-span-12 md:col-span-6 lg:col-span-5">
         <div class="flex flex-col h-full">
-        <h6>Tags:</h6>
+        <h6 class="text-light font-thin">Tags:</h6>
         {{#foreach tags }}
           <h6 class="text-light text-opacity-40 font-thin"><em><i><a href="{{url}}">{{name}}</a></i></em></h6>
         {{/foreach}}
-        <h2 class="text-[32px] font-light md:text-[45px] leading-tight">
+        <h2 class="text-2xl font-light md:text-4xl leading-tight">
             {{title}}
         </h2>
         <!-- avatar -->
@@ -61,9 +61,9 @@
                             <a href="{{url}}" rel="author">
                                 <img class="author-profile-image max-w-full h-auto rounded-full border" src="{{img_url profile_image size="xs"}}" alt="{{name}}" width="47" />  
                                 <div class="text-start">
-                                <h6 class="font-bold">{{name}}</h6>
+                                <h6 class="font-thin mt-1">{{name}}</h6>
                             </a>
-                            <p class="text-sm font-thin text-pretty text-light">{{bio}}</p>
+                            <p class="text-xs font-thin text-pretty text-lighter">{{bio}}</p>
                             </div>
                         </div>
                     {{else}}

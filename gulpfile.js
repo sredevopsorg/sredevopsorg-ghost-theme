@@ -1,10 +1,6 @@
 const {series, watch, src, dest, parallel} = require('gulp');
 const pump = require('pump');
 const tailwind = require("tailwindcss");
-// const path = require('path');
-// const releaseUtils = require('@tryghost/release-utils');
-// const inquirer = require('inquirer');
-// const fs = require('fs');
 
 // gulp plugins and utils
 const livereload = require('gulp-livereload');
@@ -59,7 +55,7 @@ function js(done) {
         src([
             // pull in lib files first so our own code can depend on it
             'assets/js/*.js'
-        ], {sourcemaps: false}),
+        ], {sourcemaps: true}),
         concat('main.js'),
         uglify(),
         dest('assets/built/', {sourcemaps: '.'}),
@@ -70,9 +66,14 @@ function js(done) {
 const cssWatcher = () => watch('assets/css/**', css);
 const jsWatcher = () => watch('assets/js/**', js);
 const hbsWatcher = () => watch(['*.hbs', 'partials/**/*.hbs'], hbs);
-// const tailwindConfigWatcher = () => watch('tailwind.config.js', css);
+const tailwindConfigWatcher = () => watch('tailwind.config.js', css);
 
-const watcher = parallel(cssWatcher, jsWatcher, hbsWatcher);
+const watcher = parallel(
+  cssWatcher,
+  jsWatcher,
+  hbsWatcher,
+  tailwindConfigWatcher
+);
 const build = series(css, js);
 
 exports.build = build;

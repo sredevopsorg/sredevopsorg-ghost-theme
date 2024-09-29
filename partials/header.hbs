@@ -1,4 +1,4 @@
-<header class="md:hidden p-4 bg-darker flex justify-between items-center">
+<header class="md:hidden p-4 bg-darker flex justify-between items-center sticky top-0 z-20">
     <div class="text-lighter text-lg font-bold"><a href="{{@site.url}}">{{@site.title}}</a></div>
     <button id="menuButton" class="text-lighter focus:outline-none" onclick="toggleSidebar()">
         {{!-- Hamburger Icon --}}
@@ -18,11 +18,35 @@
     {{/if}}
     </div>
     <section id="nav">
-{{navigation}}
-<div class="hidden">
-    {{navigation type="secondary"}}
+    <div class="relative inline-block text-left">
+    <div>
+        <button type="button" class="inline-flex justify-between w-full rounded-md border border-dark shadow-sm px-4 py-2 bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
+            Select Language
+            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="origin-top-right relative right-0 mt-2 mw-56 rounded-md shadow-lg bg-dark ring-1 ring-black ring-opacity-5">
+        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="languageMenuButton">
+            <a href="{{@site.url}}/es/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
+                <img src="{{asset 'img/es.svg'}}" alt="Spanish" class="inline w-4 h-4 mr-2"> Español
+            </a>
+            <a href="{{@site.url}}/en/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
+                <img src="{{asset 'img/en.svg'}}" alt="English" class="inline w-4 h-4 mr-2"> English
+            </a>
+            <a href="{{@site.url}}/br/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
+                <img src="{{asset 'img/br.svg'}}" alt="Brazilian Portuguese" class="inline w-4 h-4 mr-2"> Português
+            </a>
+        </div>
+    </div>
 </div>
+
+    {{navigation}}
+    
+    {{!-- <div class="">
+        {{navigation type="secondary"}}
+    </div> --}}
     </section>
 </aside>
-
-

@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
     <link rel="stylesheet" href="{{asset "built/noto.css"}}">
+    {{> "icons"}}
     {{#is "page, post"}}
     <link rel="stylesheet" href="{{asset "built/prism.css"}}">
     {{/is}}
@@ -23,7 +24,7 @@
     {{> header}}
 
     {{!-- Main content, dynamically inserted here --}}
-    <main class="container mx-auto my-auto md:pl-32" id="main">
+    <main id="main">
         {{{body}}}
     </main>
 
