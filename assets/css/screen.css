@@ -730,11 +730,11 @@ figcaption a {
 }
 
 .recommendation-title {
-    @apply text-2xl font-medium;
+    @apply text-xl font-medium p-2;
 }
 
 .recommendation-favicon {
-    @apply w-10 h-10 align-top inline-block;
+    @apply w-10 h-10 align-top inline-block mr-2;
 }
 .recommendation-url {
   @apply hidden;
@@ -751,5 +751,5 @@ figcaption a {
 
 
 .recommendation-description {
-    @apply text-xl font-light;
+    @apply text-sm font-light pl-2 pr-2 mb-1;
 }

@@ -6,20 +6,12 @@
     <title>{{meta_title}}</title>
 
     <!-- Preconnect and Preload Fonts -->
-    <link rel="preload" href="{{asset "built/noto.css"}}" as="style">
+    {{!-- <link rel="preload" as="font" type="font/woff2" href="{{asset "fonts/NotoSans.woff2"}}">
+    <link rel="preload" href="{{asset "built/noto.css"}}" as="style"> --}}
 
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
     <link rel="stylesheet" href="{{asset "built/noto.css"}}">
 
-    <!-- Social Meta Tags for SEO -->
-    <meta property="og:title" content="{{meta_title}}">
-    <meta property="og:description" content="{{meta_description}}">
-    <meta property="og:image" content="{{#if feature_image}}{{feature_image}}{{else}}{{@site.cover_image}}{{/if}}">
-    <meta property="og:url" content="{{url absolute="true"}}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{meta_title}}">
-    <meta name="twitter:description" content="{{meta_description}}">
-    <meta name="twitter:image" content="{{#if feature_image}}{{feature_image}}{{else}}{{@site.cover_image}}{{/if}}">
 
     {{> "icons"}}
 

@@ -1,3 +1,4 @@
+{{> "algolia" }}
 <header class="md:hidden p-4 bg-darker flex justify-between items-center sticky top-0 z-20">
     <div class="text-lighter text-lg font-bold"><a href="{{@site.url}}">{{@site.title}}</a></div>
     <button id="menuButton" class="text-lighter focus:outline-none" onclick="toggleSidebar()" aria-label="Open sidebar menu">
@@ -46,7 +47,9 @@
     <section id="nav" class="mb-6">
         {{navigation}}
     </section>
-    {{> "search" }}
+    <button class="block w-full rounded-full bg-violet-500 text-neutral-50 shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-violet-600 hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-violet-800 focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-violet-700 active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0" aria-label="Search in SREDevOps.org" onclick="openModal(search.start());" oninput="openModal();" onkeypress="openModal();" rel="search">
+        Search
+    </button>
     <div id="members" class="text-light">
         {{#if @member}}
         <div class="flex items-center gap-2">
