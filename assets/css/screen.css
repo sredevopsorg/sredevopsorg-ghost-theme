@@ -1,35 +1,52 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
 /* #sidebar {
   @apply w-64 bg-darker h-screen p-6 fixed md:block hidden md:w-64 z-10 transform md:translate-x-0 transition-transform duration-300 overflow-y-scroll;
 } */
-#logo{
+#logo {
   @apply align-middle mt-4 mb-4;
 }
-#svg{
-  display:none;
+
+#svg {
+  display: none;
 }
-.kg-width-wide,.kg-width-full.kg-content-wide {
+
+.kg-width-wide,
+.kg-width-full.kg-content-wide {
   @apply max-w-screen-xl;
 }
+
 /* html,body{
 } */
-a:hover,h1,h2,h3,h3{
+a:hover,
+h1,
+h2,
+h3,
+h3 {
   @apply text-light;
 }
-#main a{
+
+#main a {
   @apply text-light line-clamp-3 md:line-clamp-4;
 }
-a:hover, a:hover h1,a:hover h2,a:hover h3 {
+
+a:hover,
+a:hover h1,
+a:hover h2,
+a:hover h3 {
   @apply underline;
 }
-::-webkit-scrollbar{
+
+::-webkit-scrollbar {
   @apply bg-darker w-2 h-2;
 }
-::-webkit-scrollbar-thumb{
-@apply bg-dark w-2;
+
+::-webkit-scrollbar-thumb {
+  @apply bg-dark w-2;
 }
+
 ::-webkit-scrollbar-thumb {
   @apply bg-dark w-2;
 }
@@ -43,7 +60,7 @@ a:hover, a:hover h1,a:hover h2,a:hover h3 {
 #main h2,
 #main h3,
 #main h4,
-#main h5{
+#main h5 {
   font-family: 'Noto Sans', sans-serif;
   font-weight: 500;
   @apply text-lighter;
@@ -57,6 +74,7 @@ p {
   line-height: 2;
   @apply max-w-full pt-4 pb-4 text-light;
 }
+
 #id {
   @apply grid grid-cols-10 mt-10 md:pt-10 max-w-full;
 
@@ -64,11 +82,11 @@ p {
 
 /* All Tables */
 #content table {
-  clear:both;
-  display:block;
+  clear: both;
+  display: block;
   margin-left: auto;
   margin-right: auto;
-  max-width:95%;
+  max-width: 95%;
   min-width: 75%;
   @apply overflow-x-scroll place-self-center bg-dark text-light;
 }
@@ -84,6 +102,8 @@ table thead {
 }
 
 table th {
+
+  @apply text-light;
   padding-left: 1.5rem;
   /* px-6 */
   padding-right: 1.5rem;
@@ -96,8 +116,11 @@ table th {
 
 /* Table body */
 table tbody tr {
+
+  @apply text-light;
   border-bottom-width: 1px;
-  @apply border-dark;  /* Default light border */
+  @apply border-dark;
+  /* Default light border */
 }
 
 table tbody th,
@@ -108,13 +131,16 @@ table tbody td {
   /* px-6 */
   padding-top: 1rem;
   /* py-4 */
+  @apply text-light;
   padding-bottom: 1rem;
   /* py-4 */
 }
+
 /********** end table ************/
 
 /* Paragraph */
-section p, p {
+section p,
+p {
   margin-bottom: 1.5rem;
   /* Optional margin for spacing */
 }
@@ -144,28 +170,32 @@ section p, p {
   margin-bottom: 1rem;
   /* mb-4 */
 }
-#content li{
+
+#content li {
   @apply text-light
 }
 
 #content {
- @apply mt-4;
+  @apply mt-4;
 
 }
-#content h1{
+
+#content h1 {
   @apply text-4xl mb-2;
   font-weight: 500;
-  line-height:2;
+  line-height: 2;
   text-align: left;
 
 }
+
 #content h2 {
   @apply text-2xl mb-2;
   font-weight: 500;
-  line-height:1,5;
+  line-height: 1, 5;
   text-align: left;
   margin-top: 1.5rem;
 }
+
 #content h3 {
   @apply text-xl;
   font-weight: 400;
@@ -173,20 +203,20 @@ section p, p {
   text-align: left;
 }
 
-#content ul li a{
+#content ul li a {
   margin-bottom: 24px;
   margin-top: 24px;
   list-style-position: inside;
   list-style-type: disc;
-  line-height:2;
-  text-wrap:wrap;
+  line-height: 2;
+  text-wrap: wrap;
   @apply text-lighter;
 }
 
 #content ul li {
   margin-bottom: 24px;
   margin-top: 24px;
-  list-style-position: inside;
+  list-style-position: outside;
   list-style-type: disc;
   line-height: 2;
   text-wrap: wrap;
@@ -211,15 +241,21 @@ section p, p {
   position: relative
 }
 
+#main>article>section>ul>li {
+  @apply text-light
+}
+
+#content>ul>li::marker {}
+
 .kg-bookmark-card a.kg-bookmark-container,
 .kg-bookmark-card a.kg-bookmark-container:hover {
   text-decoration: none;
   display: flex;
   border-radius: 6px;
-  border: 1px solid #212121!important;
+  border: 1px solid #212121 !important;
   overflow: hidden;
   color: #fff;
-  background: #212121!important;
+  background: #212121 !important;
 }
 
 .kg-bookmark-content {
@@ -231,7 +267,7 @@ section p, p {
   justify-content: flex-start;
   padding: 20px;
   overflow: hidden;
-  color: #f0f0f0!important;
+  color: #f0f0f0 !important;
 }
 
 .kg-bookmark-title {
@@ -255,8 +291,8 @@ section p, p {
   line-clamp: 5;
   overflow: scroll;
   text-overflow: ellipsis;
-  text-wrap:stable;
-  
+  text-wrap: stable;
+
 }
 
 .kg-bookmark-metadata {
@@ -325,20 +361,26 @@ section p, p {
   border-radius: 0 2px 2px 0
 }
 
-figcaption{
+figcaption {
   @apply text-gray-400 text-center text-sm pl-4 pr-4 mb-4 pt-4 pb-4 italic;
 }
 
-code{
+code {
   @apply font-mono bg-stone-700 text-pretty pr-1 pl-1 rounded-lg;
 }
+
 .kg-card .kg-embed-card {
-  @apply w-min h-min
+  /* @apply w-min h-min */
 }
-.kg-card img{
-  margin-left:auto!important;
-  margin-right:auto!important;
+
+.kg-card img {
+  /* margin-left:auto!important;
+  margin-right:auto!important; */
   clear:both;
   display:block;
+}
+#content>figure{
+  @apply mb-5
+
 }
 /** end cards ****/

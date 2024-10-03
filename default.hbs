@@ -4,33 +4,42 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{meta_title}}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@100..900&display=swap" rel="stylesheet">
+
+    <!-- Preconnect and Preload Fonts -->
+    <link rel="preload" href="{{asset "built/noto.css"}}" as="style">
+
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
     <link rel="stylesheet" href="{{asset "built/noto.css"}}">
+
+    <!-- Social Meta Tags for SEO -->
+    <meta property="og:title" content="{{meta_title}}">
+    <meta property="og:description" content="{{meta_description}}">
+    <meta property="og:image" content="{{#if feature_image}}{{feature_image}}{{else}}{{@site.cover_image}}{{/if}}">
+    <meta property="og:url" content="{{url absolute="true"}}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{meta_title}}">
+    <meta name="twitter:description" content="{{meta_description}}">
+    <meta name="twitter:image" content="{{#if feature_image}}{{feature_image}}{{else}}{{@site.cover_image}}{{/if}}">
+
     {{> "icons"}}
-    {{#is "page, post"}}
+
+    {{#is "post"}}
     <link rel="stylesheet" href="{{asset "built/prism.css"}}">
     {{/is}}
 
-{{ghost_head}}
+    {{ghost_head}}
 </head>
 
 <body class="{{body_class}} bg-darker">
-<div>
 
     {{!-- Header --}}
     {{> header}}
 
     {{!-- Main content, dynamically inserted here --}}
-    <main id="main">
         {{{body}}}
-    </main>
 
     {{!-- Footer --}}
     {{> footer}}
-</div> 
 
 <script src="{{asset "built/main.js"}}"></script>
 {{ghost_foot}}

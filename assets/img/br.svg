@@ -34,36 +34,17 @@
      inkscape:deskcolor="#505050"
      inkscape:zoom="9.8333333"
      inkscape:cx="9.5084746"
-     inkscape:cy="16.728814"
-     inkscape:window-width="1512"
-     inkscape:window-height="852"
+     inkscape:cy="16.779661"
+     inkscape:window-width="1800"
+     inkscape:window-height="1005"
      inkscape:window-x="0"
-     inkscape:window-y="49"
+     inkscape:window-y="44"
      inkscape:window-maximized="0"
-     inkscape:current-layer="spanish" />
-  <g
-     id="SVGRepo_bgCarrier"
-     stroke-width="0"
-     transform="matrix(0.42105263,0,0,0.42105263,-1.2631579,-2.5263158)" />
-  <g
-     id="SVGRepo_tracerCarrier"
-     stroke-linecap="round"
-     stroke-linejoin="round"
-     stroke="#cccccc"
-     stroke-width="0.64"
-     transform="matrix(0.42105263,0,0,0.42105263,-1.2631579,-2.5263158)" />
-  <g
-     id="spanish"
-     transform="matrix(0.42105263,0,0,0.42105263,-1.2631579,-2.5263158)">
-    <text
-       xml:space="preserve"
-       transform="matrix(3.9091699,0,0,3.7872437,2.5190317,13.01979)"
-       id="text1"
-       style="white-space:pre;shape-inside:url(#rect1);display:inline;fill:#000000;stroke-width:1.233;stroke-dasharray:none"><tspan
-         x="-0.203125"
-         y="10.002487"
-         id="tspan3"><tspan
-           style="font-size:12px;font-family:Sans;-inkscape-font-specification:'Sans, @wght=327,wdth=93.3';font-variation-settings:'wdth' 93.3, 'wght' 327"
-           id="tspan2">BR</tspan></tspan></text>
-  </g>
+     inkscape:current-layer="svg12" />
+  <path
+     style="font-size:12px;font-family:Sans;-inkscape-font-specification:'Sans, @wght=327,wdth=93.3';font-variation-settings:'wdth' 93.3, 'wght' 327;white-space:pre;fill:#000000;stroke-width:1.233"
+     d="m 3.204875,1.4344866 q 1.5,0 2.22,0.492 0.732,0.492 0.732,1.596 0,0.504 -0.18,0.912 -0.18,0.408 -0.54,0.672 -0.348,0.264 -0.852,0.36 v 0.048 q 0.576,0.096 0.984,0.348 0.408,0.252 0.612,0.672 0.216,0.42 0.216,1.032 0,0.804 -0.348,1.344 -0.348,0.54 -0.984,0.816 -0.636,0.2760004 -1.5,0.2760004 h -2.64 V 1.4344866 Z m 0.144,3.744 q 1.068,0 1.524,-0.396 0.468,-0.396 0.468,-1.188 0,-0.78 -0.516,-1.128 -0.504,-0.348 -1.62,-0.348 h -1.488 v 3.06 z m -1.632,0.684 v 3.456 h 1.752 q 1.08,0 1.584,-0.456 0.504,-0.468 0.504,-1.344 0,-0.564 -0.24,-0.924 -0.228,-0.372 -0.708,-0.552 -0.48,-0.18 -1.236,-0.18 z m 8.471991,-4.428 q 0.996,0 1.656,0.252 0.66,0.24 0.984,0.768 0.336,0.516 0.336,1.356 0,0.648 -0.228,1.116 -0.228,0.456 -0.612,0.756 -0.384,0.288 -0.876,0.444 l 2.232,3.8760004 h -0.924 l -2.052,-3.6600004 H 8.9408664 v 3.6600004 h -0.792 V 1.4344866 Z m -0.048,0.696 H 8.9408664 v 3.54 h 1.3799996 q 0.984,0 1.5,-0.468 0.528,-0.468 0.528,-1.368 0,-0.624 -0.24,-0.996 -0.24,-0.372 -0.732,-0.54 -0.48,-0.168 -1.236,-0.168 z"
+     id="text1"
+     transform="matrix(1.5641636,0,0,1.6011129,0.15904664,2.9186226)"
+     aria-label="BR" />
 </svg>

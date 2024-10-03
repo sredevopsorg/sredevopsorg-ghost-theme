@@ -1,7 +1,21 @@
-
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
-  sidebar.classList.toggle("hidden");
+  const overlay = document.getElementById("overlay");
+  const isHidden = sidebar.classList.contains("hidden");
+
+  if (isHidden) {
+    sidebar.classList.remove("hidden");
+    setTimeout(() => {
+      sidebar.classList.remove("-translate-x-full");
+      overlay.classList.remove("hidden");
+    }, 10); // Small delay to allow `hidden` class to be removed first
+  } else {
+    sidebar.classList.add("-translate-x-full");
+    overlay.classList.add("hidden");
+    setTimeout(() => {
+      sidebar.classList.add("hidden");
+    }, 300); // Match transition duration
+  }
 };
 
 document

@@ -1,35 +1,80 @@
 {{!< default}}
-{{!--  --}}
+<main id="main" class="container mx-auto md:pl-64 pt-6 pb-6 overflow-y-scroll overflow-x-scroll">
 
-<div class="container mx-auto p-6 overflow-y-scroll overflow-x-scroll md:pl-32">
-<!-- Tag Navigation -->
-<div class="space-x-4 mb-6 overflow-x-scroll h-full flex">
-    {{#get "tags" include="count.posts" order="count.posts desc" limit="50"}}
+    <!-- Tag Navigation -->
+    <div class="space-x-4 mb-6 overflow-x-scroll h-full flex">
         <ul class="flex gap-4 items-center">
             <span class="text-light">Tags:</span>
-            {{#foreach tags}}
-            <li class="text-center">
-                <a href="{{url}}">{{name}}</a>
-            </li>
-            {{/foreach}}
+            {{#get "tags" include="count.posts" order="count.posts desc" limit="50"}}
+                {{#foreach tags}}
+                <li class="text-center">
+                    <a href="{{url}}" class="px-4 py-2 rounded-full {{#if @first}}bg-highlight{{else}}bg-dark{{/if}} hover:bg-highlight transition-colors">
+                        {{name}} ({{count.posts}})
+                    </a>
+                </li>
+                {{/foreach}}
+            {{/get}}
         </ul>
-    {{/get}}
-</div>
+    </div>
 
     <!-- Post Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {{#foreach posts}}
-        {{!-- {{#unless @first}} --}}
-        <div class="post-item bg-dark p-4 rounded-2xl">
-            <a href="{{url absolute="true"}}">
-                <img src="{{feature_image}}" alt="{{title}}" class="mb-4">
-                <h3 class="text-xl font-bold">{{title}}</h3></a>
-            <p class="text-gray-400">{{excerpt}}</p>
-            <p class="text-gray-500"><a href="{{url absolute="true"}}">{{t "Read More"}}</a></p>
-        </div>
-        {{!-- {{/unless}} --}}
+        <article class="overflow-hidden rounded-lg border border-dark bg-dark shadow-sm shadow-dark-700/25">
+            
+            <a href="{{url absolute="true"}}" alt="{{title}}">
+            <img alt="{{title}}"
+                src="{{feature_image}}"
+                class="h-56 w-full object-cover" loading="lazy" />
+            </a>
+
+            <div class="p-4 sm:p-6">
+                <a href="{{url absolute="true"}}" class="block">
+                    <h3 class="text-lg font-medium text-lighter">
+                        {{title}}
+                    </h3>
+                </a>
+
+                <p class="mt-2 line-clamp-3 text-sm text-light">
+                    {{excerpt}}
+                </p>
+
+                <a href="{{url absolute="true"}}" class="group mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600">
+                    {{t "Read full text"}}
+                    <span aria-hidden="true" class="block transition-all group-hover:ms-0.5">
+                        &rarr;
+                    </span>
+                </a>
+            </div>
+        </article>
         {{/foreach}}
-        {{!-- Pagination --}}
     </div>
-        {{pagination prev='<<<'}}
-</div>
+
+    <!-- Pagination -->
+    <div class="pagination flex justify-center mt-6">
+        <ul class="flex space-x-4 items-center">
+            <!-- Previous Page Link -->
+            {{#if pagination.prev}}
+            <li>
+                <a href="{{page_url pagination.prev}}" class="text-light hover:text-highlight px-3 py-1 rounded-lg bg-dark">Previous</a>
+            </li>
+            {{/if}}
+
+            <!-- Page Numbers -->
+            {{#each pagination.pages as |page|}}
+            <li>
+                <a href="{{page_url page}}" class="px-3 py-1 rounded-lg {{#if page.current}}bg-highlight text-white{{else}}bg-dark text-light hover:bg-highlight hover:text-white{{/if}}">
+                    {{page.number}}
+                </a>
+            </li>
+            {{/each}}
+
+            <!-- Next Page Link -->
+            {{#if pagination.next}}
+            <li>
+                <a href="{{page_url pagination.next}}" class="text-light hover:text-highlight px-3 py-1 rounded-lg bg-dark">Next</a>
+            </li>
+            {{/if}}
+        </ul>
+    </div>
+    </main>

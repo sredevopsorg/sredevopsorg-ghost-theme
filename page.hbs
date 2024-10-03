@@ -1,35 +1,58 @@
 {{!< default}}
+
 {{#post}}
-<article class="container mx-auto p-6 md:pl-32">
-<header class="py-0 md:py-0">
-  <div class="px-4">
-  {{#match @page.show_title_and_feature_image}}
+<main id="main">
 
-  <h1 class="text-[32px] font-light md:text-[45px] leading-tight">
-      {{title}}
-  </h1>
-    {{#if custom_excerpt}}
-    <p class="gh-article-excerpt">{{custom_excerpt}}</p>
-    {{/if}}
-    
-    <figure>
-        <img src="{{imag_url}}" alt="{{title}}" class="mb-8">
-    </figure>
-    
-    </div>
-    </header>
-    {{/match}}
+<article class="container md:ml-32 p-6 md:pl-32">
 
-    <div id="content">
+<section class="py-0 md:py-0">
+    <div class="px-4">
 
+        <!-- Post Content -->
+            {{#if @page.show_title_and_feature_image}}
+                <!-- Page Title -->
+                <h1 class="text-[32px] font-light md:text-[45px] leading-tight">
+                    {{title}}
+                </h1>
+
+                <!-- Custom Excerpt -->
+                {{#if custom_excerpt}}
+                <p class="gh-article-excerpt text-lg text-light mt-4 mb-6">
+                    {{custom_excerpt}}
+                </p>
+                {{/if}}
+
+                <!-- Feature Image -->
+                {{#if feature_image}}
+                <picture>
+                    <source 
+                        srcset="{{img_url feature_image size="s" format="webp"}} 300w,
+                                {{img_url feature_image size="m" format="webp"}} 600w,
+                                {{img_url feature_image size="l" format="webp"}} 1000w,
+                                {{img_url feature_image size="xl" format="webp"}} 2000w"
+                        sizes="(min-width: 1400px) 1400px, 92vw" 
+                        type="image/webp"
+                    >
+                    <source 
+                        srcset="{{img_url feature_image size="s"}} 300w,
+                                {{img_url feature_image size="m"}} 600w,
+                                {{img_url feature_image size="l"}} 1000w,
+                                {{img_url feature_image size="xl"}} 2000w"
+                        sizes="(min-width: 1400px) 1400px, 92vw"
+                    >
+                    <img src="{{img_url feature_image}}" alt="{{title}} feature image" class="mb-8 w-full object-cover" loading="lazy">
+                </picture>
+                {{/if}}
+            {{/if}}
+
+            <!-- Main Content -->
+
+        <div id="content" class="mt-8">
             {{content}}
-
+        </div>
     </div>
-  </div>
 </section>
 
-
-
-
 </article>
+</main>
 {{/post}}

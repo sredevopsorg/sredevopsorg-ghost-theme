@@ -1,88 +1,92 @@
 {{!< default}}
+
 {{#post}}
+<main id="main">
+
 <article class="container md:ml-32 p-6 md:pl-32">
 
-
 <section class="py-0 md:py-0">
-  <div class="px-4">
-    <div class="grid grid-cols-12 flex flex-col flex-auto">
-      <div class="col-span-12 md:col-span-6 lg:col-span-5">
-        <div class="flex flex-col h-full">
-        <h6 class="text-light font-thin">Tags:</h6>
-        {{#foreach tags }}
-          <h6 class="text-light text-opacity-40 font-thin"><em><i><a href="{{url}}">{{name}}</a></i></em></h6>
-        {{/foreach}}
-        <h2 class="text-2xl font-light md:text-4xl leading-tight">
-            {{title}}
-        </h2>
-        <!-- avatar -->
+    <div class="px-4">
+        <div class="grid grid-cols-12 gap-4">
+            <!-- Post Tags and Title -->
+            <div class="col-span-12 md:col-span-6 lg:col-span-5">
+                <div class="flex flex-col h-full">
+                    <!-- Tags -->
+                    <h6 class="text-light font-thin">Tags:</h6>
+                    {{#foreach tags}}
+                    <h6 class="text-light text-opacity-40 font-thin">
+                        <a href="{{url}}" class="underline hover:text-lighter">{{name}}</a>
+                    </h6>
+                    {{/foreach}}
+                    
+                    <!-- Post Title -->
+                    <h2 class="text-2xl font-light md:text-4xl leading-tight mt-4">
+                        {{title}}
+                    </h2>
+                </div>
+            </div>
 
-    </div>
-</div>
+            <!-- Feature Image and Author Info -->
+            <div class="col-span-12 md:col-span-6 lg:col-span-5 lg:col-start-8">
+                <!-- Feature Image -->
+                {{#if feature_image}}
+                <div class="my-6 md:my-0">
+                    <picture>
+                        <!-- WebP format -->
+                        <source 
+                            srcset="{{img_url feature_image size="s" format="webp"}} 300w,
+                                    {{img_url feature_image size="m" format="webp"}} 600w,
+                                    {{img_url feature_image size="l" format="webp"}} 1000w,
+                                    {{img_url feature_image size="xl" format="webp"}} 2000w"
+                            sizes="(min-width: 1400px) 1400px, 92vw"
+                            type="image/webp"
+                        >
+                        <!-- Fallback image -->
+                        <img
+                            srcset="{{img_url feature_image size="s"}} 300w,
+                                    {{img_url feature_image size="m"}} 600w,
+                                    {{img_url feature_image size="l"}} 1000w,
+                                    {{img_url feature_image size="xl"}} 2000w"
+                            sizes="(min-width: 1400px) 1400px, 92vw"
+                            src="{{img_url feature_image size="s"}}"
+                            alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                            class="mb-8 w-full object-cover"
+                            loading="lazy"
+                        >
+                    </picture>
+                </div>
+                {{/if}}
 
-    <div class="col-span-12 md:col-span-6 lg:col-span-5 lg:col-start-8">
-        <div class="my-6 md:my-0">
-            <picture>
-    <!-- Serve the AVIF format if the browser supports it -->
-    <!-- Remove this block when using animated images as feature images -->
-    <source 
-        srcset="{{img_url feature_image size="s" format="avif"}} 300w,
-                {{img_url feature_image size="m" format="avif"}} 600w,
-                {{img_url feature_image size="l" format="avif"}} 1000w,
-                {{img_url feature_image size="xl" format="avif"}} 2000w"
-        sizes="(min-width: 1400px) 1400px, 92vw" 
-        type="image/avif"
-    >
-    <!-- Serve the WebP format if the browser supports it -->
-    <source 
-        srcset="{{img_url feature_image size="s" format="webp"}} 300w,
-                {{img_url feature_image size="m" format="webp"}} 600w,
-                {{img_url feature_image size="l" format="webp"}} 1000w,
-                {{img_url feature_image size="xl" format="webp"}} 2000w"
-        sizes="(min-width: 1400px) 1400px, 92vw" 
-        type="image/webp"
-    >
-    <!-- Serve original file format as a fallback -->
-    <img
-        srcset="{{img_url feature_image size="s"}} 300w,
-                {{img_url feature_image size="m"}} 600w,
-                {{img_url feature_image size="l"}} 1000w,
-                {{img_url feature_image size="xl"}} 2000w"
-        sizes="(min-width: 1400px) 1400px, 92vw"
-        src="{{img_url feature_image size="s"}}"
-        alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
-    >
-</picture>
-        </div>
+                <!-- Author Info -->
                 <div class="flex items-center mt-12">
-            <div class="mr-2">
                     {{#foreach authors}}
-                        {{#if profile_image}}
-                            <a href="{{url}}" rel="author">
-                                <img class="author-profile-image max-w-full h-auto rounded-full border" src="{{img_url profile_image size="xs"}}" alt="{{name}}" width="47" />  
-                                <div class="text-start">
+                        <div class="mr-4">
+                            {{#if profile_image}}
+                            <a href="{{url}}" rel="author" aria-label="Author: {{name}}">
+                                <img class="author-profile-image max-w-full h-auto rounded-full border" 
+                                     src="{{img_url profile_image size="xs"}}" 
+                                     alt="{{name}}" width="47" />
+                            </a>
+                            {{/if}}
+                        </div>
+                        <div>
+                            <a href="{{url}}" class="text-lighter hover:underline" rel="author">
                                 <h6 class="font-thin mt-1">{{name}}</h6>
                             </a>
                             <p class="text-xs font-thin text-pretty text-lighter">{{bio}}</p>
-                            </div>
                         </div>
-                    {{else}}
-                        <a href="{{url}}" rel="author">{{> "icons/avatar"}}</a>
-                    {{/if}}
                     {{/foreach}}
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div id="content">
 
+        <!-- Post Content -->
+        <div id="content" class="mt-8">
             {{content}}
-
+        </div>
     </div>
-  </div>
 </section>
 
-
-
-
 </article>
+</main>
 {{/post}}

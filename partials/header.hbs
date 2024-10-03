@@ -1,52 +1,59 @@
 <header class="md:hidden p-4 bg-darker flex justify-between items-center sticky top-0 z-20">
     <div class="text-lighter text-lg font-bold"><a href="{{@site.url}}">{{@site.title}}</a></div>
-    <button id="menuButton" class="text-lighter focus:outline-none" onclick="toggleSidebar()">
-        {{!-- Hamburger Icon --}}
+    <button id="menuButton" class="text-lighter focus:outline-none" onclick="toggleSidebar()" aria-label="Open sidebar menu">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
         </svg>
     </button>
 </header>
 
-{{!-- Sidebar --}}
-<aside id="sidebar" class="w-64 bg-darker h-screen p-6 fixed md:block hidden md:w-64 z-10 transform md:translate-x-0 transition-transform duration-300 overflow-y-scroll">
-    {{#if @site.logo}}
-    <div id="logo">
-        <a class="logo" href="{{@site.url}}"><img src="{{@site.logo}}" alt="{{@site.title}}"></a>
-    {{else}}
-        <div class="text-lighter text-lg font-bold mb-6">{{@site.title}}</div>
-    {{/if}}
+<div id="overlay" class="fixed inset-0 bg-black opacity-50 hidden" onclick="toggleSidebar()"></div>
+
+<aside id="sidebar" class="w-64 bg-darker h-screen p-6 fixed md:block hidden z-10 transform md:translate-x-0 -translate-x-full transition-transform duration-300 overflow-y-scroll">
+    <div id="logo" class="mb-6">
+        {{#if @site.logo}}
+        <a class="logo" href="{{@site.url}}">
+            <img src="{{@site.logo}}" alt="{{@site.title}}" class="w-full h-auto" loading="lazy">
+        </a>
+        {{else}}
+        <div class="text-lighter text-lg font-bold">{{@site.title}}</div>
+        {{/if}}
     </div>
-    <section id="nav">
-    <div class="relative inline-block text-left">
-    <div>
-        <button type="button" class="inline-flex justify-between w-full rounded-md border border-dark shadow-sm px-4 py-2 bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
+
+    <section class="mb-6">
+        <button type="button" class="inline-flex justify-between w-full rounded-md border border-dark px-4 py-2 bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
             Select Language
             <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
         </button>
-    </div>
 
-    <div class="origin-top-right relative right-0 mt-2 mw-56 rounded-md shadow-lg bg-dark ring-1 ring-black ring-opacity-5">
-        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="languageMenuButton">
-            <a href="{{@site.url}}/es/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                <img src="{{asset 'img/es.svg'}}" alt="Spanish" class="inline w-4 h-4 mr-2"> Español
-            </a>
-            <a href="{{@site.url}}/en/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                <img src="{{asset 'img/en.svg'}}" alt="English" class="inline w-4 h-4 mr-2"> English
-            </a>
-            <a href="{{@site.url}}/br/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                <img src="{{asset 'img/br.svg'}}" alt="Brazilian Portuguese" class="inline w-4 h-4 mr-2"> Português
-            </a>
+        <div class="origin-top-right mt-2 rounded-md shadow-lg bg-dark ring-1 ring-black ring-opacity-5">
+            <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="languageMenuButton">
+                <a href="{{@site.url}}/es/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
+                    <img src="{{asset 'img/es.svg'}}" alt="Spanish" class="inline w-4 h-4 mr-2"> Español
+                </a>
+                <a href="{{@site.url}}/en/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
+                    <img src="{{asset 'img/en.svg'}}" alt="English" class="inline w-4 h-4 mr-2"> English
+                </a>
+                <a href="{{@site.url}}/br/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
+                    <img src="{{asset 'img/br.svg'}}" alt="Brazilian Portuguese" class="inline w-4 h-4 mr-2"> Brasil
+                </a>
+            </div>
         </div>
-    </div>
-</div>
-
-    {{navigation}}
-    
-    {{!-- <div class="">
-        {{navigation type="secondary"}}
-    </div> --}}
     </section>
+
+    <section id="nav" class="mb-6">
+        {{navigation}}
+    </section>
+
+    <div id="members" class="text-light">
+        {{#if @member}}
+        <div class="flex items-center gap-2">
+            <img src="{{@member.avatar}}" alt="{{@member.name}}" class="w-8 h-8 rounded-full">
+            <span>{{@member.name}}</span>
+        </div>
+        {{/if}}
+    </div>
 </aside>
+

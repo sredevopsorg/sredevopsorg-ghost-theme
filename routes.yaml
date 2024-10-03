@@ -17,7 +17,7 @@ collections:
   #   template: home
 
   /es/:
-    # template: home-
+    template: index
     permalink: /es/{slug}/
     filter: tag:es+tag:-en+tag:-br
     # order: published_at.asc
@@ -25,7 +25,7 @@ collections:
     # rss: true
 
   /en/:
-    # template: home-en
+    template: index
     permalink: /en/{slug}/
     filter: tag:en+tag:-es+tag:-br
     # order: published_at/.asc
@@ -33,7 +33,7 @@ collections:
     # rss: true
 
   /br/:
-    # template: home-br
+    template: index
     permalink: /br/{slug}/
     filter: tag:br+tag:-es+tag:-en
     # order: published_at.asc

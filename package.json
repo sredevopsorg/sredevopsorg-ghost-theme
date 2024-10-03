@@ -2,7 +2,7 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "A Ghost v5 Theme made for SREDevOps.org based on Tailwind CSS with sidebar navigation and dark theme by default",
     "demo": "https://sredevops.org",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "engines": {
         "ghost": ">=5.0.0"
     },
@@ -56,29 +56,32 @@
         "tailwindcss": "^3.4.13"
     },
     "browserslist": [
-        "defaults"
+    ">0.2%",
+    "not dead",
+    "not op_mini all",
+    "not IE 11"
     ],
     "config": {
-        "posts_per_page": 12,
+        "posts_per_page": 19,
         "card_assets": true,
         "image_sizes": {
             "xs": {
-                "width": 160
+                "width": 120
             },
             "s": {
-                "width": 320
+                "width": 220
             },
             "m": {
-                "width": 600
+                "width": 400
             },
             "l": {
-                "width": 960
+                "width": 600
             },
             "xl": {
-                "width": 1200
+                "width": 900
             },
             "xxl": {
-                "width": 2000
+                "width": 1000
             }
         }
     }
