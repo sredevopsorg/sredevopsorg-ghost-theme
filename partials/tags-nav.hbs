@@ -1,0 +1,18 @@
+
+<!-- Tag Navigation -->
+<div class="space-x-4 mb-6 overflow-x-scroll h-full flex">
+    <ul class="flex gap-4 items-center">
+        <span class="text-light">Tags:</span>
+        {{#get "tags" include="count.posts" order="count.posts desc" limit="50"}}
+            {{#foreach tags}}
+            <li class="text-center">
+                <a href="{{url}}" 
+                   class="px-4 py-2 rounded-2xl tag tag-{{id}} {{slug}} {{#has tag="slug"}}bg-highlight{{else}}bg-dark{{/has}} hover:bg-highlight transition-colors">
+                    {{name}} ({{count.posts}})
+                </a>
+            </li>
+            {{/foreach}}
+        {{/get}}
+    </ul>
+</div>
+

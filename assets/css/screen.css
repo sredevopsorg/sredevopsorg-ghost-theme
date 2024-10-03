@@ -223,164 +223,533 @@ p {
   @apply text-light;
 }
 
-/*** cards ******/
-.gh-viewport {
+.recommendation-favicon{
+  @apply w-12 h-12 float-left m-0;
+}
+
+/****************************************/
+/* 16. Cards
+/* ---------------------------------------------------------- */
+
+/* Add extra margin before/after any cards, except for when immediately preceeded by a heading */
+
+.gh-content :not(.kg-card):not(table):not([id])+ :is(.kg-card, table) {
+  margin-top: calc(48px * var(--content-spacing-factor, 1));
+}
+
+.gh-content :is(.kg-card, table)+ :not(.kg-card):not(table):not([id]) {
+  margin-top: calc(48px * var(--content-spacing-factor, 1));
+}
+
+.gh-content :not(.kg-card):not([id])+.kg-card.kg-width-full {
+  margin-top: calc(68px * var(--content-spacing-factor, 1));
+}
+
+.gh-content .kg-card.kg-width-full+ :not(.kg-card):not([id]) {
+  margin-top: calc(68px * var(--content-spacing-factor, 1));
+}
+
+/* Image */
+
+.kg-image {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* Embed */
+
+.kg-embed-card {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  position: relative;
+  align-items: center;
+  width: 100%;
 }
 
-.kg-bookmark-card,
-.kg-bookmark-card * {
-  box-sizing: border-box;
+/* Gallery */
+
+.kg-image[width][height],
+.kg-gallery-image {
+  cursor: pointer;
 }
 
-.kg-bookmark-card,
-.kg-bookmark-publisher {
-  position: relative
+.kg-image-card a:hover,
+.kg-gallery-image a:hover {
+  opacity: 1 !important;
 }
 
-#main>article>section>ul>li {
-  @apply text-light
+/* Toggle */
+
+.kg-card.kg-toggle-card .kg-toggle-heading-text {
+  font-size: 2rem;
+  font-weight: 700;
 }
 
-#content>ul>li::marker {}
+.has-serif-title .kg-toggle-card .kg-toggle-heading-text {
+    @apply font-serif;
+}
+
+.has-mono-title .kg-toggle-card .kg-toggle-heading-text {
+    @apply font-mono;
+}
+
+/* Callout */
+
+.kg-callout-card.kg-card {
+  border-radius: 0.25em;
+}
+
+.kg-callout-card-accent a {
+  text-decoration: underline;
+}
+
+/* Blockquote */
+
+blockquote:not([class]) {
+  padding-left: 2rem;
+  border-left: 4px solid var(--ghost-accent-color);
+}
+
+blockquote.kg-blockquote-alt {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--color-secondary-text);
+}
+
+/* Button */
+
+.kg-card.kg-button-card .kg-btn {
+  height: unset;
+  padding: .6em 1.2em;
+  text-align: center;
+  font-size: 1em;
+  line-height: 1.2em;
+}
+
+/* Header */
+
+.has-serif-title .kg-card.kg-header-card h2.kg-header-card-header {
+    @apply font-serif;
+}
+
+.has-mono-title .kg-card.kg-header-card h2.kg-header-card-header {
+    @apply font-mono;
+}
+
+.has-serif-body .kg-header-card h3.kg-header-card-subheader {
+    @apply font-serif;
+}
+
+/* Bookmark */
+
+.kg-bookmark-card .kg-bookmark-container {
+  border-radius: 0.25em !important;
+}
+
+.kg-bookmark-card .kg-bookmark-container:hover {
+  opacity: 1;
+}
 
 .kg-bookmark-card a.kg-bookmark-container,
 .kg-bookmark-card a.kg-bookmark-container:hover {
-  text-decoration: none;
-  display: flex;
-  border-radius: 6px;
-  border: 1px solid #212121 !important;
-  overflow: hidden;
-  color: #fff;
-  background: #212121 !important;
-}
+    @apply bg-dark text-lighter;
+    background: #212121!important;
 
-.kg-bookmark-content {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  flex-basis: 100%;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: 20px;
-  overflow: hidden;
-  color: #f0f0f0 !important;
-}
-
-.kg-bookmark-title {
-  font-size: 15px;
-  line-height: 1.4em;
-  font-weight: 600;
-  color: #f0f0f0;
-}
-
-.kg-bookmark-description {
-  display: -webkit-box;
-  font-size: 14px;
-  line-height: 1.5em;
-  margin-top: 3px;
-  font-weight: 400;
-  max-height: 44px;
-  overflow-y: hidden;
-  opacity: .7;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  line-clamp: 5;
-  overflow: scroll;
-  text-overflow: ellipsis;
-  text-wrap: stable;
 
 }
 
-.kg-bookmark-metadata {
-  display: flex;
-  align-items: center;
-  margin-top: 22px;
-  width: 100%;
-  font-size: 14px;
-  font-weight: 500;
+.kg-bookmark-card .kg-bookmark-content {
+  padding: 1.15em;
 }
 
-.kg-bookmark-metadata>:not(img) {
-  opacity: .7
+.kg-bookmark-card .kg-bookmark-title {
+  font-size: 0.9em;
 }
 
-.kg-bookmark-icon {
-  width: 20px;
-  height: 20px;
+.kg-bookmark-card .kg-bookmark-description {
+  max-height: none;
+  margin-top: 0.3em;
+  font-size: 0.8em;
+}
+
+.kg-bookmark-card .kg-bookmark-metadata {
+  font-size: 0.8em;
+}
+
+.kg-bookmark-card .kg-bookmark-thumbnail img {
+  border-radius: 0 0.2em 0.2em 0;
+}
+
+/* Product */
+
+.kg-product-card.kg-card .kg-product-card-image {
+  margin-bottom: 12px;
+}
+
+.kg-product-card.kg-card a.kg-product-card-button {
+  height: 2.8em;
+  margin-top: 12px;
+}
+
+.has-serif-title .kg-product-card.kg-card .kg-product-card-title {
+    @apply font-serif;
+}
+
+.has-mono-title .kg-product-card.kg-card .kg-product-card-title {
+    @apply font-mono;
+}
+
+.has-serif-body .kg-product-card-description :is(p, ul, ol) {
+  font-family: var(--font-serif-alt);
+}
+
+/* File */
+
+.kg-file-card.kg-card .kg-file-card-container {
+  padding: 0.6em;
+}
+
+.kg-file-card.kg-card .kg-file-card-contents {
+  margin: 4px 8px 6px;
+}
+
+.kg-file-card.kg-card .kg-file-card-metadata {
+  font-size: 0.9em;
+}
+
+.kg-file-card.kg-card .kg-file-card-filesize::before {
   margin-right: 6px;
-  @apply float-left;
+  margin-left: 6px;
 }
 
-.kg-bookmark-author {
-  display: inline
-}
-
-.kg-bookmark-publisher {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 240px;
-  display: block;
-  line-height: 1.65em
-}
-
-.kg-bookmark-metadata>span:nth-of-type(2) {
-  font-weight: 400
-}
-
-.kg-bookmark-metadata>span:nth-of-type(2):before {
-  content: "•";
-  margin: 0 6px
-}
-
-.kg-bookmark-metadata>span:last-of-type {
-  overflow: hidden;
-  text-overflow: ellipsis
-}
-
-.kg-bookmark-thumbnail {
-  position: relative;
-  flex-grow: 1;
-  min-width: 33%
-}
-
-.kg-bookmark-thumbnail img,
-.kg-collection-card-img img {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover
-}
-
-.kg-bookmark-thumbnail img {
-  top: 0;
-  left: 0;
-  border-radius: 0 2px 2px 0
-}
+/* Caption */
 
 figcaption {
-  @apply text-gray-400 text-center text-sm pl-4 pr-4 mb-4 pt-4 pb-4 italic;
+  @apply mt-3 text-sm text-light;
+  text-align: center;
 }
 
-code {
-  @apply font-mono bg-stone-700 text-pretty pr-1 pl-1 rounded-lg;
+.kg-card.kg-width-full figcaption {
+  padding: 0 16px;
 }
 
-.kg-card .kg-embed-card {
-  /* @apply w-min h-min */
+figcaption a {
+  text-decoration: underline;
 }
 
-.kg-card img {
-  /* margin-left:auto!important;
-  margin-right:auto!important; */
-  clear:both;
-  display:block;
+/* 17. Comments
+/* ---------------------------------------------------------- */
+
+.gh-comments {
+  margin-top: 48px;
 }
-#content>figure{
-  @apply mb-5
+
+/* ---------------------------------------------------------- */
+
+
+/* Tags Page */
+
+@media only screen and (min-width:48rem) {
+
+  .l-tags-container,
+  .recommendations {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 720px
+  }
+}
+
+@media only screen and (min-width:64rem) {
+
+  .l-tags-container,
+  .recommendations {
+    max-width: 1080px
+  }
+}
+
+.m-tag-card,
+.recommendation {
+  border: 0;
+  background-color: #212121;
+  border-radius: 10px;
+  height: 180px;
+  margin: 0 0 20px;
+  position: relative;
+  transition: all .25s cubic-bezier(.02, .01, .47, 1)
+}
+
+.m-tag-card:hover,
+.recommendation:hover {
+  background-color: #3f3f3f;
 
 }
-/** end cards ****/
+
+.m-tag-card:hover:before,
+.recommendation:hover:before {
+  box-shadow: var(--article-shadow-hover), 0 0 0 transparent
+}
+
+@media only screen and (min-width:48rem) {
+
+  .m-tag-card,
+  .recommendation {
+    margin: 0 20px 40px;
+    width: 320px
+  }
+}
+
+.m-tag-card:before,
+.recommendation:before {
+  border-radius: 10px;
+  bottom: 0;
+  box-shadow: var(--article-shadow-normal), 0 0 0 transparent;
+  content: "";
+  left: 10px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  transition: all .25s cubic-bezier(.02, .01, .47, 1);
+  z-index: 1
+}
+
+.m-tag-card__link,
+.recommendation__link {
+  background-color: #212121;
+  border-radius: 10px;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  z-index: 2
+}
+
+.m-tag-card__link.no-picture,
+.recommendation__link.no-picture {
+  background-color: var(--color-primary-background);
+}
+
+.m-tag-card__picture,
+.recommendation-favicon {
+  position: relative;
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  width: 75px;
+  height: 75px;
+
+
+}
+
+.recommendation-favicon {
+  position: relative;
+  z-index: 1;
+  top: 5px;
+  left: 5px;
+  max-width: 45px;
+  max-height: 45px;
+
+
+}
+
+.m-tag-card__info,
+.recommendation__description {
+  bottom: 15px;
+  color: #fff;
+  left: 15px;
+  position: absolute;
+  z-index: 2
+}
+
+.m-tag-card__info.no-picture {
+  color: var(--color-primary-text);
+}
+
+.m-tag-card__name,
+.recommendation__title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: .3px;
+  line-height: 1.3;
+  margin: 0 0 5px
+}
+
+.m-tag-card__description {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: .3px;
+  line-height: 0.2;
+}
+
+.m-tag-card__counter {
+  display: block;
+  font-size: 0.9rem;
+  letter-spacing: .2px
+}
+
+/* The Modal (background) */
+.modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 999;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.8);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.8);
+  /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: transparent;
+  margin: 15% auto;
+
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #3d3d3d;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ------------------------ Agolia search UI ------------------------ */
+
+#search_wrapper {
+  @apply fixed w-full h-screen left-0 top-0 backdrop-blur-sm flex justify-center z-[9999];
+}
+
+.agolia_modal_box {
+  background: var(--background-color);
+  @apply max-w-xl min-w-[90%] max-h-[80%] self-start mt-[10vmin] rounded-xl border-t border-gray-100 border-opacity-10;
+}
+
+.agolia_modal_box header {
+  @apply px-4 py-2 border-b border-gray-100 border-opacity-10;
+}
+
+.agolia_modal_box .agolia_search_hits {
+  @apply max-h-96 overflow-y-auto px-4 py-8;
+}
+
+.agolia_modal_box footer {
+  @apply flex justify-end border-t border-gray-100 border-opacity-10;
+}
+
+.agolia_modal_box footer .agolia_logo_wrapper {
+  @apply flex gap-x-3 items-center p-5;
+}
+
+.agolia_modal_box footer .agolia_logo_wrapper span {
+  @apply text-gray-500 text-[12px] font-mono block;
+}
+
+/* agolia css overwrite rules */
+
+.ais-SearchBox-form {
+  @apply w-full;
+}
+
+.ais-SearchBox-form input {
+  @apply w-full bg-transparent px-10 py-3 text-gray-50 outline-none;
+}
+
+.ais-SearchBox-submit {
+  @apply absolute left-2 top-1/2 -translate-y-1/2;
+}
+
+.ais-SearchBox-submitIcon {
+  @apply h-4 w-4 fill-slate-400;
+}
+
+.ais-SearchBox-reset {
+  @apply absolute right-2 top-1/2 -translate-y-1/2;
+}
+
+.ais-SearchBox-resetIcon {
+  @apply h-3 w-3 fill-slate-400;
+}
+
+.ais-Hits-list {
+  @apply flex flex-col gap-y-3;
+}
+
+.ais-Hits--empty {
+  @apply font-medium text-center text-slate-400;
+}
+
+.ais-Highlight-highlighted,
+.ais-Snippet-highlighted {
+  @apply bg-transparent text-white font-semibold;
+}
+
+/* agolia hit item template */
+.hit-item {
+  @apply flex flex-col cursor-pointer bg-[#e2e8f00d] p-3.5 rounded-lg;
+}
+
+.hit-title {
+  @apply font-medium flex items-center text-slate-400;
+}
+
+.hit-type {
+  @apply px-1.5 py-0.5 text-xs bg-[#fff3] rounded-md ml-3 capitalize;
+}
+
+.hit-description {
+  @apply mt-1 text-sm text-slate-400;
+}
+
+/* ------------------------ Page Recommends ------------------------ */
+ 
+.recommendations {
+
+}
+
+.recommendation {
+    @apply flex flex-col gap-y-3;
+}
+
+.recommendation-title {
+    @apply text-2xl font-medium;
+}
+
+.recommendation-favicon {
+    @apply w-10 h-10 align-top inline-block;
+}
+.recommendation-url {
+  @apply hidden;
+}
+
+.recommendation-url:hover {
+  @apply hidden;
+}
+
+#footer-navigation .nav-item .nav-link {
+  display: inline;
+  align-items: center;
+}
+
+
+.recommendation-description {
+    @apply text-xl font-light;
+}
