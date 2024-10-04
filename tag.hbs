@@ -58,13 +58,13 @@
             {{/if}}
 
             <!-- Page Numbers -->
-            {{#each pagination.pages as |page|}}
+            {{#foreach pagination.pages as |page|}}
             <li>
                 <a href="{{page_url page}}" class="px-3 py-1 rounded-lg {{#if page.current}}bg-highlight text-white{{else}}bg-dark text-light hover:bg-highlight hover:text-white{{/if}}">
                     {{page.number}}
                 </a>
             </li>
-            {{/each}}
+            {{/foreach}}
 
             <!-- Next Page Link -->
             {{#if pagination.next}}
