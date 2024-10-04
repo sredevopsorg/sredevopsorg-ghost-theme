@@ -1,4 +1,3 @@
-        <script>
         /* Set the language attribute on the HTML element based on the subpath of the URL
         This script will set the language attribute on the HTML element based on the subpath of the URL
         */
@@ -20,4 +19,3 @@
 
             document.querySelector('html').setAttribute('lang', lang);
         });
-        </script>
