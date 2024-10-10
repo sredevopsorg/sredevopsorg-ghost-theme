@@ -110,10 +110,10 @@ table thead {
 
 table th {
 
-  @apply text-light;
-  padding-left: 1.5rem;
+  @apply text-light px-1;
+  /* padding-left: 1.5rem; */
   /* px-6 */
-  padding-right: 1.5rem;
+  /* padding-right: 1.5rem; */
   /* px-6 */
   padding-top: 1rem;
   /* py-4 */
@@ -191,7 +191,7 @@ p {
   @apply text-4xl mb-2;
   font-weight: 500;
   line-height: 2;
-  text-align: left;
+  text-align: center;
 
 }
 
@@ -355,6 +355,7 @@ blockquote.kg-blockquote-alt {
 
 .kg-bookmark-card .kg-bookmark-container {
   border-radius: 0.25em !important;
+  @apply text-light
 }
 
 .kg-bookmark-card .kg-bookmark-container:hover {
@@ -365,6 +366,7 @@ blockquote.kg-blockquote-alt {
 .kg-bookmark-card a.kg-bookmark-container:hover {
     @apply bg-dark text-lighter;
     background: #212121!important;
+    color: #fefefe!important;
 
 
 }

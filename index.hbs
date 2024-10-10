@@ -8,8 +8,8 @@
             
             <a href="{{url absolute="true"}}" alt="{{title}}">
             <img alt="{{title}}"
-                src="{{feature_image}}"
-                class="h-56 w-full object-cover" loading="lazy" />
+                src="{{img_url feature_image absolute size="xs" format="webp"}}"
+                class="h-56 w-full object-cover" {{#is "paged, tag"}} loading="lazy"{{/is}} />
             </a>
 
             <div class="p-4 sm:p-6">
@@ -20,13 +20,12 @@
                 </a>
 
                 <p class="mt-2 line-clamp-3 text-sm text-light">
-                    {{excerpt words="240"}}
+                    {{excerpt words="260"}}
                 </p>
 
                 <a href="{{url absolute="true"}}" class="group mt-4 inline-flex items-center gap-1 text-sm font-medium">
-                    {{t "Read full text"}}
                     <span aria-hidden="true" class="block transition-all group-hover:ms-0.5">
-                        &rarr;
+                        Full post &rarr;
                     </span>
                 </a>
             </div>
@@ -40,23 +39,15 @@
             <!-- Previous Page Link -->
             {{#if pagination.prev}}
             <li>
-                <a href="{{page_url pagination.prev}}" class="text-light hover:text-highlight px-3 py-1 rounded-lg bg-dark">Previous</a>
+                <a href="{{page_url pagination.prev}}" class="text-light hover:text-highlight px-3 py-1 rounded-lg bg-dark">&larr; Newer Posts</a>
             </li>
             {{/if}}
 
-            <!-- Page Numbers -->
-            {{#foreach pagination.pages as |page|}}
-            <li>
-                <a href="{{page_url page}}" class="px-3 py-1 rounded-lg {{#if page.current}}bg-highlight text-white{{else}}bg-dark text-light hover:bg-highlight hover:text-white{{/if}}">
-                    {{page.number}}
-                </a>
-            </li>
-            {{/foreach}}
-
+ 
             <!-- Next Page Link -->
             {{#if pagination.next}}
             <li>
-                <a href="{{page_url pagination.next}}" class="text-light hover:text-highlight px-3 py-1 rounded-lg bg-dark">Next</a>
+                <a href="{{page_url pagination.next}}" class="text-light hover:text-highlight px-3 py-1 rounded-lg bg-dark">Older posts &rarr;</a>
             </li>
             {{/if}}
         </ul>

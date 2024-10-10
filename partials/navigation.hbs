@@ -1,13 +1,12 @@
 {{#if isSecondary}}
-    <ul class="nav" role="menu">
+    <ul class="nav space-y-1" role="menu">
         {{#foreach navigation}}
-            <li class="nav-{{slug}}" role="menuitem">
-                <a href="{{url}}">
-                    <svg class="icon" role="img" aria-label="{{slug}}">
-                        <title>{{slug}}</title>
-                        <use xlink:href="#{{slug}}"></use>
-                    </svg>
-                </a>
+            <li class="{{link_class for=(url) class=(concat "nav-"slug)}} flex items-center gap-2 rounded-lg px-4 py-2 text-light hover:text-lighter hover:bg-dark" role="menuitem">
+                <!-- SVG icon to the left of the navigation item -->
+                <svg class="h-5 w-5 text-light" role="img" aria-label="{{label}}">
+                    <use xlink:href="{{concat '#icon-' slug}}"></use>
+                </svg>
+                <a href="{{url absolute="true"}}" class="text-light hover:text-lighter">{{label}}</a>
             </li>
         {{/foreach}}
     </ul>
