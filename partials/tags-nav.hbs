@@ -1,7 +1,7 @@
 
 <!-- Tag Navigation -->
-<div class="space-x-4 mb-6 overflow-x-scroll h-full flex">
-    <ul class="flex gap-4 items-center">
+<div class="flex h-full mb-6 overflow-x-scroll space-x-4">
+    <ul class="flex items-center gap-4">
         <span class="text-light">Tags:</span>
         {{#get "tags" include="count.posts" order="count.posts desc" limit="50"}}
             {{#foreach tags}}

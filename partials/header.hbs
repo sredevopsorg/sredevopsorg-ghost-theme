@@ -1,6 +1,6 @@
 {{> "algolia" }}
-<header class="md:hidden p-4 bg-darker flex justify-between items-center sticky top-0 z-20">
-    <div class="text-lighter text-lg font-bold"><a href="{{@site.url}}">{{@site.title}}</a></div>
+<header class="sticky top-0 z-20 flex items-center justify-between p-4 md:hidden bg-darker">
+    <div class="text-lg font-bold text-lighter"><a href="{{@site.url}}">{{@site.title}}</a></div>
     <button id="menuButton" class="text-lighter focus:outline-none" onclick="toggleSidebar()" aria-label="Open sidebar menu">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
@@ -8,31 +8,31 @@
     </button>
 </header>
 
-<div id="overlay" class="fixed inset-0 bg-black opacity-50 hidden" onclick="toggleSidebar()"></div>
+<div id="overlay" class="fixed inset-0 hidden bg-black opacity-50" onclick="toggleSidebar()"></div>
 
-<aside id="sidebar" class="w-64 bg-darker h-screen p-6 fixed md:block hidden z-10 transform md:translate-x-0 -translate-x-full transition-transform duration-300 overflow-y-scroll">
+<aside id="sidebar" class="fixed z-10 hidden w-64 h-screen p-6 overflow-y-scroll bg-darker md:block transform md:translate-x-0 -translate-x-full transition-transform duration-300">
     <div id="logo" class="mb-6">
         {{#if @site.logo}}
         <a class="logo" href="{{@site.url}}">
             <img src="{{@site.logo}}" alt="{{@site.title}}" class="w-full h-auto" loading="lazy">
         </a>
         {{else}}
-        <div class="text-lighter text-lg font-bold">{{@site.title}}</div>
+        <div class="text-lg font-bold text-lighter">{{@site.title}}</div>
         {{/if}}
     </div>
 
     <section class="mb-6">
-        <button type="button" class="inline-flex justify-between w-full rounded-md border border-dark px-4 py-2 bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
+        <button type="button" class="inline-flex justify-between w-full px-4 py-2 border rounded-md border-dark bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
                             <!-- SVG icon to the left of the navigation item -->
-                <svg class="h-5 w-5 text-light" role="img" aria-label="{{label}}">
+                <svg class="w-5 h-5 text-light" role="img" aria-label="{{label}}">
                     <use xlink:href="#icon-i18n"></use>
                 </svg>Languages
-            <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <svg class="w-5 h-5 ml-2 -mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
         </button>
 
-        <div class="origin-top-right mt-2 rounded-md shadow-lg bg-dark ring-1 ring-black ring-opacity-5">
+        <div class="mt-2 shadow-lg origin-top-right rounded-md bg-dark ring-1 ring-black ring-opacity-5">
             <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="languageMenuButton">
                 <a href="{{@site.url}}/es/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
                     Español

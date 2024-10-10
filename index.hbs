@@ -1,15 +1,15 @@
 {{!< default}}
-<main id="main" class="container mx-auto md:pl-64 pt-6 pb-6 overflow-y-scroll overflow-x-scroll">
+<main id="main" class="container pt-6 pb-6 mx-auto overflow-x-scroll overflow-y-scroll md:pl-64">
 {{> "tags-nav" }}
     <!-- Post Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {{#foreach posts}}
-        <article class="overflow-hidden rounded-lg border border-dark bg-dark shadow-sm shadow-dark-700/25">
+        <article class="overflow-hidden border rounded-lg border-dark bg-dark shadow-sm shadow-dark-700/25">
             
             <a href="{{url absolute="true"}}" alt="{{title}}">
             <img alt="{{title}}"
                 src="{{img_url feature_image absolute size="xs" format="webp"}}"
-                class="h-56 w-full object-cover" {{#is "paged, tag"}} loading="lazy"{{/is}} />
+                class="object-cover w-full h-56" {{#is "paged, tag"}} loading="lazy"{{/is}} />
             </a>
 
             <div class="p-4 sm:p-6">
@@ -19,11 +19,11 @@
                     </h3>
                 </a>
 
-                <p class="mt-2 line-clamp-3 text-sm text-light">
+                <p class="mt-2 text-sm line-clamp-3 text-light">
                     {{excerpt words="260"}}
                 </p>
 
-                <a href="{{url absolute="true"}}" class="group mt-4 inline-flex items-center gap-1 text-sm font-medium">
+                <a href="{{url absolute="true"}}" class="inline-flex items-center mt-4 text-sm font-medium group gap-1">
                     <span aria-hidden="true" class="block transition-all group-hover:ms-0.5">
                         Full post &rarr;
                     </span>
@@ -34,12 +34,12 @@
     </div>
 
     <!-- Pagination -->
-    <div class="pagination flex justify-center mt-6">
-        <ul class="flex space-x-4 items-center">
+    <div class="flex justify-center mt-6 pagination">
+        <ul class="flex items-center space-x-4">
             <!-- Previous Page Link -->
             {{#if pagination.prev}}
             <li>
-                <a href="{{page_url pagination.prev}}" class="text-light hover:text-highlight px-3 py-1 rounded-lg bg-dark">&larr; Newer Posts</a>
+                <a href="{{page_url pagination.prev}}" class="px-3 py-1 rounded-lg text-light hover:text-highlight bg-dark">&larr; Newer Posts</a>
             </li>
             {{/if}}
 
@@ -47,7 +47,7 @@
             <!-- Next Page Link -->
             {{#if pagination.next}}
             <li>
-                <a href="{{page_url pagination.next}}" class="text-light hover:text-highlight px-3 py-1 rounded-lg bg-dark">Older posts &rarr;</a>
+                <a href="{{page_url pagination.next}}" class="px-3 py-1 rounded-lg text-light hover:text-highlight bg-dark">Older posts &rarr;</a>
             </li>
             {{/if}}
         </ul>

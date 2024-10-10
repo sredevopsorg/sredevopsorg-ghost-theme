@@ -6,7 +6,7 @@
   @apply w-64 bg-darker h-screen p-6 fixed md:block hidden z-10 transform md:translate-x-0 -translate-x-full transition-transform duration-300 overflow-y-scroll
 } */
 #logo {
-  @apply align-middle mt-4 mb-4;
+  @apply mt-4 mb-4 align-middle;
 }
 
 #svg {
@@ -44,19 +44,19 @@ a:hover h3 {
 }
 
 ::-webkit-scrollbar {
-  @apply bg-darker w-2 h-2;
+  @apply w-2 h-2 bg-darker;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-dark w-2;
+  @apply w-2 bg-dark;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-dark w-2;
+  @apply w-2 bg-dark;
 }
 
 /* ul,li{
-  @apply list-outside list-disc;
+  @apply list-disc list-outside;
 } */
 
 
@@ -66,7 +66,7 @@ a:hover h3 {
 #main h4,
 #main h5 {
   font-weight: 500;
-  @apply text-lighter font-sans;
+  @apply font-sans text-lighter;
 }
 
 p {
@@ -79,7 +79,7 @@ p {
 }
 
 #id {
-  @apply grid grid-cols-10 mt-10 md:pt-10 max-w-full;
+  @apply grid max-w-full grid-cols-10 mt-10 md:pt-10;
 
 }
 
@@ -95,7 +95,7 @@ p {
   min-width: 75%;
 }
 .post-content{
-  @apply container mx-auto p-6 md:ml-64 md:px-32 md:py-12;
+  @apply container p-6 mx-auto md:ml-64 md:px-32 md:py-12;
 }
 
 /* Table head */
@@ -110,7 +110,7 @@ table thead {
 
 table th {
 
-  @apply text-light px-1;
+  @apply px-1 text-light;
   /* padding-left: 1.5rem; */
   /* px-6 */
   /* padding-right: 1.5rem; */
@@ -198,7 +198,7 @@ p {
 }
 
 #content h1 {
-  @apply text-4xl mb-2;
+  @apply mb-2 text-4xl;
   font-weight: 500;
   line-height: 2;
   text-align: center;
@@ -206,7 +206,7 @@ p {
 }
 
 #content h2 {
-  @apply text-2xl mb-2;
+  @apply mb-2 text-2xl;
   font-weight: 500;
   line-height: 1, 5;
   text-align: left;
@@ -245,7 +245,7 @@ p {
 }
 
 .recommendation-favicon{
-  @apply w-12 h-12 float-left m-0;
+  @apply float-left w-12 h-12 m-0;
 }
 
 /****************************************/
@@ -671,7 +671,7 @@ figcaption a {
 }
 
 .agolia_modal_box .agolia_search_hits {
-  @apply max-h-96 overflow-y-auto px-4 py-8;
+  @apply px-4 py-8 overflow-y-auto max-h-96;
 }
 
 .agolia_modal_box footer {
@@ -679,7 +679,7 @@ figcaption a {
 }
 
 .agolia_modal_box footer .agolia_logo_wrapper {
-  @apply flex gap-x-3 items-center p-5;
+  @apply flex items-center p-5 gap-x-3;
 }
 
 .agolia_modal_box footer .agolia_logo_wrapper span {
@@ -693,23 +693,23 @@ figcaption a {
 }
 
 .ais-SearchBox-form input {
-  @apply w-full bg-transparent px-10 py-3 text-gray-50 outline-none;
+  @apply w-full px-10 py-3 bg-transparent outline-none text-gray-50;
 }
 
 .ais-SearchBox-submit {
-  @apply absolute left-2 top-1/2 -translate-y-1/2;
+  @apply absolute -translate-y-1/2 left-2 top-1/2;
 }
 
 .ais-SearchBox-submitIcon {
-  @apply h-4 w-4 fill-slate-400;
+  @apply w-4 h-4 fill-slate-400;
 }
 
 .ais-SearchBox-reset {
-  @apply absolute right-2 top-1/2 -translate-y-1/2;
+  @apply absolute -translate-y-1/2 right-2 top-1/2;
 }
 
 .ais-SearchBox-resetIcon {
-  @apply h-3 w-3 fill-slate-400;
+  @apply w-3 h-3 fill-slate-400;
 }
 
 .ais-Hits-list {
@@ -722,7 +722,7 @@ figcaption a {
 
 .ais-Highlight-highlighted,
 .ais-Snippet-highlighted {
-  @apply bg-transparent text-white font-semibold;
+  @apply font-semibold text-white bg-transparent;
 }
 
 /* agolia hit item template */
@@ -731,7 +731,7 @@ figcaption a {
 }
 
 .hit-title {
-  @apply font-medium flex items-center text-slate-400;
+  @apply flex items-center font-medium text-slate-400;
 }
 
 .hit-type {
@@ -753,11 +753,11 @@ figcaption a {
 }
 
 .recommendation-title {
-    @apply text-xl font-medium p-2;
+    @apply p-2 text-xl font-medium;
 }
 
 .recommendation-favicon {
-    @apply w-10 h-10 align-top inline-block mr-2;
+    @apply inline-block w-10 h-10 mr-2 align-top;
 }
 .recommendation-url {
   @apply hidden;
@@ -774,5 +774,5 @@ figcaption a {
 
 
 .recommendation-description {
-    @apply text-sm font-light pl-2 pr-2 mb-1;
+    @apply pl-2 pr-2 mb-1 text-sm font-light;
 }

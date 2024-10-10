@@ -1,7 +1,7 @@
-<footer class="text-center text-light container md:ml-64 mx-auto py-4 bg-darker">
+<footer class="container py-4 mx-auto text-center text-light md:ml-64 bg-darker">
     <!-- Footer Copyleft Section -->
-    <div class="flex items-center justify-center space-x-1 text-sm">
-        <svg class="h-5 w-5 text-lighter" role="img">
+    <div class="flex items-center justify-center text-sm space-x-1">
+        <svg class="w-5 h-5 text-lighter" role="img">
             <use xlink:href="#icon-copyleft"></use>
         </svg>
         <span>Copyleft <a href="{{@site.url}}" rel="me" class="underline hover:text-highlight">{{@site.title}}</a> {{date format="YYYY"}}</span>
@@ -9,7 +9,7 @@
 
     <!-- Footer Navigation -->
     <section id="footer-nav" class="mt-4 mb-6">
-        <nav class="flex flex-col justify-center gap-1 text-xs text-light">
+        <nav class="flex flex-col justify-center text-xs gap-1 text-light">
             {{navigation type="secondary"}}
         </nav>
     </section>

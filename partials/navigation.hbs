@@ -1,9 +1,9 @@
 {{#if isSecondary}}
-    <ul class="flex flex-wrap justify-center space-x-4 text-sm" role="menu">
+    <ul class="flex flex-wrap justify-center text-sm space-x-4" role="menu">
         {{#foreach navigation}}
-            <li class="flex items-center gap-2 rounded-lg px-4 py-2 hover:text-lighter hover:bg-dark" role="menuitem">
+            <li class="flex items-center px-4 py-2 rounded-lg gap-2 hover:text-lighter hover:bg-dark" role="menuitem">
                 <!-- SVG icon to the left of the navigation item -->
-                <svg class="h-5 w-5 text-light" role="img" aria-label="{{label}}">
+                <svg class="w-5 h-5 text-light" role="img" aria-label="{{label}}">
                     <use xlink:href="{{concat '#icon-' slug}}"></use>
                 </svg>
                 <a href="{{url absolute="true"}}" class="text-light hover:text-lighter">{{label}}</a>
@@ -15,7 +15,7 @@
         {{#foreach navigation}}
             <li class="{{link_class for=(url) class=(concat "nav-"slug)}} flex items-center gap-2 rounded-lg px-4 py-2 text-light hover:text-lighter hover:bg-dark" role="menuitem">
                 <!-- SVG icon to the left of the navigation item -->
-                <svg class="h-5 w-5 text-light" role="img" aria-label="{{label}}">
+                <svg class="w-5 h-5 text-light" role="img" aria-label="{{label}}">
                     <use xlink:href="{{concat '#icon-' slug}}"></use>
                 </svg>
                 <a href="{{url absolute="true"}}" class="text-light hover:text-lighter">{{label}}</a>
