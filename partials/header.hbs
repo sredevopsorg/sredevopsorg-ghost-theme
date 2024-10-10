@@ -23,7 +23,10 @@
 
     <section class="mb-6">
         <button type="button" class="inline-flex justify-between w-full rounded-md border border-dark px-4 py-2 bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
-            Select Language
+                            <!-- SVG icon to the left of the navigation item -->
+                <svg class="h-5 w-5 text-light" role="img" aria-label="{{label}}">
+                    <use xlink:href="#icon-i18n"></use>
+                </svg>Languages
             <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
@@ -32,31 +35,34 @@
         <div class="origin-top-right mt-2 rounded-md shadow-lg bg-dark ring-1 ring-black ring-opacity-5">
             <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="languageMenuButton">
                 <a href="{{@site.url}}/es/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                    <img src="{{asset 'img/es.svg'}}" alt="Spanish" class="inline w-4 h-4 mr-2"> Español
+                    Español
                 </a>
                 <a href="{{@site.url}}/en/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                    <img src="{{asset 'img/en.svg'}}" alt="English" class="inline w-4 h-4 mr-2"> English
+                    English
                 </a>
                 <a href="{{@site.url}}/br/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                    <img src="{{asset 'img/br.svg'}}" alt="Brazilian Portuguese" class="inline w-4 h-4 mr-2"> Brasil
+                    Brasil
                 </a>
             </div>
         </div>
     </section>
 
+    <button class="block mb-2 w-full rounded-full bg-dark text-lighter shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-highlight hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-highlight focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-highlight active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0" aria-label="Search in SREDevOps.org" onclick="openModal(search.start());" oninput="openModal();" onkeypress="openModal();" rel="search">
+        Search 
+    </button>
+
     <section id="nav" class="mb-6">
         {{navigation}}
     </section>
-    <button class="block w-full rounded-full bg-violet-500 text-neutral-50 shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-violet-600 hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-violet-800 focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-violet-700 active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0" aria-label="Search in SREDevOps.org" onclick="openModal(search.start());" oninput="openModal();" onkeypress="openModal();" rel="search">
-        Search
-    </button>
-    <div id="members" class="text-light">
+    <section id="members" class="text-light">
+        {{> "social-sso"}}
         {{#if @member}}
         <div class="flex items-center gap-2">
             <img src="{{@member.avatar}}" alt="{{@member.name}}" class="w-8 h-8 rounded-full">
             <span>{{@member.name}}</span>
         </div>
+        {{else}}
         {{/if}}
-    </div>
+    </section>
 </aside>
 

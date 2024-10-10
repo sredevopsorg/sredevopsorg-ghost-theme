@@ -1,28 +1,17 @@
 {{!< default}}
 
-{{#post}}
-<main id="main">
+<main id="main post-wrapper">
 
-<article class="container md:ml-32 p-6 md:pl-32">
+  {{#post}}
+ 
 
-<section class="py-0 md:py-0">
-    <div class="px-4">
 
-        <!-- Post Content -->
-            {{#if @page.show_title_and_feature_image}}
-                <!-- Page Title -->
-                <h1 class="text-[32px] font-light md:text-[45px] leading-tight">
-                    {{title}}
-                </h1>
-
-                <!-- Custom Excerpt -->
-                {{#if custom_excerpt}}
-                <p class="gh-article-excerpt text-lg text-light mt-4 mb-6">
-                    {{custom_excerpt}}
-                </p>
-                {{/if}}
-
-                <!-- Feature Image -->
+  <!-- Post Content Section -->
+  <article class="post-content prose-invert prose-lg max-w-full text-light mx-auto px-4 md:px-32">
+    <section class="post-meta text-center mb-8">
+                 {{#if @page.show_title_and_feature_image}}
+ <h1 class="text-4xl md:text-5xl font-bold leading-tight">{{title}}</h1>
+                      <!-- Feature Image -->
                 {{#if feature_image}}
                 <picture>
                     <source 
@@ -43,16 +32,18 @@
                     <img src="{{img_url feature_image}}" alt="{{title}} feature image" class="mb-8 w-full object-cover" loading="lazy">
                 </picture>
                 {{/if}}
-            {{/if}}
 
-            <!-- Main Content -->
+    </section>
+ {{/if}}
 
-        <div id="content" class="mt-8">
-            {{content}}
-        </div>
-    </div>
-</section>
+    <!-- Main Post Content -->
+    <section>
+      {{{content}}}
+    </section>
 
-</article>
+  </article>
+
+  {{/post}}
+
 </main>
-{{/post}}
+

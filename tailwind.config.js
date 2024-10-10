@@ -13,7 +13,7 @@ module.exports = {
         dark: "#212121", // Secondary background
         lighter: "#fefefe", // Main texts, links, headings
         light: "#C2C2C2", // Contents, body, text
-        highlight: "#600ba0",
+        highlight: "#600ba0"
       },
     },
   },
