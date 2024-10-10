@@ -55,13 +55,13 @@
         {{navigation}}
     </section>
     <section id="members" class="text-light">
-        {{> "social-sso"}}
         {{#if @member}}
         <div class="flex items-center gap-2">
             <img src="{{@member.avatar}}" alt="{{@member.name}}" class="w-8 h-8 rounded-full">
             <span>{{@member.name}}</span>
         </div>
         {{else}}
+        {{> "social-sso"}}
         {{/if}}
     </section>
 </aside>

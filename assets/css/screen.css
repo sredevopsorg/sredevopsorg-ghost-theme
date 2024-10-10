@@ -145,6 +145,16 @@ table tbody td {
 
 /********** end table ************/
 
+article:hover {
+  animation: border-animation 1s infinite;
+}
+
+@keyframes border-animation {
+  0% { border-color: transparent; }
+  50% { border-color: var(--ghost-accent-color) }
+  100% { border-color: transparent; }
+}
+
 /* Paragraph */
 section p,
 p {
