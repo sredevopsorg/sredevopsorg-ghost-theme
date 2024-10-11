@@ -25,7 +25,7 @@ h1,
 h2,
 h3,
 h3 {
-  @apply text-light;
+  @apply text-lighter;
 }
 #main #post-wrapper {
 
@@ -151,7 +151,7 @@ article:hover {
 
 @keyframes border-animation {
   0% { border-color: transparent; }
-  50% { border-color: var(--ghost-accent-color) }
+  50% { border-block-start-color: #630ef1; border-block-end-color: purple; }
   100% { border-color: transparent; }
 }
 
