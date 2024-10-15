@@ -4,7 +4,7 @@ module.exports = {
     "./*.hbs",
     "./**/*.hbs",
     "./assets/js/*.js",
-    "./node_modules/**/*.bhs",
+    "./node_modules/**/*.hbs",
   ],
   theme: {
     extend: {

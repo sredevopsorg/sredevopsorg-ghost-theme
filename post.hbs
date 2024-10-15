@@ -3,39 +3,43 @@
 <main id="main post-wrapper">
 
   {{#post}}
-  <!-- Hero Section with Feature Image -->
-
-
-
-
   <!-- Post Content Section -->
-  <article class="max-w-full px-4 mx-auto post-content prose-invert prose-lg text-light md:px-32">
-      <h1 class="text-4xl font-bold leading-tight md:text-5xl">{{title}}</h1>
+  <article class="max-w-full px-4 mx-auto prose-lg post-content prose-invert text-light md:px-32">
+    {{#is "page"}}
+      {{#if @page.show_title_and_feature_image}}
+        <h1 class="text-4xl">{{title}}</h1>
+        <div class="items-center mx-auto">
+          {{> "feature-image"}}
+        </div>
+      {{/if}}
+    {{/is}}
+
+    {{#is "post"}}
+    <h1 class="text-4xl">{{title}}</h1>
     <section class="mb-8 text-center post-meta">
-      <div class="mb-2 text-sm text-light">
+      {{> "feature-image" }}
+      <div class="mb-2 text-xs text-light">
         {{#foreach authors}}
-          <a href="{{url}}" class="hover:underline">{{name}}</a> 
-        {{/foreach}} 
-        • {{date published_at format="MMMM D, YYYY"}}
+          Author: <a href="{{url}}" class="hover:underline" rel="author" >{{name}}</a> 
+        {{/foreach}} | {{date published_at format="D MMMM YYYY"}}
       </div>
-      {{#if tags}}
-        <div class="tags space-x-2">
+        <div class="space-x-2 tags">
           {{#foreach tags}}
             <a href="{{url}}" class="px-2 py-1 text-sm rounded bg-dark hover:bg-highlight">{{name}}</a>
           {{/foreach}}
         </div>
-      {{/if}}
+    {{/is}}
     </section>
 
     <!-- Main Post Content -->
     <section>
       {{{content}}}
     </section>
-
+    {{#is "post"}}
     <!-- Author Box -->
     <section class="flex items-center mt-12 author-box">
       {{#foreach authors}}
-      <div class="flex items-center author space-x-4">
+      <div class="flex items-center space-x-4 author">
         <img src="{{img_url profile_image size="s" format="webp"}}" alt="{{name}}" class="w-12 h-12 rounded-full">
         <div>
           <h3 class="text-lg font-bold">{{name}}</h3>
@@ -44,6 +48,19 @@
       </div>
       {{/foreach}}
     </section>
+    <section id="comments">
+        {{#if comments}}
+        <div class="gh-comments gh-canvas">
+            {{#if @member}}
+                {{comments count=false mode=dark title="Opinions?"}}
+            {{else}}
+            {{> "social-sso"}}
+            {{comments count=false mode=dark title=" "}}
+            {{/if}}
+        </div>
+        {{/if}}
+    </section>
+    {{/is}}
   </article>
 
   {{/post}}

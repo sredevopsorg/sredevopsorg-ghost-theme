@@ -1,28 +1,30 @@
 <!DOCTYPE html>
-<html lang="{{@site.locale}}" data-types="dark">
+<html lang="{{@site.locale}}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{meta_title}}</title>
+    {{#is "home"}}
+    <link rel="alternate" hreflang="pt-BR" href="{{@site.url}}/br/" />
+    <link rel="alternate" hreflang="en" href="{{@site.url}}/en/" />
+    <link rel="alternate" hreflang="es" href="{{@site.url}}/es/" />
+    <link rel="alternate" hreflang="x-default" href="{{@site.url}}" />
+    {{/is}}
 
-    <!-- Preconnect and Preload Fonts -->
-    {{!-- <link rel="preload" as="font" type="font/woff2" href="{{asset "fonts/NotoSans.woff2"}}">
-    <link rel="preload" href="{{asset "built/noto.css"}}" as="style"> --}}
+    {{> "typography/noto"}}
 
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
-    <link rel="stylesheet" href="{{asset "built/noto.css"}}">
-
 
     {{> "icons"}}
 
-    {{#is "post"}}
+    {{#is "post, page"}}
     <link rel="stylesheet" href="{{asset "built/prism.css"}}">
     {{/is}}
 
     {{ghost_head}}
 </head>
 
-<body class="{{body_class}} bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-darker via-dark to-black">
+<body class="{{body_class}} bg-gradient-to-r from-darker via-darker to-dark">
 
     {{!-- Header --}}
     {{> header}}

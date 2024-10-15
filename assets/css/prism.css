@@ -444,7 +444,8 @@ pre[class*="language-"] {
 
 :not(pre)>code[class*="language-"],
 pre[class*="language-"] {
-  background: #282a36;
+  /* background: #282a36; */
+  @apply bg-darker;
   /* Background color */
 }
 

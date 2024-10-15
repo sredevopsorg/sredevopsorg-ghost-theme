@@ -1,6 +1,8 @@
 name: deploy-theme
 on:
   workflow_dispatch:
+permissions:
+  contents: read 
 jobs: 
   deploy:
     runs-on: ubuntu-latest
@@ -15,10 +17,10 @@ jobs:
         name: Checkout Repository
       
       - name: Deploy Ghost Theme to website
-        uses: TryGhost/action-deploy-theme@a0ee1147d15641db25681e54549c4db9a53c2629 # v1.6.6
+        uses: sredevopsorg/action-deploy-theme@68d7b0f98e20212068a39ea90c0f84ce4ab770a8 # v1.7.3  
         continue-on-error: false
         with:
           api-url: ${{ secrets.GHOST_API_URL }}
           api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
-          exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md .pre-commit-config.yaml routes.yaml"
+          exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md .pre-commit-config.yaml routes.yaml tailwind.config.js"
 

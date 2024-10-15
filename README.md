@@ -1,6 +1,15 @@
-# sredevopsorg-ghost-theme
+# SREDevOps.org Ghost Theme
 
-A Ghost v5 Theme made for SREDevOps.org based on Tailwind CSS with sidebar navigation and dark theme by default.
+Our Ghost v5 Theme made for [SREDevOps.org](https://sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navgation, customized tags and recommendations pages. Highly inspired on [Priority Vision's "Aspect" Theme](https://www.priority.vision/themes/aspect/) and took many functionalities from [@TryGhost "Source" default theme](https://github.com/TryGhost/Source).
+
+## To do / Roadmap
+
+- [] Missing SVG Icons
+- [] Granular internationalization using custom post templates.
+- [] Ghost Cards assets CSS Cleanup
+- [] Migrate Tailwind classes from inline styles into stylesheets files
+- [] Improve Algolia Search
+- [] Implement custom options
 
 ## Repo
 
@@ -12,7 +21,10 @@ A Ghost v5 Theme made for SREDevOps.org based on Tailwind CSS with sidebar navig
 
 ## Installation
 
+0. Check [how to run Ghost Locally and setup a local environment](https://ghost.org/docs/install/local/)
+
 1. Install the theme:
+
    - Clone the repository:  
 
      ```bash
@@ -28,21 +40,22 @@ A Ghost v5 Theme made for SREDevOps.org based on Tailwind CSS with sidebar navig
    - Install dependencies:  
 
      ```bash
-     npm install
+     yarn install
      ```
 
-2. Activate the theme in your Ghost admin panel.
+   - Run in dev mode:
 
-## Usage
+      ```bash
+      yarn dev
+      ```
 
-- After activating the theme, you can customize it through the Ghost admin panel.
-- Adjust the settings for sidebar navigation and dark theme preferences.
+2. Activate the theme in your Ghost admin panel or just use the [Deploy Ghost Theme Action (example)](https://github.com/sredevopsorg/sredevopsorg-ghost-theme/blob/main/.github/workflows/deploy-theme.yaml)
 
 ## Features
 
 - Tailwind CSS based design
-- Sidebar navigation
-- Dark theme by default
+- Sidebar main navigation
+- Dark schema
 - Responsive design
 - Customizable image sizes
 
@@ -52,4 +65,10 @@ Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
-This theme is licensed under the GPL-3.0-only license.
+All our original code of this theme is licensed under the MIT License.
+
+## Credits
+
+- Author: Nicolás Georger [@ngeorger] - [info@sredevops.org](info@sredevops.org)
+- Highly inspired on [Priority Vision's "Aspect" Theme](https://www.priority.vision/themes/aspect/)
+- Took many functionalities from [@TryGhost "Source" default theme](https://github.com/TryGhost/Source)
