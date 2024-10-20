@@ -1,0 +1,51 @@
+    <!-- Post Grid -->
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {{#foreach posts}}
+        <article id="{{slug}}" class="mx-6 overflow-hidden border border-transparent rounded-lg bg-dark md:mx-0">
+            
+            <a href="{{url absolute="true"}}" alt="{{title}}">
+            <img alt="{{title}}"
+                src="{{img_url feature_image absolute size="xs" format="webp"}}"
+                class="object-cover w-full h-56 " {{#is "paged, tag"}} loading="lazy"{{/is}} />
+            </a>
+
+            <div class="p-4 sm:p-6">
+                <a href="{{url absolute="true"}}" class="block">
+                    <h1 class="text-lg font-medium text-lighter">
+                        {{title}}
+                    </h1>
+                </a>
+
+                <p class="mt-2 text-sm line-clamp-3 text-light">
+                    {{excerpt}}
+                </p>
+
+                <a href="{{url absolute="true"}}" class="inline-flex items-center gap-1 mt-4 text-sm font-medium group" alt="{{title}}" rel="" >
+                    <h3 id="{{slug}}" class="block transition-all group-hover:ms-0.5">
+                        Full post &rarr;
+                    </h3>
+                </a>
+            </div>
+        </article>
+        {{/foreach}}
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex justify-center mt-6 pagination">
+        <ul class="flex items-center space-x-4">
+            <!-- Previous Page Link -->
+            {{#if pagination.prev}}
+            <li>
+                <a href="{{page_url pagination.prev}}" class="px-3 py-1 rounded-xlg text-lighter hover:text-highlight bg-dark">&larr; Newer Posts</a>
+            </li>
+            {{/if}}
+
+
+            <!-- Next Page Link -->
+            {{#if pagination.next}}
+            <li>
+                <a href="{{page_url pagination.next}}" class="px-3 py-1 rounded-xlg text-lighter hover:text-highlight bg-dark">Older posts &rarr;</a>
+            </li>
+            {{/if}}
+        </ul>
+    </div>

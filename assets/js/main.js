@@ -59,4 +59,16 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('html').setAttribute('lang', lang);
 });
 
+/* Responsive HTML table */
+(function () {
+    const tables = document.querySelectorAll('section > table');
+    
+    tables.forEach(function (table) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'hay-tabla';
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+    });
+})();
+
 

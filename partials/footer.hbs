@@ -1,11 +1,26 @@
 <footer class="container pt-6 pb-6 mx-auto md:pl-64">
-    <!-- Footer Copyleft Section -->
-    <div class="flex items-center justify-center space-x-1 text-sm">
-        <svg class="w-5 h-5 text-lighter" role="img">
-            <use xlink:href="#icon-copyleft"></use>
-        </svg>
-        <span>Copyleft <a href="{{@site.url}}" rel="me" class="underline hover:text-highlight">{{@site.title}}</a> {{date format="YYYY"}}</span>
-    </div>
+    <!-- Footer Nav Section -->
+    <section class="flex flex-col items-center gap-1 mx-auto text-xs text-light">
+        <ul class="text-center">
+            <li>
+                <a href="{{@site.url}}" rel="me" alt="{{@site.title}}" aria-label="SREDevOps.org">
+                    <img src="{{asset "img/sredevopsorg.svg"}}" alt="SREDevOps.org" />
+                </a>
+            </li>
+
+            <li>
+                <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/">
+                <a property="dct:title" rel="cc:attributionURL" href="https://sredevops.org">SREDevOps.org</a>
+                <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://sredevops.org/author/ngeorger" class="hidden ">by Nicolás Georger</a>
+                is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener noreferrer">CC BY 4.0</a>
+                </p>
+            </li>
+
+            <li>
+                <a href="https://ghost.org/" target="_blank" rel="noopener">Built with Ghost</a>
+            </li>
+        </ul>
+    </section>
 
     <!-- Footer Navigation -->
     <section id="footer-nav" class="mt-4 mb-6">

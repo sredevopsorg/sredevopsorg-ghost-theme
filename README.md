@@ -1,55 +1,68 @@
 # SREDevOps.org Ghost Theme
 
-Our Ghost v5 Theme made for [SREDevOps.org](https://sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navgation, customized tags and recommendations pages. Highly inspired on [Priority Vision's "Aspect" Theme](https://www.priority.vision/themes/aspect/) and took many functionalities from [@TryGhost "Source" default theme](https://github.com/TryGhost/Source).
+Our Ghost v5 Theme made for [SREDevOps.org](https://sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navigation, customized tags, and recommendations pages. Highly inspired by [Priority Vision's "Aspect" Theme](https://www.priority.vision/themes/aspect/) and took many functionalities from [@TryGhost "Source" default theme](https://github.com/TryGhost/Source).
 
-## To do / Roadmap
+## Table of Contents
 
-- [] Missing SVG Icons
-- [] Granular internationalization using custom post templates.
-- [] Ghost Cards assets CSS Cleanup
-- [] Migrate Tailwind classes from inline styles into stylesheets files
-- [] Improve Algolia Search
-- [] Implement custom options
+- [To Do / Roadmap](#to-do--roadmap)
+- [Repo](#repo)
+- [Demo](#demo)
+- [Installation](#installation)
+- [Features](#features)
+- [Contributing](#contributing)
+- [License](#license)
+- [Credits](#credits)
+
+## To Do / Roadmap
+
+- [ ] Missing SVG Icons
+- [ ] Granular internationalization using custom post templates
+- [ ] Ghost Cards assets CSS Cleanup
+- [ ] Migrate Tailwind classes from inline styles into stylesheets files
+- [ ] Improve Algolia Search
+- [ ] Implement custom options
 
 ## Repo
 
-[GitHub Repo](https://github.com/sredevopsorg/sredevopsorg-ghost-theme)
+Find the source code on [GitHub Repo](https://github.com/sredevopsorg/sredevopsorg-ghost-theme).
 
 ## Demo
 
-[https://sredevops.org](https://sredevops.org)
+Check out the live demo at [SREDevOps.org](https://sredevops.org).
 
 ## Installation
 
-0. Check [how to run Ghost Locally and setup a local environment](https://ghost.org/docs/install/local/)
+### Prerequisites
 
-1. Install the theme:
+- Ensure you have Ghost installed locally. Check [how to run Ghost Locally and set up a local environment](https://ghost.org/docs/install/local/).
 
-   - Clone the repository:  
+### Steps
 
-     ```bash
-     git clone https://github.com/sredevopsorg/sredevopsorg-ghost-theme.git
-     ```
+1. Clone the repository:
 
-   - Navigate to the theme directory:  
+   ```bash
+   git clone https://github.com/sredevopsorg/redevopsorg-ghost-theme.git
+   ```
 
-     ```bash
-     cd sredevopsorg-ghost-theme
-     ```
+2. Navigate to the theme directory:
 
-   - Install dependencies:  
+   ```bash
+   cd sredevopsorg-ghost-theme
+   ```
 
-     ```bash
-     yarn install
-     ```
+3. Install dependencies:
 
-   - Run in dev mode:
+   ```bash
+   yarn install
+   ```
 
-      ```bash
-      yarn dev
-      ```
+4. Run in development mode:
 
-2. Activate the theme in your Ghost admin panel or just use the [Deploy Ghost Theme Action (example)](https://github.com/sredevopsorg/sredevopsorg-ghost-theme/blob/main/.github/workflows/deploy-theme.yaml)
+   ```bash
+   yarn dev
+   ```
+
+5. Activate the theme in your Ghost admin panel or use the [Deploy Ghost Theme Action](https://github.com/sredevopsorg/sredevopsorg-ghost-theme/blob/main/.github/workflows/deploy-theme.yaml).
 
 ## Features
 
@@ -65,10 +78,10 @@ Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
-All our original code of this theme is licensed under the MIT License.
+All original code of this theme is licensed under the MIT License.
 
 ## Credits
 
-- Author: Nicolás Georger [@ngeorger] - [info@sredevops.org](info@sredevops.org)
-- Highly inspired on [Priority Vision's "Aspect" Theme](https://www.priority.vision/themes/aspect/)
+- Author: Nicolás Georger [@ngeorger] - [info@sredevops.org](mailto:info@sredevops.org)
+- Highly inspired by [Priority Vision's "Aspect" Theme](https://www.priority.vision/themes/aspect/)
 - Took many functionalities from [@TryGhost "Source" default theme](https://github.com/TryGhost/Source)

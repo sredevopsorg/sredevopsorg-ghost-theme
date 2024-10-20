@@ -90,64 +90,11 @@ p {
 }
 
 /* All Tables */
-#content table {
-  @apply overflow-x-scroll place-self-center bg-dark text-light;
-  clear: both;
-  display:flex;
-  flex-direction:column;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 95%;
-  min-width: 75%;
-}
+
 .post-content{
   @apply container p-6 mx-auto md:ml-64 md:px-32 md:py-12;
 }
 
-/* Table head */
-table thead {
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  /* tracking-wider */
-  border-bottom-width: 2px;
-  @apply border-dark;
-  /* Default light border */
-}
-
-table th {
-
-  @apply px-1 text-light;
-  /* padding-left: 1.5rem; */
-  /* px-6 */
-  /* padding-right: 1.5rem; */
-  /* px-6 */
-  padding-top: 1rem;
-  /* py-4 */
-  padding-bottom: 1rem;
-  /* py-4 */
-}
-
-/* Table body */
-table tbody tr {
-
-  @apply text-light;
-  border-bottom-width: 1px;
-  @apply border-dark;
-  /* Default light border */
-}
-
-table tbody th,
-table tbody td {
-  padding-left: 1.5rem;
-  /* px-6 */
-  padding-right: 1.5rem;
-  /* px-6 */
-  padding-top: 1rem;
-  /* py-4 */
-  @apply text-light;
-  padding-bottom: 1rem;
-  /* py-4 */
-}
 
 /********** end table ************/
 
@@ -471,7 +418,7 @@ figcaption a {
 /* ---------------------------------------------------------- */
 
 .gh-comments {
-  margin-top: 48px;
+  @apply mt-6
 }
 
 /* ---------------------------------------------------------- */
@@ -483,11 +430,7 @@ figcaption a {
 
   .l-tags-container,
   .recommendations {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 0 auto;
-    max-width: 720px
+    @apply flex flex-wrap justify-center mx-auto max-w-[720px];
   }
 }
 
@@ -495,128 +438,77 @@ figcaption a {
 
   .l-tags-container,
   .recommendations {
-    max-width: 1080px
+    @apply max-w-[1080px];
   }
 }
 
 .m-tag-card,
 .recommendation {
-  border: 0;
-  background-color: #212121;
-  border-radius: 10px;
-  height: 180px;
-  margin: 0 0 20px;
-  position: relative;
-  transition: all .25s cubic-bezier(.02, .01, .47, 1)
+  @apply border-0 bg-[#212121] rounded-[10px] h-[180px] my-0 mb-[20px] relative transition-all duration-[0.25s] ease-[cubic-bezier(.02,.01,.47,1)];
 }
 
 .m-tag-card:hover,
 .recommendation:hover {
-  background-color: #3f3f3f;
-
+  @apply bg-darker;
 }
 
 .m-tag-card:hover:before,
 .recommendation:hover:before {
-  box-shadow: var(--article-shadow-hover), 0 0 0 transparent
+  @apply shadow-[var(--article-shadow-hover),0_0_0_transparent];
 }
 
 @media only screen and (min-width:48rem) {
 
   .m-tag-card,
   .recommendation {
-    margin: 0 20px 40px;
-    width: 320px
+    @apply my-0 mb-[40px] mx-[20px] w-[320px];
   }
 }
 
 .m-tag-card:before,
 .recommendation:before {
-  border-radius: 10px;
-  bottom: 0;
-  box-shadow: var(--article-shadow-normal), 0 0 0 transparent;
-  content: "";
-  left: 10px;
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  transition: all .25s cubic-bezier(.02, .01, .47, 1);
-  z-index: 1
+  @apply rounded-[10px] bottom-0 shadow-[var(--article-shadow-normal),0_0_0_transparent] content-[""] left-[10px] absolute right-[10px] top-[10px] transition-all duration-[0.25s] ease-[cubic-bezier(.02,.01,.47,1)];
 }
 
 .m-tag-card__link,
 .recommendation__link {
-  background-color: #212121;
-  border-radius: 10px;
-  display: block;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  z-index: 2
+  @apply bg-[#212121] rounded-[10px] block h-full overflow-hidden relative w-full;
 }
 
 .m-tag-card__link.no-picture,
 .recommendation__link.no-picture {
-  background-color: var(--color-primary-background);
+  @apply bg-[var(--color-primary-background)];
 }
 
 .m-tag-card__picture,
 .recommendation-favicon {
-  position: relative;
-  z-index: 1;
-  top: 0px;
-  left: 0px;
-  width: 75px;
-  height: 75px;
-
-
+  @apply relative  top-0 left-0 w-[75px] h-[75px];
 }
 
 .recommendation-favicon {
-  position: relative;
-  z-index: 1;
-  top: 5px;
-  left: 5px;
-  max-width: 45px;
-  max-height: 45px;
-
-
+  @apply relative  top-[5px] left-[5px] max-w-[45px] max-h-[45px];
 }
 
 .m-tag-card__info,
 .recommendation__description {
-  bottom: 15px;
-  color: #fff;
-  left: 15px;
-  position: absolute;
-  z-index: 2
+  @apply bottom-[15px] text-white left-[15px] absolute ;
 }
 
 .m-tag-card__info.no-picture {
-  color: var(--color-primary-text);
+  @apply text-[var(--color-primary-text)];
 }
 
 .m-tag-card__name,
 .recommendation__title {
-  font-size: 1.8rem;
-  font-weight: 600;
-  letter-spacing: .3px;
-  line-height: 1.3;
-  margin: 0 0 5px
+  @apply text-[1.8rem] font-semibold tracking-[.3px] leading-[1.3] my-0 mb-[5px];
 }
 
 .m-tag-card__description {
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: .3px;
-  line-height: 0.2;
+  @apply text-[1rem] font-medium tracking-[.3px] leading-[0.2];
 }
 
 .m-tag-card__counter {
-  display: block;
-  font-size: 0.9rem;
-  letter-spacing: .2px
+  @apply block text-[0.9rem] tracking-[.2px];
 }
 
 /* The Modal (background) */
@@ -751,7 +643,7 @@ figcaption a {
 }
 
 /* ------------------------ Page Recommends ------------------------ */
- 
+
 .recommendations {
 
 }
@@ -765,14 +657,14 @@ figcaption a {
 }
 
 .recommendation-favicon {
-    @apply inline-block w-10 h-10 mr-2 align-top;
+    @apply block w-10 h-10 mr-2 align-top;
 }
 .recommendation-url {
-  @apply hidden;
+  @apply text-xs text-lighter;
 }
 
 .recommendation-url:hover {
-  @apply hidden;
+  @apply text-highlight;
 }
 
 #footer-navigation .nav-item .nav-link {
@@ -782,5 +674,25 @@ figcaption a {
 
 
 .recommendation-description {
-    @apply pl-2 pr-2 mb-1 text-sm font-light;
+    @apply pl-2 pr-2 mb-1 text-xs text-light;
+}
+
+.recommendation-description a {
+  @apply text-lighter;
+}
+
+.recommendation-description a:hover {
+  @apply text-highlight;
+}
+
+/* Global Table Styles */
+.hay-tabla {
+  @apply overflow-x-scroll bg-opacity-50 place-self-center bg-dark text-light;
+  clear: both;
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 95%;
+  min-width: 75%;
 }

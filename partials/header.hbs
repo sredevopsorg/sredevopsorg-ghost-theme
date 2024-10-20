@@ -1,7 +1,7 @@
 {{> "algolia" }}
 <header class="sticky top-0 z-20 flex items-center justify-between p-4 md:hidden bg-darker">
     <div class="text-lg font-bold text-lighter"><a href="{{@site.url}}">{{@site.title}}</a></div>
-    <button id="menuButton" class="text-lighter focus:outline-none" onclick="toggleSidebar()" aria-label="Open sidebar menu">
+    <button id="menuButton" type="button" class="text-lighter focus:outline-none" onclick="toggleSidebar()" aria-label="Open sidebar menu">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
         </svg>
@@ -10,7 +10,7 @@
 
 <div id="overlay" class="fixed inset-0 hidden bg-black opacity-50" onclick="toggleSidebar()"></div>
 
-<aside id="sidebar" class="fixed z-10 hidden w-64 h-screen p-6 overflow-y-scroll bg-darker md:block transform md:translate-x-0 -translate-x-full transition-transform duration-300">
+<aside id="sidebar" class="fixed z-10 hidden w-64 h-screen p-6 overflow-y-scroll transition-transform duration-300 transform -translate-x-full bg-darker md:block md:translate-x-0">
     <div id="logo" class="mb-6">
         {{#if @site.logo}}
         <a class="logo" href="{{@site.url}}">
@@ -23,7 +23,6 @@
 
     <section class="mb-6">
         <button type="button" class="inline-flex justify-between w-full px-4 py-2 border rounded-md border-dark bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
-                            <!-- SVG icon to the left of the navigation item -->
                 <svg class="w-5 h-5 text-light" role="img" aria-label="{{label}}">
                     <use xlink:href="#icon-i18n"></use>
                 </svg>Languages
@@ -32,7 +31,7 @@
             </svg>
         </button>
 
-        <div class="mt-2 shadow-lg origin-top-right rounded-md bg-dark ring-1 ring-black ring-opacity-5">
+        <div class="mt-2 origin-top-right rounded-md shadow-lg bg-dark ring-1 ring-black ring-opacity-5">
             <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="languageMenuButton">
                 <a href="{{@site.url}}/es/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
                     Español
@@ -47,10 +46,11 @@
         </div>
     </section>
 
+<!-- Search button -->
     <button class="block mb-2 w-full rounded-full bg-dark text-lighter shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-highlight hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-highlight focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-highlight active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0" aria-label="Search in SREDevOps.org" onclick="openModal(search.start());" oninput="openModal();" onkeypress="openModal();" rel="search">
         Search 
     </button>
-
+<!-- Main menu -->
     <section id="nav" class="mb-6">
         {{navigation}}
     </section>
@@ -58,7 +58,7 @@
         {{#if @member}}
         <div class="flex items-center gap-2">
             <img src="{{@member.avatar}}" alt="{{@member.name}}" class="w-8 h-8 rounded-full">
-            <span>{{@member.name}}</span>
+            <span>Welcome{{@member.name}} | <a href="javascript:" data-members-signout>Sign out</a> </span> 
         </div>
         {{else}}
         {{> "social-sso"}}
