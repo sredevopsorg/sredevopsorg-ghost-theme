@@ -426,16 +426,14 @@ figcaption a {
 
 /* Tags Page */
 
-@media only screen and (min-width:48rem) {
-
+@media (min-width: 48rem) {
   .l-tags-container,
   .recommendations {
     @apply flex flex-wrap justify-center mx-auto max-w-[720px];
   }
 }
 
-@media only screen and (min-width:64rem) {
-
+@media (min-width: 64rem) {
   .l-tags-container,
   .recommendations {
     @apply max-w-[1080px];
@@ -457,8 +455,7 @@ figcaption a {
   @apply shadow-[var(--article-shadow-hover),0_0_0_transparent];
 }
 
-@media only screen and (min-width:48rem) {
-
+@media (min-width: 48rem) {
   .m-tag-card,
   .recommendation {
     @apply my-0 mb-[40px] mx-[20px] w-[320px];
@@ -482,16 +479,16 @@ figcaption a {
 
 .m-tag-card__picture,
 .recommendation-favicon {
-  @apply relative  top-0 left-0 w-[75px] h-[75px];
+  @apply relative top-0 left-0 w-[75px] h-[75px];
 }
 
 .recommendation-favicon {
-  @apply relative  top-[5px] left-[5px] max-w-[45px] max-h-[45px];
+  @apply relative top-[5px] left-[5px] max-w-[45px] max-h-[45px];
 }
 
 .m-tag-card__info,
 .recommendation__description {
-  @apply bottom-[15px] text-white left-[15px] absolute ;
+  @apply bottom-[15px] text-white left-[15px] absolute;
 }
 
 .m-tag-card__info.no-picture {
@@ -649,7 +646,7 @@ figcaption a {
 }
 
 .recommendation {
-    @apply flex flex-col gap-y-3;
+    @apply flex flex-col p-2 gap-y-3;
 }
 
 .recommendation-title {
@@ -657,7 +654,7 @@ figcaption a {
 }
 
 .recommendation-favicon {
-    @apply block w-10 h-10 mr-2 align-top;
+    @apply w-10 h-10 mr-2;
 }
 .recommendation-url {
   @apply text-xs text-lighter;

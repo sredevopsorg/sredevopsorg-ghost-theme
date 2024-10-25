@@ -13,9 +13,9 @@
 <aside id="sidebar" class="fixed z-10 hidden w-64 h-screen p-6 overflow-y-scroll transition-transform duration-300 transform -translate-x-full bg-darker md:block md:translate-x-0">
     <div id="logo" class="mb-6">
         {{#if @site.logo}}
-        <a class="logo" href="{{@site.url}}">
-            <img src="{{@site.logo}}" alt="{{@site.title}}" class="w-full h-auto" loading="lazy">
-        </a>
+                <a href="{{@site.url}}" rel="me" alt="{{@site.title}}" aria-label="SREDevOps.org">
+                    <img src="{{asset "img/sredevopsorg.svg"}}" alt="SREDevOps.org" />
+                </a>
         {{else}}
         <div class="text-lg font-bold text-lighter">{{@site.title}}</div>
         {{/if}}
@@ -54,11 +54,13 @@
     <section id="nav" class="mb-6">
         {{navigation}}
     </section>
-    <section id="members" class="text-light">
+    <section id="members" class="pb-4 text-light">
         {{#if @member}}
         <div class="flex items-center gap-2">
-            <img src="{{@member.avatar}}" alt="{{@member.name}}" class="w-8 h-8 rounded-full">
-            <span><a href="/#/portal/account/profile">{{@member.name}} Settings</a> | <a href="javascript:" data-members-signout>Sign out</a> </span> 
+            <ul>
+                <li><a href="/#/portal/account/profile"><img src="{{@member.avatar}}" alt="{{@member.name}} Settings" aria-label="{{@member.name}} Settings" class="w-8 h-8 rounded-full"></a></li>
+                <li><a href="javascript:" data-members-signout>Sign out</a></li>
+            </ul> 
         </div>
         {{else}}
         {{> "social-sso"}}

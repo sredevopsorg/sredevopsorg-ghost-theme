@@ -17,8 +17,8 @@
                             <img class="m-tag-card__picture" src="{{img_url feature_image size="xs"}}" loading="lazy" alt="{{name}}">
                           {{/if}}
                           <div class="m-tag-card__info {{#unless feature_image}}no-picture{{/unless}}">
-                            <h4 class="m-tag-card__name">{{name}}</h4>
-                            <span class="m-tag-card__description">{{description}}</span>
+                            <h4 class="text-xl font-semibold">{{name}}</h4>
+                            <span class="text-sm text-clip font-extralight max-h-fit">{{description}}</span>
                             <span class="m-tag-card__counter">
                               {{plural count.posts empty=(t "No posts") singular=(t "1 post") plural=(t "% posts")}}
                             </span>

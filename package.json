@@ -2,7 +2,7 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost v5 Theme made for SREDevOps.org (https://sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navgation, customized tags and recommendations pages.",
     "demo": "https://sredevops.org",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "engines": {
         "ghost": ">=5.0.0"
     },
@@ -67,19 +67,19 @@
         "card_assets": true,
         "image_sizes": {
             "xs": {
-                "width": 120
+                "width": 100
             },
             "s": {
                 "width": 220
             },
             "m": {
-                "width": 400
+                "width": 300
             },
             "l": {
-                "width": 600
+                "width": 400
             },
             "xl": {
-                "width": 900
+                "width": 500
             }
         }
     }
