@@ -58,7 +58,7 @@
         {{#if @member}}
         <div class="flex items-center gap-2">
             <img src="{{@member.avatar}}" alt="{{@member.name}}" class="w-8 h-8 rounded-full">
-            <span>Welcome{{@member.name}} | <a href="javascript:" data-members-signout>Sign out</a> </span> 
+            <span><a href="/#/portal/account/profile">{{@member.name}} Settings</a> | <a href="javascript:" data-members-signout>Sign out</a> </span> 
         </div>
         {{else}}
         {{> "social-sso"}}

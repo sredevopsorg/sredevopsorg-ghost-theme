@@ -1,35 +1,55 @@
-{{!< default}}
+        {{!< default}}
 <main id="main" class="container pt-6 pb-6 mx-auto md:pl-64">
-{{#is "author"}}
-    {{> "tags-nav" }}
-    <section name="author-profile">
-    <span class="text-sm italic font-light ">Author profile and content at {{@site.title}} </span>
-    <h1 class="pb-4 text-4xl">
-        <a href="{{url absolute="true"}}" rel="author" alt="All content published by {{name}} in {{@site.title}}">{{name}}</a></h1>
-    <h2 class="pb-4 text-xl">{{bio}}</h2>
-    {{#if twitter}}
-        <a href="{{twitter_url}}" target="_blank" rel="noopener">Twitter</a>
-    {{/if}}
-    {{#if website}}
-        <a href="{{website_url}}" target="_blank" rel="noopener">Website</a>
-    {{/if}}
-    {{#if facebook}}
-        <a href="{{facebook_url}}" target="_blank" rel="noopener">Facebook</a>
-    {{/if}}
-    {{#if profile_image}}
-        <img src="{{profile_image_url}}" alt="{{name}}'s profile image">
-    {{/if}}
-    {{#if cover_image}}
-        <img src="{{cover_image_url}}" alt="{{name}}'s cover image">
-    {{/if}}
-    {{#if url}}
-        <a href="{{url}}" target="_blank" rel="noopener">Websitew</a>
-    {{/if}}
-    </section>
-    
-    {{> "posts-list" }}
+{{> "tags-nav" }}
 
-{{/is}}
+        {{#author}}
+        <header class="flex flex-col">
+            {{#if profile_image}}
+                <img class="w-24 h-24 rounded-full" src="{{profile_image}}" alt="{{name}}" />
+            {{/if}}
+
+            <h1 class="text-4xl">{{name}}</h1>
+            {{#if bio}}
+                <p class="text-lg">{{bio}}</p>
+            {{/if}}
+
+            <div class="flex gap-2 mt-4">
+                <div class="flex items-center gap-2 text-sm">
+                    {{#if website}}
+                        <a href="{{website}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Website">
+                                <use xlink:href="#icon-link"></use>
+                            </svg>
+                            Website
+                        </a>
+                    {{/if}}
+                    {{#if twitter}}
+                        <a href="{{twitter_url}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Twitter">
+                                <use xlink:href="#icon-x"></use>
+                            </svg>
+                            Twitter
+                        </a>
+                    {{/if}}
+                    {{#if facebook}}
+                        <a href="{{facebook_url}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Facebook">
+                                <use xlink:href="#icon-facebook"></use>
+                            </svg>
+                            Facebook
+                        </a>
+                    {{/if}}
+                </div>
+            </div>
+
+            {{!-- {{#if cover_image}}
+                <img class="gh-page-image" src="{{cover_image}}" alt="{{name}}" />
+            {{/if}} --}}
+        </header>
+        {{/author}}
+
+
+
+{{> "posts-list" }}
 
 </main>
-

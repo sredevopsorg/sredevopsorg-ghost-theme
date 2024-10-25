@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    font-family: "Noto Sans", system-ui, sans-serif;
+    font-family: 'Noto Sans', system-ui, sans-serif;
   }
 }
 /* #sidebar {

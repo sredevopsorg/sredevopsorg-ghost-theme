@@ -1,7 +1,6 @@
 {{#if feature_image}}
     <figure>
         <picture>
-            <source srcset="{{img_url feature_image format="webp" size="xl"}}" media="(min-width: {{image_sizes.xl}})">
             <source srcset="{{img_url feature_image format="webp" size="l"}}" media="(min-width: {{image_sizes.l}})">
             <source srcset="{{img_url feature_image format="webp" size="m"}}" media="(min-width: {{image_sizes.m}})">
             <source srcset="{{img_url feature_image format="webp" size="s"}}" media="(min-width: {{image_sizes.s}})">
@@ -10,7 +9,7 @@
                 {{#is "home, index, tag, author, paged" }}
                     class="object-cover w-full h-56 "
                 {{else}}
-                    class="align-middle"
+                    class="object-center "
                 {{/is}}
             >
         </picture>
