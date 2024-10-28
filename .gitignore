@@ -30,3 +30,4 @@ old/
 **.local
 **.local.**
 !assets/js/lib/**
+.cursorignore

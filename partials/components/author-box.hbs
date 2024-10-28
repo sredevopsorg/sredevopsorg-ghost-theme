@@ -1,11 +1,10 @@
-        {{!< default}}
-<main id="main" class="container pt-6 pb-6 mx-auto md:pl-64">
-{{> "tags-nav" }}
+    <!-- Author Box -->
+    <section class="flex items-center mt-12 author-box">
+      {{#foreach authors}}
 
-        {{#author}}
-        <header class="flex flex-col">
+      <div class="flex-row author-box">
             {{#if profile_image}}
-                <img class="w-24 h-24 rounded-full" src="{{profile_image}}" alt="{{name}}" />
+                <img src="{{img_url profile_image size="s" format="webp"}}" alt="{{name}}" class="w-24 h-24 rounded-full">
             {{/if}}
 
             <h1 class="text-4xl">{{name}}</h1>
@@ -61,11 +60,8 @@
             {{!-- {{#if cover_image}}
                 <img class="gh-page-image" src="{{cover_image}}" alt="{{name}}" />
             {{/if}} --}}
-        </header>
-        {{/author}}
-
-
-
-{{> "posts-list" }}
-
-</main>
+          
+        </div>
+      </div>
+      {{/foreach}}
+    </section>

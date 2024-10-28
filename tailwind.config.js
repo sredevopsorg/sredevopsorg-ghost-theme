@@ -5,6 +5,7 @@ module.exports = {
     "./**/*.hbs",
     "./assets/js/*.js",
     "./node_modules/**/*.hbs",
+    "./assets/built/*.js"
   ],
   theme: {
     extend: {

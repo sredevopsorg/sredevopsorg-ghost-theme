@@ -4,31 +4,31 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{meta_title}}</title>
-    
+    <meta name="description" content="{{@site.description}}">
+    <link rel="stylesheet" href="{{asset "built/screen.css"}}">
+    {{#is "post"}}
+        <script src="{{asset "built/prism.js"}}"></script>
+        <link rel="stylesheet" href="{{asset "built/prism.css"}}">
+    {{/is}}
 
     {{> "typography/noto"}}
 
-    <link rel="stylesheet" href="{{asset "built/screen.css"}}">
-
     {{> "icons"}}
+    {{> "algolia"}}
 
-    {{#is "post, page"}}
-    <link rel="stylesheet" href="{{asset "built/prism.css"}}">
-    {{/is}}
-
+    {{!-- Header --}}
     {{ghost_head}}
 </head>
 
 <body class="{{body_class}} bg-gradient-to-r from-darker via-darker to-dark">
 
-    {{!-- Header --}}
-    {{> header}}
+    {{> "components/nav"}}
 
     {{!-- Main content, dynamically inserted here --}}
-        {{{body}}}
+    {{{body}}}
 
     {{!-- Footer --}}
-    {{> footer}}
+    {{> "components/footer"}}
 
 <script src="{{asset "built/main.js"}}"></script>
 {{ghost_foot}}

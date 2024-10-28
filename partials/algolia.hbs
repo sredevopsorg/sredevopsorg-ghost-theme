@@ -1,6 +1,16 @@
-
+    <script>
+        function loadAlgoliaScriptAndOpenModal() {
+            var script = document.createElement('script');
+            script.src = "{{asset 'built/algolia.js'}}";
+            script.onload = function() {
+                openModal(search.start());
+            };
+            document.head.appendChild(script);
+        }
+    </script>
+    
 <div id="searchModal" class="modal">
-    <div class="modal-content" onclick="closeModal();">
+    <div class="modal-content">
 
         <div id="search_wrapper">
             <span class="close" onclick="closeModal();">&times;</span>

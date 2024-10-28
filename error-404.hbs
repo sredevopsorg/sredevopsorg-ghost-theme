@@ -1,7 +1,27 @@
 {{!< default}}
 
-<section class="container p-6 mx-auto text-center">
-    <h1 class="text-4xl font-bold">404 - Page Not Found</h1>
-    <p class="text-gray-500">The page you are looking for doesn't exist.</p>
-    <a href="/" class="text-highlight">Go Back to Home</a>
+<main id="main post-wrapper">
+
+<article class="max-w-full px-4 mx-auto prose-lg post-content prose-invert text-light md:px-32">
+
+<section>
+<section class="error-message">
+    <h1 class="error-code">404</h1>
+    <a href="{{@site.url}}" title="Go to the front page of SREDevOps.org or try searching below."
+        referrerpolicy="no-referrer-when-downgrade" rel="home">Go to the front page of SREDevOps.org</a> or try searching
+    below.
 </section>
+<section class="search-form">
+        <button class="block mb-2 w-full rounded-full bg-dark text-lighter shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-highlight hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-highlight focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-highlight active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+        aria-label="Search in SREDevOps.org"
+        onclick="loadAlgoliaScriptAndOpenModal()"
+        rel="search">
+        Search 
+    </button>
+
+</section>
+</article>
+
+
+</main>
+
