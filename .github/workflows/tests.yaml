@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
   push:
     branches: [ "main" ]
-  workflow_call:
 
 permissions:
   contents: read
@@ -42,8 +41,7 @@ jobs:
 
     - name: Install and test with ${{ matrix.node-version }}
       run: |
-          npm install -g gscan
+          yarn add gscan || npm install -g gscan
           yarn install
           yarn build
-          yarn test:ci || yarn test
-
+          yarn test:ci

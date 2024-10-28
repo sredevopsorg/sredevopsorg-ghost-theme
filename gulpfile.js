@@ -1,7 +1,7 @@
 const {series, watch, src, dest, parallel} = require('gulp');
 const pump = require('pump');
 const tailwind = require("tailwindcss");
-const concat = require('gulp-concat');
+// const concat = require('gulp-concat');
 
 // gulp plugins and utils
 const livereload = require('gulp-livereload');
@@ -63,38 +63,16 @@ function js(done) {
     ], handleError(done));
 }
 
-function prism(done) {
-    pump([
-        src([
-          // pull in lib files first so our own code can depend on it
-            "node_modules/prismjs/prism.js",
-            "node_modules/prismjs/components/prism-*.min.js",
-            "node_modules/prismjs/plugins/line-numbers/prism-line-numbers.min.js",
-            "node_modules/prismjs/plugins/toolbar/prism-toolbar.min.js",
-            "node_modules/prismjs/plugins/show-language/prism-show-language.min.js",
-            "node_modules/prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js"
-        ], { sourcemaps: false }),
-        concat('prism.js'),
-        uglify(),
-        dest("assets/built/", { sourcemaps: "." }),
-        livereload(),
-    ],
-    handleError(done)
-);
-}
-
 
 const cssWatcher = () => watch('assets/css/**', css);
 const jsWatcher = () => watch('assets/js/**', js);
 const hbsWatcher = () => watch(['*.hbs', 'partials/**/*.hbs'], hbs);
-const prismWatcher = () => watch('gulpfile.js', prism);
 const watcher = parallel(
     cssWatcher,
     jsWatcher,
-    prismWatcher,
     hbsWatcher
 );
-const build = series(css, js, prism);
+const build = series(css, js);
 
 exports.build = build;
 exports.default = series(build, serve, watcher);

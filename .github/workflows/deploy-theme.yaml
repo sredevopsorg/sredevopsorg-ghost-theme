@@ -22,5 +22,5 @@ jobs:
         with:
           api-url: ${{ secrets.GHOST_API_URL }}
           api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
-          exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md .pre-commit-config.yaml routes.yaml tailwind.config.js"
+          exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md .pre-commit-config.yaml routes.yaml tailwind.config.js .nvmrc "
 
