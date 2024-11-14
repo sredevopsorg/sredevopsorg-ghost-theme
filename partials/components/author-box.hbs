@@ -1,19 +1,21 @@
     <!-- Author Box -->
-    <section class="flex items-center mt-12 author-box">
-      {{#foreach authors}}
+    <section class="mt-8 author-box">
+    {{#foreach authors}}
 
-      <div class="flex-row author-box">
-            {{#if profile_image}}
-                <img src="{{img_url profile_image size="s" format="webp"}}" alt="{{name}}" class="w-24 h-24 rounded-full">
-            {{/if}}
+    <div class="flex flex-col w-full p-4">
+            <div class="flex items-center gap-4 mb-4">
+                {{#if profile_image}}
+                    <img src="{{img_url profile_image size="xs" format="webp"}}" alt="{{name}}" class="rounded-full">
+                {{/if}}
+                <h3 class="text-xl font-normal text-light">{{name}}</h3>
+            </div>
 
-            <h1 class="text-4xl">{{name}}</h1>
             {{#if bio}}
                 <p class="text-lg">{{bio}}</p>
             {{/if}}
 
-            <div class="flex gap-2 mb-4">
-                <div class="flex items-center gap-2 text-sm">
+            <div class="flex flex-wrap gap-2 mb-4">
+                <div class="flex flex-wrap gap-2 text-sm">
                     {{#if website}}
                         <a href="{{website}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
                             <svg class="w-5 h-5 text-light" role="img" aria-label="Website">
@@ -23,7 +25,7 @@
                         </a>
                     {{/if}}
                     {{#if twitter}}
-                        <a href="{{twitter_url}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark"  target="_blank" rel="noopener">
+                        <a href="{{twitter_url}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
                             <svg class="w-5 h-5 text-light" role="img" aria-label="Twitter">
                                 <use xlink:href="#icon-x"></use>
                             </svg>
@@ -31,7 +33,7 @@
                         </a>
                     {{/if}}
                     {{#if facebook}}
-                        <a href="{{facebook_url}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark" target="_blank" rel="noopener">
+                        <a href="{{facebook_url}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
                             <svg class="w-5 h-5 text-light" role="img" aria-label="Facebook">
                                 <use xlink:href="#icon-facebook"></use>
                             </svg>
@@ -39,7 +41,7 @@
                         </a>
                     {{/if}}
                     {{#match slug "==" "ngeorger"}}
-                        <a href="mailto:ngeorger@sredevops.org" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark" target="_blank" rel="noopener">
+                        <a href="mailto:ngeorger@sredevops.org" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
                             <svg class="w-5 h-5 text-light" role="img" aria-label="Email">
                                 <use xlink:href="#icon-contact-us"></use>
                             </svg>
@@ -47,21 +49,16 @@
                         </a>
                     {{/match}}
                     {{#if location}}
-                        <span  class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark text-light">
+                        <span class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark text-light">
                             <svg class="w-5 h-5 text-light" role="img" aria-label="Location">
-                            <use xlink:href="#icon-globe"></use>
-                        </svg>
+                                <use xlink:href="#icon-globe"></use>
+                            </svg>
                             {{location}}
                         </span>
                     {{/if}}
                 </div>
             </div>
-
-            {{!-- {{#if cover_image}}
-                <img class="gh-page-image" src="{{cover_image}}" alt="{{name}}" />
-            {{/if}} --}}
-          
         </div>
-      </div>
-      {{/foreach}}
+    {{/foreach}}
+
     </section>

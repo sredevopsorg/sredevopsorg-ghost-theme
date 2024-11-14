@@ -641,9 +641,9 @@ figcaption a {
 
 /* ------------------------ Page Recommends ------------------------ */
 
-.recommendations {
+/* .recommendations {
 
-}
+} */
 
 .recommendation {
     @apply flex flex-col p-2 gap-y-3;
