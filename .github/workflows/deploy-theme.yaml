@@ -1,10 +1,14 @@
 name: deploy-theme
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 permissions:
   contents: read 
 jobs: 
   deploy:
+    if: ${{ github.event_name == 'push' && github.actor == 'ngeorger' || github.event_name == 'workflow_dispatch' && github.actor == 'ngeorger' }}
     runs-on: ubuntu-latest
     steps:
       - 
@@ -22,5 +26,5 @@ jobs:
         with:
           api-url: ${{ secrets.GHOST_API_URL }}
           api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
-          exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md .pre-commit-config.yaml routes.yaml tailwind.config.js .nvmrc "
+          exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md .pre-commit-config.yaml routes.yaml tailwind.config.js"
 

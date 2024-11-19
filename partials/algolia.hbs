@@ -7,8 +7,15 @@
             };
             document.head.appendChild(script);
         }
+
+        // Add event listener for ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
     </script>
-    
+
 <div id="searchModal" class="modal">
     <div class="modal-content">
 

@@ -60,14 +60,29 @@
     </section>
     <section id="members" class="pb-4 text-light">
         {{#if @member}}
+            {{!-- Add CryptoJS library --}}
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Step 1: Hash your email address using SHA-256.
+                    const hashedEmail = CryptoJS.SHA256('{{@member.email}}').toString();  // Add toString()
+                    // Step 2: Construct the Gravatar URL.
+                    const gravatarUrl = `https://www.gravatar.com/avatar/${hashedEmail}`;
+                    // Step 3: Set the image source to the Gravatar URL.
+                    document.getElementById('gravatar-image').src = gravatarUrl;
+                });
+            </script>
         <div class="flex items-center gap-2">
             <ul>
-                <li><a href="/#/portal/account/profile"><img src="{{@member.avatar}}" alt="{{@member.name}} Settings" aria-label="{{@member.name}} Settings" class="w-8 h-8 rounded-full"></a></li>
-                <li><a href="javascript:" data-members-signout>Sign out</a></li>
+                <li><img alt="{{@member.name}}" aria-label="Avatar" class="w-10 h-10 rounded-full" id="gravatar-image"></li>
+                <li><span class="text-xs text-light">Welcome, {{@member.name}}</span></li>
+                <li><a href="/#/portal/account/profile" data-portal="account/profile" class="text-xs text-light">Settings</a></li>
+                <li><a href="https://gravatar.com/profile" target="_blank" rel="noopener nofollow" class="text-xs text-light">Edit your avatar</a></li>
+                <li><a href="javascript:" data-members-signout class="text-xs text-light">Sign out</a></li>
             </ul> 
         </div>
         {{else}}
-        {{> "social-sso"}}
+            {{> "social-sso"}}
         {{/if}}
     </section>
 </aside>
