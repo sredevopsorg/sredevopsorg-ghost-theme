@@ -90,3 +90,16 @@ links.forEach((link) => {
         console.warn('Error processing link:', error);
     }
 });
+
+/* Ghost search */
+document.addEventListener("keydown", function (e) {
+  // Check if user is not typing in an input/textarea
+  if (
+    e.key === "/" &&
+    !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)
+  ) {
+    e.preventDefault();
+    // Trigger Ghost search
+    document.querySelector("[data-ghost-search]").click();
+  }
+});
