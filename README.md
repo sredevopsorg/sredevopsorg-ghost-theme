@@ -15,11 +15,11 @@ Our Ghost v5 Theme made for [SREDevOps.org](https://sredevops.org) based on Tail
 
 ## To Do / Roadmap
 
-- [ ] Missing SVG Icons
+- [x] Missing SVG Icons
 - [ ] Granular internationalization using custom post templates
 - [ ] Ghost Cards assets CSS Cleanup
 - [ ] Migrate Tailwind classes from inline styles into stylesheets files
-- [ ] Improve Algolia Search
+- ~~[ ] Improve Algolia Search~~ (Replaced with Ghost Search)
 - [ ] Implement custom options
 
 ## Repo

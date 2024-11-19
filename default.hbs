@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{meta_title}}</title>
-    <meta name="description" content="{{@site.description}}">
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
     {{#is "post"}}
         <script src="{{asset "built/prism.js"}}"></script>
@@ -13,15 +12,14 @@
 
     {{> "typography/noto"}}
 
-    {{> "icons"}}
-    {{> "algolia"}}
+    {{!-- {{> "algolia"}} --}}
 
-    {{!-- Header --}}
     {{ghost_head}}
 </head>
 
 <body class="{{body_class}} bg-gradient-to-r from-darker via-darker to-dark">
 
+    {{> "icons"}}
     {{> "components/nav"}}
 
     {{!-- Main content, dynamically inserted here --}}

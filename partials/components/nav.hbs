@@ -20,6 +20,23 @@
         {{/if}}
     </div>
 
+<!-- Search button -->
+    <section class="mb-6">
+    <button 
+        class="flex items-center w-full gap-2 px-4 py-2 transition-colors duration-200 border rounded-md border-dark bg-dark text-lighter hover:bg-darker" 
+        data-ghost-search 
+        aria-label="Search site content"
+        title="Press / to search"
+    >
+        <svg class="w-5 h-5 text-light" role="img" aria-label="Search">
+            <use xlink:href="#icon-search"></use>
+        </svg>
+        <span class="flex-grow text-left">Search</span>
+        <kbd class="hidden px-2 py-1 text-xs rounded md:inline-block bg-darker">
+            /
+        </kbd>
+    </button>
+    </section>
     <section class="mb-6">
         <button type="button" class="inline-flex justify-between w-full px-4 py-2 border rounded-md border-dark bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
                 <svg class="w-5 h-5 text-light" role="img" aria-label="{{label}}">
@@ -45,15 +62,6 @@
         </div>
     </section>
 
-<!-- Search button -->
-    <button class="block mb-2 w-full rounded-full bg-dark text-lighter shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-highlight hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-highlight focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-highlight active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-        aria-label="Search in SREDevOps.org"
-        onclick="loadAlgoliaScriptAndOpenModal()"
-        rel="search">
-        Search 
-    </button>
-
-
 <!-- Main menu -->
     <section id="nav" class="mb-6">
         {{navigation}}
@@ -61,7 +69,7 @@
     <section id="members" class="pb-4 text-light">
         {{#if @member}}
             {{!-- Add CryptoJS library --}}
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
             <script>
                 document.addEventListener('DOMContentLoaded', () => {
                     // Step 1: Hash your email address using SHA-256.
@@ -75,8 +83,8 @@
         <div class="flex items-center gap-2">
             <ul>
                 <li><img alt="{{@member.name}}" aria-label="Avatar" class="w-10 h-10 rounded-full" id="gravatar-image"></li>
-                <li><span class="text-xs text-light">Welcome, {{@member.name}}</span></li>
-                <li><a href="/#/portal/account/profile" data-portal="account/profile" class="text-xs text-light">Settings</a></li>
+                <li><span class="text-xs text-light">Welcome, <a href="/#/portal/account/profile" data-portal="account/profile" class="text-light">{{@member.name}}</a></span></li>
+                <li><a href="/#/portal/account" data-portal="account" class="text-xs text-light">Settings</a></li>
                 <li><a href="https://gravatar.com/profile" target="_blank" rel="noopener nofollow" class="text-xs text-light">Edit your avatar</a></li>
                 <li><a href="javascript:" data-members-signout class="text-xs text-light">Sign out</a></li>
             </ul> 

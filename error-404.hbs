@@ -11,15 +11,24 @@
         referrerpolicy="no-referrer-when-downgrade" rel="home">Go to the front page of SREDevOps.org</a> or try searching
     below.
 </section>
-<section class="search-form">
-        <button class="block mb-2 w-full rounded-full bg-dark text-lighter shadow-[0_4px_9px_-4px_rgba(51,45,45,0.7)] hover:bg-highlight hover:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] focus:bg-highlight focus:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] active:bg-highlight active:shadow-[0_8px_9px_-4px_rgba(51,45,45,0.2),0_4px_18px_0_rgba(51,45,45,0.1)] px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-        aria-label="Search in SREDevOps.org"
-        onclick="loadAlgoliaScriptAndOpenModal()"
-        rel="search">
-        Search 
+<!-- Search button -->
+    <section class="mb-6">
+    <button 
+        class="flex items-center w-full gap-2 px-4 py-2 transition-colors duration-200 border rounded-md border-dark bg-dark text-lighter hover:bg-darker" 
+        data-ghost-search 
+        aria-label="Search site content"
+        title="Press / to search"
+    >
+        <svg class="w-5 h-5 text-light" role="img" aria-label="Search">
+            <use xlink:href="#icon-search"></use>
+        </svg>
+        <span class="flex-grow text-left">Search</span>
+        <kbd class="hidden px-2 py-1 text-xs rounded md:inline-block bg-darker">
+            /
+        </kbd>
     </button>
+    </section>
 
-</section>
 </article>
 
 
