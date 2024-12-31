@@ -12,7 +12,12 @@
 
     {{!-- {{> "typography/noto"}} --}}
 
-    {{ghost_head}}
+    {{#is "home, tag, author, index"}}
+        {{ghost_head exclude="card_assets,cta_styles,comment_counts,announcement"}}
+    {{else}}
+        {{ghost_head}}
+    {{/is}}
+
 </head>
 
 <body class="{{body_class}} bg-gradient-to-r from-darker via-darker to-dark">
@@ -26,7 +31,7 @@
     {{!-- Footer --}}
     {{> "components/footer"}}
 
-<script src="{{asset "built/main.js"}}"></script>
+<script src="{{asset "built/main.js"}}" defer></script>
 {{ghost_foot}}
 
 </body>

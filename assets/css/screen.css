@@ -232,15 +232,6 @@ p {
   margin-left: auto;
 }
 
-/* Embed */
-
-.kg-embed-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
 /* Gallery */
 
 .kg-image[width][height],
@@ -601,4 +592,12 @@ figcaption a {
 }
 #post-list {
   @apply grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3;
+}
+
+/* Embed */
+.kg-embed-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
