@@ -1,15 +1,15 @@
     <!-- Post Grid -->
-    <section id="post-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <section id="post-list">
         {{#foreach posts}}
-        <article id="{{slug}}" class="mx-6 overflow-hidden border border-transparent rounded-lg bg-dark md:mx-0">   
+        <article id="{{slug}}">   
             <a href="{{url absolute="true"}}" alt="{{title}}">
             <img alt="{{title}}"
                 src="{{img_url feature_image size='s' format='webp'}}"
-                class="object-cover w-full h-56" {{#if @custom.lazy_images}} loading="lazy"{{/if}} />
+                {{#if @custom.lazy_images}} loading="lazy"{{/if}} />
             </a>
-            <div class="p-4 sm:p-6">
+            <div>
 
-                <h1 class="block text-lg font-medium text-lighter">
+                <h1>
                     <a href="{{url absolute="true"}}">
                         {{title}}
                     </a>
@@ -20,9 +20,9 @@
                 </p>
 
                 <a href="{{url absolute="true"}}" class="inline-flex items-center gap-1 mt-4 text-sm font-medium group" alt="{{title}}" rel="bookmark">
-                    <h3 id="{{slug}}" class="block transition-all group-hover:ms-0.5" alt="{{title}}">
+                    <h2 id="{{slug}}" class="block transition-all group-hover:ms-0.5" alt="{{title}}">
                         Read the full post &rarr;
-                    </h3>
+                    </h2>
                 </a>
             </div>
         </article>

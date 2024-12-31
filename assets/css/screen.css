@@ -585,3 +585,20 @@ figcaption a {
   max-width: 95%;
   min-width: 75%;
 }
+
+/* Post List Images */
+#post-list article div{
+  @apply p-4 sm:p-6;  
+}
+#post-list article div h1{
+  @apply block text-lg font-medium text-lighter;  
+}
+#post-list article a img{
+  @apply object-cover w-full h-56;  
+}
+#post-list article{
+  @apply mx-6 overflow-hidden border border-transparent rounded-lg bg-dark md:mx-0;  
+}
+#post-list {
+  @apply grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3;
+}

@@ -1,0 +1,14 @@
+{{!< default}}
+<main id="main" class="container pt-6 pb-6 mx-auto md:pl-64">
+{{> "tags-nav" }}
+
+{{#tag}}
+    <h1 class="pb-4 text-4xl">{{name}}</h1>
+    {{#if description}}
+    <h2 class="pb-4 text-xl">{{description}}</h2>
+    {{/if}}
+{{/tag}}
+
+{{> "posts-list" }}
+
+</main>
