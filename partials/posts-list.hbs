@@ -5,6 +5,7 @@
             <a href="{{url absolute="true"}}" alt="{{title}}">
             <img alt="{{title}}"
                 src="{{img_url feature_image size='s' format='webp'}}"
+                width="220px"
                 {{#if @custom.lazy_images}} loading="lazy"{{/if}} />
             </a>
             <div>
@@ -20,7 +21,7 @@
                 </p>
 
                 <a href="{{url absolute="true"}}" class="inline-flex items-center gap-1 mt-4 text-sm font-medium group" alt="{{title}}" rel="bookmark">
-                    <h2 id="{{slug}}" class="block transition-all group-hover:ms-0.5" alt="{{title}}">
+                    <h2 class="block transition-all group-hover:ms-0.5" alt="{{title}}">
                         Read the full post &rarr;
                     </h2>
                 </a>
