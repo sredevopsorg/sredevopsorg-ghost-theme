@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{@site.locale}}">
+<html lang="{{@site.locale}}" data-mode="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,7 @@
     {{#is "post"}}
         <script src="{{asset "built/prism.js"}}"></script>
         <link rel="stylesheet" href="{{asset "built/prism.css"}}">
+        <link rel="stylesheet" href="{{asset "built/tocbot.css"}}">
     {{/is}}
 
     {{#is "home, tag, author, index"}}
@@ -30,6 +31,21 @@
     {{> "components/footer"}}
 
 <script src="{{asset "built/main.js"}}" defer></script>
+{{#is "post"}}
+        <script src="{{asset "built/tocbot.js"}}"></script>
+        <script>
+            tocbot.init({
+                // Where to render the table of contents.
+                tocSelector: '.gh-toc',
+                // Where to grab the headings to build the table of contents.
+                contentSelector: '.gh-content',
+                // Which headings to grab inside of the contentSelector element.
+                headingSelector: 'h1, h2, h3, h4',
+                // Ensure correct positioning
+                hasInnerContainers: true,
+            });
+        </script>
+{{/is}}
 {{ghost_foot}}
 
 </body>
