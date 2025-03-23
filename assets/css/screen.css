@@ -2,11 +2,7 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-@layer base {
-  html {
-    font-family: 'Noto Sans', system-ui, sans-serif;
-  }
-}
+
 /* #sidebar {
   @apply w-64 bg-darker h-screen p-6 fixed md:block hidden z-10 transform md:translate-x-0 -translate-x-full transition-transform duration-300 overflow-y-scroll
 } */
@@ -70,13 +66,11 @@ a:hover h3 {
 #main h3,
 #main h4,
 #main h5 {
-  font-family: 'Noto Sans', sans-serif;
   font-weight: 500;
   @apply text-lighter;
 }
 
 p {
-  font-family: 'Noto Sans', sans-serif;
   font-weight: 400;
   text-align: justify;
   hyphens: auto;
@@ -92,7 +86,7 @@ p {
 /* All Tables */
 
 .post-content{
-  @apply container p-6 mx-auto md:ml-64 md:px-32 md:py-12;
+  @apply px-6 mx-auto md:ml-64 md:p-32 md:py-12;
 }
 
 
@@ -230,6 +224,7 @@ p {
 .kg-image {
   margin-right: auto;
   margin-left: auto;
+  max-width: 80%;
 }
 
 /* Gallery */
