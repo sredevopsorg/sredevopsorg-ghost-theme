@@ -31,3 +31,4 @@ old/
 **.local.**
 !assets/js/lib/**
 .cursorignore
+.vscode/**

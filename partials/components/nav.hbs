@@ -1,97 +1,42 @@
-<header class="sticky top-0 z-20 flex items-center justify-between p-4 md:hidden bg-darker">
-    <div class="text-lg font-bold text-lighter"><a href="{{@site.url}}">{{@site.title}}</a></div>
-    <button id="menuButton" type="button" class="text-lighter focus:outline-none" onclick="toggleSidebar()" aria-label="Open menu">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-        </svg>
-    </button>
-</header>
+<header class="bg-white dark:bg-neutral-950">
+    <div class="mx-auto flex h-16 max-w-screen-xl items-center gap-8 px-4 sm:px-6 lg:px-8">
+        <a class="block text-teal-600 dark:text-teal-300" href="{{@site.url}}" rel="me" alt="{{@site.title}}" aria-label="{{@site.title}}">
+            {{#if @site.logo}}
+                <img src="{{@site.logo}}" alt="{{@site.title}}" />
+            {{else}}
+                <span class="sr-only">{{@site.title}}</span>
+            {{/if}}
+        </a>
 
-<div id="overlay" class="fixed inset-0 hidden bg-black opacity-50" onclick="toggleSidebar()"></div>
+        <div class="flex flex-1 items-center justify-end md:justify-between">
+            <nav aria-label="Global" class="hidden md:block">
+                {{navigation}}
+            </nav>
 
-<aside id="sidebar" class="fixed z-10 hidden w-64 h-screen p-6 overflow-y-scroll transition-transform duration-300 transform -translate-x-full bg-darker md:block md:translate-x-0">
-    <div id="logo" class="mb-6">
-        {{#if @site.logo}}
-                <a href="{{@site.url}}" rel="me" alt="{{@site.title}}" aria-label="{{@site.title}}">
-                    <img src="{{@site.logo}}" alt="{{@site.title}}" />
-                </a>
-        {{else}}
-        <div class="text-lg font-bold text-lighter">{{@site.title}}</div>
-        {{/if}}
-    </div>
+            <div class="flex items-center gap-4">
+                <div class="sm:flex sm:gap-4">
+                    <a class="block rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700 dark:hover:bg-teal-500"
+                        href="#">
+                        Login
+                    </a>
 
-<!-- Search button -->
-    <section class="mb-6">
-    <button 
-        class="flex items-center w-full gap-2 px-4 py-2 transition-colors duration-200 border rounded-md border-dark bg-dark text-lighter hover:bg-darker" 
-        data-ghost-search 
-        aria-label="Search site content"
-        title="Press / to search"
-    >
-        <svg class="w-5 h-5 text-light" role="img" aria-label="Search">
-            <use xlink:href="#icon-search"></use>
-        </svg>
-        <span class="flex-grow text-left">Search</span>
-        <kbd class="hidden px-2 py-1 text-xs rounded md:inline-block bg-darker">
-            /
-        </kbd>
-    </button>
-    </section>
-    <section class="mb-6">
-        <button type="button" class="inline-flex justify-between w-full px-4 py-2 border rounded-md border-dark bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
-                <svg class="w-5 h-5 text-light" role="img" aria-label="{{label}}">
-                    <use xlink:href="#icon-i18n"></use>
-                </svg>Languages
-            <svg class="w-5 h-5 ml-2 -mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-        </button>
+                    <a class="hidden rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600 transition hover:text-teal-600/75 sm:block dark:bg-gray-800 dark:text-white dark:hover:text-white/75"
+                        href="#">
+                        Register
+                    </a>
+                </div>
 
-        <div class="mt-2 origin-top-right rounded-md shadow-lg bg-dark ring-1 ring-black ring-opacity-5">
-            <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="languageMenuButton">
-                <a href="{{@site.url}}/es/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                    Español
-                </a>
-                <a href="{{@site.url}}/en/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                    English
-                </a>
-                <a href="{{@site.url}}/br/" class="block px-4 py-2 text-sm text-light hover:bg-darker hover:text-lighter" role="menuitem">
-                    Brasil
-                </a>
+                <button
+                    class="block rounded-sm bg-gray-100 p-2.5 text-gray-600 transition hover:text-gray-600/75 md:hidden dark:bg-gray-800 dark:text-white dark:hover:text-white/75">
+                    <span class="sr-only">Toggle menu</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
         </div>
-    </section>
+    </div>
+</header>
 
-<!-- Main menu -->
-    <section id="nav" class="mb-6">
-        {{navigation}}
-    </section>
-    <section id="members" class="pb-4 text-light">
-        {{#if @member}}
-            {{!-- Add CryptoJS library --}}
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js" integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    // Step 1: Hash your email address using SHA-256.
-                    const hashedEmail = CryptoJS.SHA256('{{@member.email}}').toString();  // Add toString()
-                    // Step 2: Construct the Gravatar URL.
-                    const gravatarUrl = `https://www.gravatar.com/avatar/${hashedEmail}`;
-                    // Step 3: Set the image source to the Gravatar URL.
-                    document.getElementById('gravatar-image').src = gravatarUrl;
-                });
-            </script>
-        <div class="flex items-center gap-2">
-            <ul>
-                <li><img alt="{{@member.name}}" aria-label="Avatar" class="w-10 h-10 rounded-full" id="gravatar-image"></li>
-                <li><span class="text-xs text-light">Welcome, <a href="/#/portal/account/profile" data-portal="account/profile" class="text-light">{{@member.name}}</a></span></li>
-                <li><a href="/#/portal/account" data-portal="account" class="text-xs text-light">Settings</a></li>
-                <li><a href="https://gravatar.com/profile" target="_blank" rel="noopener nofollow" class="text-xs text-light">Edit your avatar</a></li>
-                <li><a href="javascript:" data-members-signout class="text-xs text-light">Sign out</a></li>
-            </ul> 
-        </div>
-        {{else}}
-            {{> "social-sso"}}
-        {{/if}}
-    </section>
-</aside>
 

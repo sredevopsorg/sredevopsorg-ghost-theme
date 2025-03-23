@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="{{@site.locale}}">
+<html lang="{{@site.locale}}" data-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{meta_title}}</title>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
     {{#is "post"}}
         <script src="{{asset "built/prism.js"}}"></script>
         <link rel="stylesheet" href="{{asset "built/prism.css"}}">
     {{/is}}
-
-    {{!-- {{> "typography/noto"}} --}}
 
     {{#is "home, tag, author, index"}}
         {{ghost_head exclude="card_assets,cta_styles,comment_counts,announcement"}}
@@ -20,7 +19,7 @@
 
 </head>
 
-<body class="{{body_class}} bg-gradient-to-r from-darker via-darker to-dark">
+<body class="{{body_class}} bg-neutral-900">
 
     {{> "icons"}}
     {{> "components/nav"}}
@@ -29,9 +28,11 @@
     {{{body}}}
 
     {{!-- Footer --}}
-    {{> "components/footer"}}
+    {{!-- {{> "components/footer"}} --}}
 
 <script src="{{asset "built/main.js"}}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+
 {{ghost_foot}}
 
 </body>

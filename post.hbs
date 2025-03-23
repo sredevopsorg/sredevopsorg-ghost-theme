@@ -1,55 +1,49 @@
 {{!< default}}
 
-<main id="main post-wrapper">
-
+<main class="pt-8 pb-16 lg:pt-16 lg:pb-24 bg-white dark:bg-neutral-900 antialiased">
+  <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
   {{#post}}
   <!-- Post Content Section -->
-  <article class="max-w-full px-4 mx-auto prose-lg post-content prose-invert text-light md:px-32">
+  <article class="mx-auto w-full max-w-2xl format format-sm sm:format-base lg:format-lg format-blue dark:format-invert">
     {{#is "page"}}
       {{#if @page.show_title_and_feature_image}}
-        <h1 class="text-4xl">{{title}}</h1>
+            <h1 class="mb-4 text-3xl font-bold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+              {{title}}
+            </h1>
         {{> "feature-image"}}
       {{/if}}
     {{/is}}
 
     {{#is "post"}}
-    <h1 class="text-4xl">{{title}}</h1>
-    <section class="mb-8 text-center post-meta">
-      {{> "feature-image" }}
-        <div class="space-x-2 tags">
-          {{#foreach tags}}
-            <a href="{{url}}" class="px-2 py-1 text-sm rounded bg-dark hover:bg-highlight">{{name}}</a>
-          {{/foreach}}
-        </div>
-      <div class="mb-2 text-xs text-light">
-        {{#foreach authors}}
-          Author: <a href="{{url}}" class="hover:underline" rel="author" >{{name}}</a> 
-        {{/foreach}} | Published on {{date published_at format="D MMMM YYYY"}}
-      </div>
+          <header class="mb-4 lg:mb-6 not-format">
+            <address class="flex items-center mb-6 not-italic">
+              <div class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white">
+                {{#foreach authors}}
+                <img class="mr-4 w-16 h-16 rounded-full" src="{{profile_image}}"
+                  alt="{{name}}">
+                <div>
+                    <a href="{{url}}" rel="author" class="text-xl font-bold text-gray-900 dark:text-white">
+                    {{name}}
+                    </a>
+                    {{/foreach}}
+                  <p class="text-base text-gray-500 dark:text-gray-400"><time pubdate datetime="{{date published_at}}"
+                      title="{{date published_at}}">{{date published_at format="D MMMM YYYY"}}</time></p>
+                </div>
+              </div>
+            </address>
+            <h1 class="mb-4 text-3xl font-extrabold leading-tight text-gray-900 lg:mb-6 lg:text-4xl dark:text-white">
+              {{title}}
+            </h1>
+            <p class="text-base text-gray-500 dark:text-gray-400">
+              {{#foreach tags}}
+              <a href="{{url}}">{{name}}</a>
+              {{/foreach}}
+            </p>
+                  {{> "feature-image" }}
+          </header>
     {{/is}}
-    </section>
-
     <!-- Main Post Content -->
-    <section>
       {{{content}}}
-    </section>
-    {{#is "post"}}
-    <section id="comments">
-        {{#if comments}}
-        <div class="gh-comments gh-canvas">
-            {{#if @member}}
-                {{comments count=false mode=dark title="Opinions?"}}
-            {{else}}
-            {{> "social-sso"}}
-            {{comments count=false mode=dark title=" "}}
-            {{/if}}
-        </div>
-        {{/if}}
-    </section>
-
-        {{> "components/author-box"}}
-
-    {{/is}}
   </article>
 
   {{/post}}
