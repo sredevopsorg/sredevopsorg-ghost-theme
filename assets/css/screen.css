@@ -224,7 +224,7 @@ p {
 .kg-image {
   margin-right: auto;
   margin-left: auto;
-  max-width: 80%;
+  max-width: 90%;
 }
 
 /* Gallery */
@@ -342,6 +342,8 @@ blockquote.kg-blockquote-alt {
 
 .kg-bookmark-card .kg-bookmark-thumbnail img {
   border-radius: 0 0.2em 0.2em 0;
+  margin-top: 0;
+
 }
 
 /* Product */
@@ -595,4 +597,45 @@ figcaption a {
   flex-direction: column;
   align-items: center;
   width: 100%;
+}
+
+/* TOC */
+
+.gh-content {
+  position: relative;
+}
+
+.gh-toc>.toc-list {
+  position: relative;
+}
+
+.toc-list {
+  overflow: hidden;
+  list-style: none;
+}
+
+@media (min-width: 1300px) {
+  .gh-sidebar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-top: 4vmin;
+    right: 0;
+    /* Changed grid-column to right positioning */
+    width: 260px;
+    margin-right: 4vmin;
+  }
+
+  .gh-toc {
+    position: sticky;
+    top: 4vmin;
+    max-height: calc(100vh - 8vmin);
+    overflow-y: auto;
+  }
+}
+
+.gh-toc .is-active-link::before {
+  /* background-color: var(--ghost-accent-color); */
+  @apply bg-dark;
+  /* Defines TOC   accent color based on Accent color set in Ghost Admin */
 }
