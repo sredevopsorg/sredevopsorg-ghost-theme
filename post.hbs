@@ -7,20 +7,20 @@
   <article class="prose-lg post-content prose-invert text-light">
     {{#is "page"}}
       {{#if @page.show_title_and_feature_image}}
-        <h1 class="text-4xl">{{title}}</h1>
+        <h1 class="text-4xl text-center">{{title}}</h1>
         {{> "feature-image"}}
       {{/if}}
     {{/is}}
 
     {{#is "post"}}
-    <h1 class="text-4xl">{{title}}</h1>
+    <h1 class="text-4xl text-center">{{title}}</h1>
     <section class="mb-8 text-center post-meta">
-      {{> "feature-image" }}
         <div class="space-x-2 tags">
           {{#foreach tags}}
             <a href="{{url}}" class="px-2 py-1 text-sm rounded bg-dark hover:bg-highlight">{{name}}</a>
           {{/foreach}}
         </div>
+      {{> "feature-image" }}
       <div class="mb-2 text-xs text-light">
         {{#foreach authors}}
           Author: <a href="{{url}}" class="hover:underline" rel="author" >{{name}}</a> 
@@ -30,12 +30,16 @@
     </section>
 
     <!-- Main Post Content -->
+      {{#is "post"}}
     <section class="gh-content grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-8">
       <aside class="gh-sidebar">
         <span>Table of Contents</span>
         <div class="gh-toc"></div>
       </aside> {{! The TOC will be inserted here }}
       <div class="lg:col-span-2">
+        {{else}}
+      <section class="gh-content grid grid-cols-1 gap-4">
+      {{/is}}
       {{{content}}}
       </div>
     </section>
