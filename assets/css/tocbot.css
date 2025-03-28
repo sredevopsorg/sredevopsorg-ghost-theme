@@ -35,7 +35,7 @@
 
 .gh-toc .is-active-link::before {
   /* background-color: var(--ghost-accent-color); */
-  @apply bg-dark;
+  @apply bg-light;
   /* Defines TOC   accent color based on Accent color set in Ghost Admin */
 }
 
@@ -78,20 +78,20 @@ a.toc-link {
 }
 
 .is-active-link {
-  font-weight: 700
+  font-weight: 600
 }
 
 .toc-link::before {
-  background-color: #EEE;
+  @apply bg-dark;
   content: ' ';
   display: inline-block;
   height: inherit;
   left: 0;
   margin-top: -1px;
   position: absolute;
-  width: 2px
+  width: 1px
 }
 
 .is-active-link::before {
-  background-color: #54BC4B
+  @apply bg-lighter
 }

@@ -107,7 +107,7 @@ article:hover {
 /* Paragraph */
 section p,
 p {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.1rem;
   /* Optional margin for spacing */
 }
 
@@ -147,7 +147,7 @@ p {
 }
 
 #content h1 {
-  @apply mb-2 text-4xl;
+  @apply text-4xl;
   font-weight: 500;
   line-height: 2;
   text-align: center;
@@ -155,15 +155,14 @@ p {
 }
 
 #content h2 {
-  @apply mb-2 text-2xl;
+  @apply text-3xl;
   font-weight: 500;
-  line-height: 1, 5;
+  line-height: 1.5;
   text-align: left;
-  margin-top: 1.5rem;
 }
 
 #content h3 {
-  @apply text-xl;
+  @apply text-2xl;
   font-weight: 400;
   line-height: 1.5;
   text-align: left;

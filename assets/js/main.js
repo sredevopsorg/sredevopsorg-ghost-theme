@@ -119,3 +119,29 @@ document.addEventListener("keydown", function (e) {
     ];
     reframe(document.querySelectorAll(sources.join(',')));
 })();
+
+
+// Back to top button
+
+  (function () {
+    const backToTopButton = document.getElementById('back-to-top');
+
+    function scrollFunction() {
+      if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        backToTopButton.classList.remove('hidden');
+      } else {
+        backToTopButton.classList.add('hidden');
+      }
+    }
+
+    window.onscroll = function () {
+      scrollFunction();
+    };
+
+    backToTopButton.onclick = function () {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    };
+  })();
