@@ -14,6 +14,8 @@
 
     {{#is "post"}}
     <h1 class="text-4xl text-center">{{title}}</h1>
+    {{> social-share}}
+
     <section class="mb-8 text-center post-meta">
         <div class="space-x-2 tags">
           {{#foreach tags}}
@@ -36,7 +38,7 @@
         <span>Table of Contents</span>
         <div class="gh-toc"></div>
       </aside> {{! The TOC will be inserted here }}
-      <div class="lg:col-span-2">
+      <div class="lg:col-span-2 pr-4">
         {{else}}
       <section class="gh-content grid grid-cols-1 gap-4">
       {{/is}}
