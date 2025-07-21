@@ -2,13 +2,13 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost v5 Theme made for SREDevOps.org (https://sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navgation, customized tags and recommendations pages.",
     "demo": "https://sredevops.org",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "engines": {
         "ghost": ">=5.0.0"
     },
     "license": "MIT",
     "scripts": {
-        "dev": "gulp",
+        "dev": "rm -fv ./assets/build/* && gulp",
         "build": "gulp build",
         "test": "gscan .",
         "test:dev": "npx gscan --verbose .",
@@ -44,15 +44,15 @@
         "@tailwindcss/forms": "^0.5.10",
         "@tailwindcss/typography": "^0.5.16",
         "autoprefixer": "^10.4.21",
-        "cssnano": "7.0.6",
-        "gulp": "^5.0.0",
+        "cssnano": "7.1.0",
+        "gulp": "^5.0.1",
         "gulp-concat": "2.6.1",
         "gulp-livereload": "4.0.2",
         "gulp-postcss": "10.0.0",
         "gulp-uglify": "3.0.2",
-        "postcss": "^8.5.4",
-        "postcss-import": "^16.1.0",
-        "pump": "3.0.2",
+        "postcss": "^8.5.6",
+        "postcss-import": "^16.1.1",
+        "pump": "3.0.3",
         "tailwindcss": "^3.4.17"
     },
     "browserslist": [
