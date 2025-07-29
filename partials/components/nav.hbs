@@ -37,6 +37,7 @@
         </kbd>
     </button>
     </section>
+    {{#match @custom.show_langs}}
     <section class="mb-6">
         <button type="button" class="inline-flex justify-between w-full px-4 py-2 border rounded-md border-dark bg-dark text-lighter" id="languageMenuButton" aria-expanded="true" aria-haspopup="true">
                 <svg class="w-5 h-5 text-light" role="img" aria-label="{{label}}">
@@ -61,11 +62,14 @@
             </div>
         </div>
     </section>
-
+    {{/match}}
 <!-- Main menu -->
     <section id="nav" class="mb-6">
         {{navigation}}
     </section>
+
+    {{#match @custom.show_sso}}
+
     <section id="members" class="pb-4 text-light">
         {{#if @member}}
             {{!-- Add CryptoJS library --}}
@@ -93,5 +97,6 @@
             {{> "social-sso"}}
         {{/if}}
     </section>
+    {{/match}}
 </aside>
 

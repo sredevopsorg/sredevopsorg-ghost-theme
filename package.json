@@ -2,7 +2,7 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost v5 Theme made for SREDevOps.org (https://sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navgation, customized tags and recommendations pages.",
     "demo": "https://sredevops.org",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "engines": {
         "ghost": ">=5.0.0"
     },
@@ -76,6 +76,18 @@
                 "default": true,
                 "description": "Enable share buttons on posts",
                 "group": "post"
+            },
+            "show_langs": {
+                "type": "boolean",
+                "default": false,
+                "description": "Enable language menu in sidebar",
+                "group": "homepage"
+            },
+            "show_sso": {
+                "type": "boolean",
+                "default": false,
+                "description": "Enable SSO menu in sidebar",
+                "group": "homepage"
             }
         },
         "image_sizes": {
