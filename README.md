@@ -20,7 +20,7 @@ Our Ghost v5 Theme made for [SREDevOps.org](https://sredevops.org) based on Tail
 - [ ] Ghost Cards assets CSS Cleanup
 - [ ] Migrate Tailwind classes from inline styles into stylesheets files
 - ~~[ ] Improve Algolia Search~~ (Replaced with Ghost Search)
-- [ ] Implement custom options
+- [x] Implement custom options
 
 ## Repo
 
@@ -70,7 +70,8 @@ Check out the live demo at [SREDevOps.org](https://sredevops.org).
 - Sidebar main navigation
 - Dark schema
 - Responsive design
-- Customizable image sizes
+- Customizable sections for sidebar navigation and post sharing
+- Optional lazy loading for images in homepage
 
 ## Contributing
 
