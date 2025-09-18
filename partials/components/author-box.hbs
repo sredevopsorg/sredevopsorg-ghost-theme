@@ -25,7 +25,7 @@
                         </a>
                     {{/if}}
                     {{#if twitter}}
-                        <a href="{{twitter_url}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                        <a href="{{social_url type="twitter"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
                             <svg class="w-5 h-5 text-light" role="img" aria-label="Twitter">
                                 <use xlink:href="#icon-x"></use>
                             </svg>
@@ -33,11 +33,59 @@
                         </a>
                     {{/if}}
                     {{#if facebook}}
-                        <a href="{{facebook_url}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                        <a href="{{social_url type="facebook"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
                             <svg class="w-5 h-5 text-light" role="img" aria-label="Facebook">
                                 <use xlink:href="#icon-facebook"></use>
                             </svg>
                             Facebook
+                        </a>
+                    {{/if}}
+                    {{#if threads}}
+                        <a href="{{social_url type="threads"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Threads">
+                                <use xlink:href="#icon-threads"></use>
+                            </svg>
+                            Threads
+                        </a>
+                    {{/if}}
+                    {{#if bluesky}}
+                        <a href="{{social_url type="bluesky"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Bluesky">
+                                <use xlink:href="#icon-bluesky"></use>
+                            </svg>
+                            Bluesky
+                        </a>
+                    {{/if}}
+                    {{#if mastodon}}
+                        <a href="{{social_url type="mastodon"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Mastodon">
+                                <use xlink:href="#icon-mastodon"></use>
+                            </svg>
+                            Mastodon
+                        </a>
+                    {{/if}}
+                    {{#if tiktok}}
+                        <a href="{{social_url type="tiktok"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="TikTok">
+                                <use xlink:href="#icon-tiktok"></use>
+                            </svg>
+                            TikTok
+                        </a>
+                    {{/if}}
+                    {{#if youtube}}
+                        <a href="{{social_url type="youtube"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="YouTube">
+                                <use xlink:href="#icon-youtube"></use>
+                            </svg>
+                            YouTube
+                        </a>
+                    {{/if}}
+                    {{#if instagram}}
+                        <a href="{{social_url type="instagram"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Instagram">
+                                <use xlink:href="#icon-instagram"></use>
+                            </svg>
+                            Instagram
                         </a>
                     {{/if}}
                     {{#match slug "==" "ngeorger"}}

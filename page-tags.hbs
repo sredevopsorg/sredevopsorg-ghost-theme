@@ -9,7 +9,7 @@
           <div class="l-content">
               <div class="l-wrapper" data-animate="fade-up">
                 <div class="l-tags-container">
-                  {{#get 'tags' limit='all' include='count.posts,description,feature_image' order='count.posts desc'}}
+                  {{#get 'tags' limit='100' include='count.posts,description,feature_image' order='count.posts desc'}}
                     {{#foreach tags}}
                       <div class="m-tag-card">
                         <a href="{{url}}" class="m-tag-card__link {{#unless feature_image}}no-picture{{/unless}}" aria-label="{{name}}">

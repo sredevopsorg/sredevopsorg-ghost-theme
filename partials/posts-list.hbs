@@ -22,7 +22,7 @@
 
                 <a href="{{url absolute="true"}}" class="inline-flex items-center gap-1 mt-4 text-sm font-medium group" alt="{{title}}" rel="bookmark">
                     <h2 class="block transition-all group-hover:ms-0.5" alt="{{title}}">
-                        Read the full post &rarr;
+                        {{t "Read the full post"}} &rarr;
                     </h2>
                 </a>
             </div>
@@ -36,7 +36,7 @@
             <!-- Previous Page Link -->
             {{#if pagination.prev}}
             <li>
-                <a href="{{page_url pagination.prev}}" class="px-3 py-1 rounded-xlg text-lighter hover:bg-highlight bg-darker">&larr; Newer Posts</a>
+                <a href="{{page_url pagination.prev}}" class="px-3 py-1 rounded-xlg text-lighter hover:bg-highlight bg-darker">&larr; {{t "Newer Posts"}}</a>
             </li>
             {{/if}}
 
@@ -44,7 +44,7 @@
             <!-- Next Page Link -->
             {{#if pagination.next}}
             <li>
-                <a href="{{page_url pagination.next}}" class="px-3 py-1 rounded-xlg text-lighter hover:bg-highlight bg-darker">Older posts &rarr;</a>
+                <a href="{{page_url pagination.next}}" class="px-3 py-1 rounded-xlg text-lighter hover:bg-highlight bg-darker">{{t "Older posts"}} &rarr;</a>
             </li>
             {{/if}}
         </ul>
