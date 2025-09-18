@@ -31,3 +31,5 @@ old/
 **.local.**
 !assets/js/lib/**
 .cursorignore
+.env
+docker-compose.yml
