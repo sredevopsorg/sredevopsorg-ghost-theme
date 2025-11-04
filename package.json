@@ -44,7 +44,7 @@
         "@tailwindcss/forms": "^0.5.10",
         "@tailwindcss/typography": "^0.5.19",
         "autoprefixer": "^10.4.21",
-        "cssnano": "7.1.1",
+        "cssnano": "7.1.2",
         "gulp": "^5.0.1",
         "gulp-concat": "2.6.1",
         "gulp-livereload": "4.0.2",
