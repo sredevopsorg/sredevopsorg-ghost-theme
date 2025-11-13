@@ -7,9 +7,6 @@
   --gh-font-body: '';
 }
 
-/* #sidebar {
-  @apply w-64 bg-darker h-screen p-6 fixed md:block hidden z-10 transform md:translate-x-0 -translate-x-full transition-transform duration-300 overflow-y-scroll
-} */
 #logo {
   @apply mt-4 mb-4 align-middle;
 }
@@ -23,14 +20,13 @@
   @apply max-w-screen-xl;
 }
 
-/* html,body{
-} */
-a:hover,
+
 h1,
 h2,
 h3,
-h3 {
-  @apply text-lighter;
+h4,
+h5 {
+  @apply text-lighter font-semibold;
 }
 #main #post-wrapper {
 
@@ -60,9 +56,9 @@ a:hover h3 {
   @apply w-2 bg-dark;
 }
 
-/* ul,li{
+.contenido ul,.contenido li{
   @apply list-disc list-outside;
-} */
+}
 
 
 #main h1,
@@ -70,8 +66,7 @@ a:hover h3 {
 #main h3,
 #main h4,
 #main h5 {
-  font-weight: 500;
-  @apply text-lighter;
+  @apply font-semibold;
 }
 
 p {
@@ -91,21 +86,6 @@ p {
 
 .post-content{
   @apply px-6 mx-auto md:ml-64 md:p-32 md:py-12;
-}
-
-
-/********** end table ************/
-
-article:hover {
-  animation: border-animation 1s infinite;
-}
-
-@keyframes border-animation {
-  /* 0% { border-color: transparent; } */
-  /* 100% { border-color: transparent; } */
-  0% { border-block-start-color: purple; border-block-end-color: #630ef1; border-left-color: purple; border-right-color: #630ef1; }
-  50% { border-block-start-color: #630ef1; border-block-end-color: purple; border-left-color: #630ef1; border-right-color: purple; }
-  100% { border-block-start-color: purple; border-block-end-color: #630ef1; border-left-color: purple; border-right-color: #630ef1; }
 }
 
 /* Paragraph */
@@ -154,7 +134,7 @@ p {
   @apply text-4xl;
   font-weight: 500;
   line-height: 2;
-  text-align: center;
+  /* text-align: center; */
 
 }
 
@@ -196,213 +176,23 @@ p {
   @apply text-lighter;
 }
 
+
+/********** end table ************/
+
+article:hover {
+  animation: border-animation 1s infinite;
+}
+
+@keyframes border-animation {
+  /* 0% { border-color: transparent; } */
+  /* 100% { border-color: transparent; } */
+  0% { border-block-start-color: purple; border-block-end-color: #630ef1; border-left-color: purple; border-right-color: #630ef1; }
+  50% { border-block-start-color: #630ef1; border-block-end-color: purple; border-left-color: #630ef1; border-right-color: purple; }
+  100% { border-block-start-color: purple; border-block-end-color: #630ef1; border-left-color: purple; border-right-color: #630ef1; }
+}
+
 .recommendation-favicon{
   @apply float-left w-12 h-12 m-0;
-}
-
-/****************************************/
-/* 16. Cards
-/* ---------------------------------------------------------- */
-
-/* Add extra margin before/after any cards, except for when immediately preceeded by a heading */
-
-.gh-content :not(.kg-card):not(table):not([id])+ :is(.kg-card, table) {
-  margin-top: calc(48px * var(--content-spacing-factor, 1));
-}
-
-.gh-content :is(.kg-card, table)+ :not(.kg-card):not(table):not([id]) {
-  margin-top: calc(48px * var(--content-spacing-factor, 1));
-}
-
-.gh-content :not(.kg-card):not([id])+.kg-card.kg-width-full {
-  margin-top: calc(68px * var(--content-spacing-factor, 1));
-}
-
-.gh-content .kg-card.kg-width-full+ :not(.kg-card):not([id]) {
-  margin-top: calc(68px * var(--content-spacing-factor, 1));
-}
-
-/* Image */
-
-.kg-image {
-  margin-right: auto;
-  margin-left: auto;
-  max-width: 90%;
-}
-
-/* Gallery */
-
-.kg-image[width][height],
-.kg-gallery-image {
-  cursor: pointer;
-}
-
-.kg-image-card a:hover,
-.kg-gallery-image a:hover {
-  opacity: 1 !important;
-}
-
-/* Toggle */
-
-.kg-card.kg-toggle-card .kg-toggle-heading-text {
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.has-serif-title .kg-toggle-card .kg-toggle-heading-text {
-    @apply font-serif;
-}
-
-.has-mono-title .kg-toggle-card .kg-toggle-heading-text {
-    @apply font-mono;
-}
-
-/* Callout */
-
-.kg-callout-card.kg-card {
-  border-radius: 0.25em;
-}
-
-.kg-callout-card-accent a {
-  text-decoration: underline;
-}
-
-/* Blockquote */
-
-blockquote:not([class]) {
-  padding-left: 2rem;
-  border-left: 4px solid var(--ghost-accent-color);
-    @apply text-light;
-}
-
-blockquote.kg-blockquote-alt {
-  @apply text-light;
-  font-style: normal;
-  font-weight: 400;
-}
-
-/* Button */
-
-.kg-card.kg-button-card .kg-btn {
-  height: unset;
-  padding: .6em 1.2em;
-  text-align: center;
-  font-size: 1em;
-  line-height: 1.2em;
-}
-
-/* Header */
-
-.has-serif-title .kg-card.kg-header-card h2.kg-header-card-header {
-    @apply font-serif;
-}
-
-.has-mono-title .kg-card.kg-header-card h2.kg-header-card-header {
-    @apply font-mono;
-}
-
-.has-serif-body .kg-header-card h3.kg-header-card-subheader {
-    @apply font-serif;
-}
-
-/* Bookmark */
-
-.kg-bookmark-card .kg-bookmark-container {
-  border-radius: 0.25em !important;
-  @apply text-light
-}
-
-.kg-bookmark-card .kg-bookmark-container:hover {
-  opacity: 1;
-}
-
-.kg-bookmark-card a.kg-bookmark-container,
-.kg-bookmark-card a.kg-bookmark-container:hover {
-    @apply bg-dark text-lighter;
-    background: #212121!important;
-    color: #fefefe!important;
-
-
-}
-
-.kg-bookmark-card .kg-bookmark-content {
-  padding: 1.15em;
-}
-
-.kg-bookmark-card .kg-bookmark-title {
-  font-size: 0.9em;
-}
-
-.kg-bookmark-card .kg-bookmark-description {
-  max-height: none;
-  margin-top: 0.3em;
-  font-size: 0.8em;
-}
-
-.kg-bookmark-card .kg-bookmark-metadata {
-  font-size: 0.8em;
-}
-
-.kg-bookmark-card .kg-bookmark-thumbnail img {
-  border-radius: 0 0.2em 0.2em 0;
-  margin-top: 0;
-
-}
-
-/* Product */
-
-.kg-product-card.kg-card .kg-product-card-image {
-  margin-bottom: 12px;
-}
-
-.kg-product-card.kg-card a.kg-product-card-button {
-  height: 2.8em;
-  margin-top: 12px;
-}
-
-.has-serif-title .kg-product-card.kg-card .kg-product-card-title {
-    @apply font-serif;
-}
-
-.has-mono-title .kg-product-card.kg-card .kg-product-card-title {
-    @apply font-mono;
-}
-
-.has-serif-body .kg-product-card-description :is(p, ul, ol) {
-  font-family: var(--font-serif-alt);
-}
-
-/* File */
-
-.kg-file-card.kg-card .kg-file-card-container {
-  padding: 0.6em;
-}
-
-.kg-file-card.kg-card .kg-file-card-contents {
-  margin: 4px 8px 6px;
-}
-
-.kg-file-card.kg-card .kg-file-card-metadata {
-  font-size: 0.9em;
-}
-
-.kg-file-card.kg-card .kg-file-card-filesize::before {
-  margin-right: 6px;
-  margin-left: 6px;
-}
-
-/* Caption */
-
-figcaption {
-  @apply mt-3 text-sm text-light text-center
-}
-
-.kg-card.kg-width-full figcaption {
-  padding: 0 16px;
-}
-
-figcaption a {
-  text-decoration: underline;
 }
 
 /* 17. Comments

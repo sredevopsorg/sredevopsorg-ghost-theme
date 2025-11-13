@@ -33,3 +33,4 @@ old/
 .cursorignore
 .env
 docker-compose.yml
+demo.html

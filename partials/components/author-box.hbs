@@ -3,16 +3,19 @@
     {{#foreach authors}}
 
     <div class="flex flex-col w-full p-4">
-            <div class="flex items-center gap-4 mb-4">
+            <div class="flex flex-col gap-4 mb-4">
+                <span>
                 {{#if profile_image}}
                     <img src="{{img_url profile_image size="xs" format="webp"}}" alt="{{name}}" class="rounded-full">
                 {{/if}}
-                <h3 class="text-xl font-normal text-light">{{name}}</h3>
+                </span>
+                <span class=" text-base font-normal text-light">{{name}}</span>
+                <span class="text-xs" ><a href="{{url}}">View more content by {{name}}</a></span>
+            {{#if bio}}
+                <span class="text-base">{{bio}}</span>
+            {{/if}}
             </div>
 
-            {{#if bio}}
-                <p class="text-lg">{{bio}}</p>
-            {{/if}}
 
             <div class="flex flex-wrap gap-2 mb-4">
                 <div class="flex flex-wrap gap-2 text-sm">
@@ -88,14 +91,6 @@
                             Instagram
                         </a>
                     {{/if}}
-                    {{#match slug "==" "ngeorger"}}
-                        <a href="mailto:ngeorger@sredevops.org" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Email">
-                                <use xlink:href="#icon-contact-us"></use>
-                            </svg>
-                            Email
-                        </a>
-                    {{/match}}
                     {{#if location}}
                         <span class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark text-light">
                             <svg class="w-5 h-5 text-light" role="img" aria-label="Location">

@@ -1,0 +1,116 @@
+{{!< default}} {{! This tells Ghost to use default.hbs as the base layout }}
+
+<main id="main" class="container pt-6 pb-6 mx-auto md:pl-64">
+    <div class="container">
+        {{#get "authors" limit="5" include="count.posts" order="count.posts desc"}}
+            {{#foreach authors}}
+                <section class="flex flex-col {{slug}} max-w-6xl mx-auto my-32">
+                    <div class="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8 pb-8 border-b border-b0 mb-8">
+                        {{#if profile_image}}
+                            <img src="{{profile_image}}" alt="{{name}}" class="w-32 h-32 object-cover rounded-full" />
+                        {{else}}
+                            <img src="{{asset "images/default-avatar.png"}}" alt="{{name}}" class="w-32 h-32 object-cover rounded-full" />
+                        {{/if}}
+                        <div class="flex flex-col gap-2 md:max-w-xl">
+                            <div class="flex items-center gap-2">
+                                <h2>{{name}}</h2>
+                                <div class="flex gap-2 items-center text-sm opacity-30 hover:opacity-70 transition-all duration-200 text-h4">
+                                    {{#if website}}
+                                        <a
+                                            href="{{website}}"
+                                            aria-label="Website"
+                                            class="hover:underline"
+                                            target="_blank" rel="noopener noreferrer"
+                                        >
+                                            <div data-icon="globe" class="scale-95"></div>
+                                        </a>
+                                    {{/if}}
+                                    {{#if twitter}}
+                                        <a
+                                            href="https://x.com/{{twitter}}"
+                                            aria-label="Twitter"
+                                            class="hover:underline"
+                                            target="_blank" rel="noopener noreferrer"
+                                        >
+                                            <div data-icon="x"></div>
+                                        </a>
+                                    {{/if}}
+                                    {{#if facebook}}
+                                        <a
+                                            href="https://facebook.com/{{facebook}}"
+                                            aria-label="Facebook"
+                                            class="hover:underline"
+                                            target="_blank" rel="noopener noreferrer"
+                                        >
+                                            <div data-icon="facebook"></div>
+                                        </a>
+                                    {{/if}}
+                                </div>
+                            </div>
+                            {{#if bio}}
+                                <p>{{bio}}</p>
+                            {{/if}}
+                        </div>
+                        <div class="flex flex-col lg:self-end lg:ml-auto">
+                            <div class="flex items-center gap-2 font-medium">{{plural count.posts empty="No posts" singular="% post" plural="% posts"}}</div>
+                            <a href="{{url}}" class="flex items-center gap-2 text-sm opacity-50">
+                                <span class="hover:underline">View all</span> <span data-icon="arrow_right"></span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {{! Display recent posts by this author }}
+                    {{#get "posts" filter="authors:{{slug}}" limit="4" as |author_posts|}}
+                        <section class="col-span-1 md:col-span-3 ">
+                            <div class="relative grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                {{#foreach author_posts}}
+                                    <article class="post-card post-card--{{#if @first}}column{{else}}row-reverse{{/if}} {{#unless @first}}nth-3:pt-4 nth-4:pt-4 nth-3:border-t nth-4:border-t{{/unless}} border-b0 {{#if @first}}pb-4 md:border-r md:border-b-0 md:pr-8{{/if}} post {{post_class}}">
+                                        {{#if feature_image}}
+                                            <figure class="relative {{#if @first}}!aspect-[1.4]{{else}}w-28 !h-28 flex-shrink-0{{/if}}">
+                                                <img
+                                                    alt="{{title}}"
+                                                    class=""
+                                                    loading="lazy"
+                                                    src="{{img_url feature_image size="s"}}"
+                                                    srcset="{{img_url feature_image size="s"}} 320w,
+                                                            {{img_url feature_image size="m"}} 600w,
+                                                            {{img_url feature_image size="l"}} 960w,
+                                                            {{img_url feature_image size="xl"}} 1200w,
+                                                            {{img_url feature_image size="xxl"}} 2000w"
+                                                >
+                                                {{#if feature_image_caption}}
+                                                    <figcaption class="text-xs text-center text-gray-500 mt-2">{{feature_image_caption}}</figcaption>
+                                                {{/if}}
+                                                <a href="{{url}}" class="absolute inset-0 z-10"></a>
+                                            </figure>
+                                        {{/if}}
+
+                                        <div class="post-card-content {{#unless @first}}flex-1{{/unless}}">
+                                            {{#if primary_tag}}
+                                                <div class="text-xs uppercase tracking-wide font-medium text-gray-500 -mb-1 hidden">
+                                                    <a href="{{primary_tag.url}}">{{primary_tag.name}}</a>
+                                                </div>
+                                            {{/if}}
+
+                                            <h3 class="mt-0 {{#unless @first}}text-h4{{/unless}}"><a href="{{url}}">{{title}}</a></h3>
+
+                                            <a href="{{url}}" class="post-card-excerpt ">
+                                                {{excerpt words="25"}}
+                                            </a>
+
+                                            <div class="font-light text-xs opacity-50 ">
+                                                By {{#primary_author}}<a href="{{url}}" class="hover:underline">{{name}}</a>{{/primary_author}}
+                                                <span>•</span>
+                                                <span>{{reading_time}}</span>
+                                            </div>
+                                        </div>
+                                    </article>
+                                {{/foreach}}
+                            </div>
+                        </section>
+                    {{/get}}
+                </section>
+            {{/foreach}}
+        {{/get}}
+    </div>
+</main>

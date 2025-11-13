@@ -1,27 +1,34 @@
 <!DOCTYPE html>
-<html lang="{{@site.locale}}" data-mode="dark">
+<html lang="{{@site.locale}}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{meta_title}}</title>
     <link rel="stylesheet" href="{{asset "built/screen.css"}}">
-    {{#is "post"}}
+    <!-- Excludes card_assets, cta_styles, comment_counts, announcement from ghost_head on home, tag, author and index template -->
+    {{#is "home, tag, author, index, paged"}}
+    {{ghost_head exclude="card_assets, cta_styles, comment_counts, announcement"}}
+    {{else}}
+    {{ghost_head exclude="cta_styles, comment_counts, announcement"}}
+    {{/is}}
+    <!-- End Excludes card_assets, cta_styles, comment_counts, announcement from ghost_head on home, tag, author and index template -->
+
+
+
+    <!-- Loads PrismJS, Tocbot and card assets only on posts -->
+    {{#is "post, page"}}
         <script src="{{asset "built/prism.js"}}"></script>
         <link rel="stylesheet" href="{{asset "built/prism.css"}}">
         <link rel="stylesheet" href="{{asset "built/tocbot.css"}}">
+        <link rel="stylesheet" href="{{asset "built/cards.css"}}">
     {{/is}}
+    <!-- End Loads PrismJS, Tocbot and card assets only on posts -->
 
-    {{#is "home, tag, author, index"}}
-        {{ghost_head exclude="card_assets,cta_styles,comment_counts,announcement"}}
-    {{else}}
-        {{ghost_head}}
-    {{/is}}
 
 </head>
 
 <body class="{{body_class}} bg-gradient-to-r from-darker via-darker to-dark">
 
-    {{> "icons"}}
     {{> "components/nav"}}
 
     {{!-- Main content, dynamically inserted here --}}
@@ -31,8 +38,10 @@
     {{> "components/footer"}}
 
 <script src="{{asset "built/main.js"}}" defer></script>
+
+<!-- Load Tocbot only on posts -->
 {{#is "post"}}
-        <script src="{{asset "built/tocbot.js"}}"></script>
+    <script src="{{asset "built/tocbot.js"}}"></script>
         <script>
             tocbot.init({
                 // Where to render the table of contents.
@@ -46,6 +55,10 @@
             });
         </script>
 {{/is}}
+
+<!-- Load SVG Icons -->
+{{> "icons"}}
+
 {{ghost_foot}}
 
 </body>
