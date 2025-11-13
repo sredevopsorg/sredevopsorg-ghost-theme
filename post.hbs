@@ -4,7 +4,7 @@
 
   {{#post}}
   <!-- Post Content Section -->
-  <article class="prose-lg post-content prose-invert text-light">
+  <article class="prose-invert prose-lg post-content text-light">
     {{#is "page"}}
       {{#if @page.show_title_and_feature_image}}
         <h1 class="text-4xl text-center">{{title}}</h1>
@@ -26,7 +26,7 @@
       <div class="mb-2 text-xs text-light">
         {{#foreach authors}}
           Author: <a href="{{url}}" class="hover:underline" rel="author" >{{name}}</a> 
-        {{/foreach}} | Published on {{date published_at format="D MMMM YYYY"}}
+        {{/foreach}} | {{t "Published at"}} {{date published_at format="d MMMM YYYY"}}
       </div>
     {{/is}}
     </section>
@@ -38,9 +38,9 @@
         <span>Table of Contents</span>
         <div class="gh-toc"></div>
       </aside> {{! The TOC will be inserted here }}
-      <div class="lg:col-span-2 pr-4">
-        {{else}}
-      <section class="gh-content grid grid-cols-1 gap-4">
+      <div class="lg:col-span-2 pr-4 contenido">
+      {{else}}
+        <section class="gh-content grid grid-cols-1 gap-4">
       {{/is}}
       {{{content}}}
       </div>

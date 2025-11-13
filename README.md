@@ -1,6 +1,6 @@
 # SREDevOps.org Ghost Theme
 
-Our Ghost v5 Theme made for [SREDevOps.org](https://sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navigation, customized tags, and recommendations pages. Highly inspired by [Priority Vision's "Aspect" Theme](https://www.priority.vision/themes/aspect/) and took many functionalities from [@TryGhost "Source" default theme](https://github.com/TryGhost/Source).
+Our Ghost v6 Theme made for [SREDevOps.org](https://www.sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navigation, customized tags, and recommendations pages. Highly inspired by [Priority Vision's "Aspect" Theme](https://www.priority.vision/themes/aspect/) and took many functionalities from [@TryGhost "Source" default theme](https://github.com/TryGhost/Source).
 
 ## Table of Contents
 
@@ -17,9 +17,8 @@ Our Ghost v5 Theme made for [SREDevOps.org](https://sredevops.org) based on Tail
 
 - [x] Missing SVG Icons
 - [ ] Granular internationalization using custom post templates
-- [ ] Ghost Cards assets CSS Cleanup
+- [x] Ghost Cards assets CSS Cleanup
 - [ ] Migrate Tailwind classes from inline styles into stylesheets files
-- ~~[ ] Improve Algolia Search~~ (Replaced with Ghost Search)
 - [x] Implement custom options
 
 ## Repo
@@ -28,7 +27,7 @@ Find the source code on [GitHub Repo](https://github.com/sredevopsorg/sredevopso
 
 ## Demo
 
-Check out the live demo at [SREDevOps.org](https://sredevops.org).
+Check out the live demo at [www.SREDevOps.org](https://www.sredevops.org).
 
 ## Installation
 
