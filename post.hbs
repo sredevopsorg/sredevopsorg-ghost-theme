@@ -10,6 +10,7 @@
         <h1 class="text-4xl text-center">{{title}}</h1>
         {{> "feature-image"}}
       {{/if}}
+      {{!-- {{> social-share}} --}}
     {{/is}}
 
     {{#is "post"}}
@@ -40,12 +41,25 @@
       </aside> {{! The TOC will be inserted here }}
       <div class="lg:col-span-2 pr-4 contenido">
       {{else}}
-        <section class="gh-content grid grid-cols-1 gap-4">
+        <section class="lg:col-span-2 pr-4 contenido">
       {{/is}}
       {{{content}}}
       </div>
     </section>
-    {{#is "post"}}
+
+
+{{#is "post"}}
+<h2>{{t "Related content"}}</h2>
+{{#get "posts" include="authors" filter="id:-{{id}}+tags:[{{primary_tag.slug}}]" limit="2" as |next|}}
+{{#if next}}
+<section id="post-list">
+      {{#foreach next}}
+      {{> "post-card"}}
+      {{/foreach}}
+</section>
+{{/if}}
+{{/get}}
+
     <section id="comments">
         {{#if comments}}
         <div class="gh-comments gh-canvas">
@@ -58,8 +72,8 @@
         </div>
         {{/if}}
     </section>
-
         {{> "components/author-box"}}
+
 
     {{/is}}
   </article>
