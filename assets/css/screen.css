@@ -94,7 +94,13 @@ p {
   margin-bottom: 0.1rem;
   /* Optional margin for spacing */
 }
-
+.contenido a {
+  text-decoration: underline;
+}
+.contenido a:hover {
+  text-decoration: underline;
+  color: var(--ghost-accent-color);
+}
 /* Grid layout */
 .grid-container {
   display: grid;

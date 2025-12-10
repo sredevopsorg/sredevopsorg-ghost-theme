@@ -21,7 +21,8 @@ module.exports = {
         lighter: "#ffffff", // Main texts, links, headings
         // light: "#C2C2C2", // Contents, body, text
         light: "#e6e6e6",
-        highlight: "#600ba0"
+        highlight: "#600ba0",
+        sidebar: "rgba(15, 15, 15, 0.5)"
       },
       fontFamily: {
         'body': [

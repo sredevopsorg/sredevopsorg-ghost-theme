@@ -9,7 +9,7 @@
 
 <div id="overlay" class="fixed inset-0 hidden bg-black opacity-50" onclick="toggleSidebar()"></div>
 
-<aside id="sidebar" class="fixed z-10 hidden w-64 h-screen p-6 overflow-y-scroll transition-transform duration-300 transform -translate-x-full bg-darker md:block md:translate-x-0">
+<aside id="sidebar" class="fixed z-10 hidden w-64 h-screen p-6 overflow-y-scroll transition-transform duration-300 transform -translate-x-full bg-sidebar md:block md:translate-x-0">
     <div id="logo" class="mb-6">
         {{#if @site.logo}}
                 <a href="{{@site.url}}" rel="me" alt="{{@site.title}}" aria-label="{{@site.title}}">
