@@ -2,16 +2,16 @@
 <figure>
     <picture>
         {{#is "home, index, tag, author, paged" }}
-        <img src="{{img_url feature_image format='webp' size='s'}}" alt="{{title}}" class="object-cover w-full">
+        <img src="{{img_url feature_image format='webp' size='m'}}" alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}" class="object-cover w-full" {{#if @custom.lazy_images}} loading="lazy"{{/if}}>
         {{else}}
-        <img src="{{img_url feature_image format='webp' size='xl'}}" alt="{{title}}"
+        <img src="{{img_url feature_image format='webp' size='xl'}}" alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
             class="items-center clear-both mx-auto">
         {{/is}}
     </picture>
-    {{#unless "post" }}
+    {{#is "post" }}
     {{#if feature_image_caption}}
-    <figcaption class="text-xs text-center text-light">{{feature_image_caption}}</figcaption>
+    <figcaption class="text-xs text-center text-light italic">{{feature_image_caption}}</figcaption>
     {{/if}}
-    {{/unless}}
+    {{/is}}
 </figure>
 {{/if}}

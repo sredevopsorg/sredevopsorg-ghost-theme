@@ -34,11 +34,7 @@
 
     <!-- Main Post Content -->
       {{#is "post"}}
-    <section class="gh-content grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-8">
-      <aside class="gh-sidebar">
-        <span>{{t "Table of Contents"}}</span>
-        <div class="gh-toc"></div>
-      </aside> {{! The TOC will be inserted here }}
+    <section class="grid grid-cols-1 gap-4 lg:grid-cols-1 lg:gap-8">
       <div class="lg:col-span-2 pr-4 contenido">
       {{else}}
         <section class="lg:col-span-2 pr-4 contenido">
@@ -50,7 +46,7 @@
 
 {{#is "post"}}
 <h2>{{t "Related content"}}</h2>
-{{#get "posts" include="authors" filter="id:-{{id}}+tags:[{{primary_tag.slug}}]" limit="2" as |next|}}
+{{#get "posts" include="authors" filter="id:-{{id}}+tags:[{{primary_tag.slug}}]" limit="3" as |next|}}
 {{#if next}}
 <section id="post-list">
       {{#foreach next}}
