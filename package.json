@@ -41,7 +41,7 @@
         "https://github.com/sredevopsorg/sredevopsorg-ghost-theme/graphs/contributors"
     ],
     "devDependencies": {
-        "@tailwindcss/forms": "^0.5.10",
+        "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/typography": "^0.5.19",
         "autoprefixer": "^10.4.22",
         "cssnano": "7.1.2",
