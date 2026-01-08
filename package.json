@@ -2,7 +2,7 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost v6 Theme made for SREDevOps.org (https://www.sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navgation, customized tags and recommendations pages.",
     "demo": "https://www.sredevops.org",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "engines": {
         "ghost": ">=5.0.0"
     },

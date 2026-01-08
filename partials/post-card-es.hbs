@@ -1,0 +1,24 @@
+<article id="{{slug}}">
+  <a href="{{url absolute=" true"}}" alt="{{title}}">
+    {{> "feature-image"}}
+  </a>
+  <div>
+
+    <h1>
+      <a href="{{url absolute=" true"}}">
+        {{title}}
+      </a>
+    </h1>
+
+    <p class="mt-2 text-sm line-clamp-3 text-light">
+      {{excerpt}}
+    </p>
+
+    <a href="{{url absolute=" true"}}" class="inline-flex items-center gap-1 mt-4 text-sm font-medium group"
+      alt="{{title}}" rel="bookmark">
+      <h4 class="block transition-all group-hover:ms-0.5" alt="{{title}}">
+                        Leer más &rarr;
+      </h4>
+    </a>
+  </div>
+</article>
