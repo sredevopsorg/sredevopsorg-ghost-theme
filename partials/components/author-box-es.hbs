@@ -1,0 +1,107 @@
+    <!-- Author Box -->
+    <section class="mt-8 author-box">
+    {{#foreach authors}}
+
+    <div class="flex flex-col w-full p-4">
+            <div class="flex flex-col gap-4 mb-4">
+                <span>
+                {{#if profile_image}}
+                    <img src="{{img_url profile_image size="xs" format="webp"}}" alt="{{name}}" class="rounded-full">
+                {{/if}}
+                </span>
+                <span class=" text-base font-normal text-light">{{name}}</span>
+                <span class="text-xs" ><a href="{{url}}">Ver más contenido por {{name}}</a></span>
+            {{#if bio}}
+                <span class="text-base">{{bio}}</span>
+            {{/if}}
+            </div>
+
+
+            <div class="flex flex-wrap gap-2 mb-4">
+                <div class="flex flex-wrap gap-2 text-sm">
+                    {{#if website}}
+                        <a href="{{website}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Website">
+                                <use xlink:href="#icon-link"></use>
+                            </svg>
+                            Website
+                        </a>
+                    {{/if}}
+                    {{#if twitter}}
+                        <a href="{{social_url type="twitter"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Twitter">
+                                <use xlink:href="#icon-x"></use>
+                            </svg>
+                            Twitter
+                        </a>
+                    {{/if}}
+                    {{#if facebook}}
+                        <a href="{{social_url type="facebook"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Facebook">
+                                <use xlink:href="#icon-facebook"></use>
+                            </svg>
+                            Facebook
+                        </a>
+                    {{/if}}
+                    {{#if threads}}
+                        <a href="{{social_url type="threads"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Threads">
+                                <use xlink:href="#icon-threads"></use>
+                            </svg>
+                            Threads
+                        </a>
+                    {{/if}}
+                    {{#if bluesky}}
+                        <a href="{{social_url type="bluesky"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Bluesky">
+                                <use xlink:href="#icon-bluesky"></use>
+                            </svg>
+                            Bluesky
+                        </a>
+                    {{/if}}
+                    {{#if mastodon}}
+                        <a href="{{social_url type="mastodon"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Mastodon">
+                                <use xlink:href="#icon-mastodon"></use>
+                            </svg>
+                            Mastodon
+                        </a>
+                    {{/if}}
+                    {{#if tiktok}}
+                        <a href="{{social_url type="tiktok"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="TikTok">
+                                <use xlink:href="#icon-tiktok"></use>
+                            </svg>
+                            TikTok
+                        </a>
+                    {{/if}}
+                    {{#if youtube}}
+                        <a href="{{social_url type="youtube"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="YouTube">
+                                <use xlink:href="#icon-youtube"></use>
+                            </svg>
+                            YouTube
+                        </a>
+                    {{/if}}
+                    {{#if instagram}}
+                        <a href="{{social_url type="instagram"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Instagram">
+                                <use xlink:href="#icon-instagram"></use>
+                            </svg>
+                            Instagram
+                        </a>
+                    {{/if}}
+                    {{#if location}}
+                        <span class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark text-light">
+                            <svg class="w-5 h-5 text-light" role="img" aria-label="Location">
+                                <use xlink:href="#icon-globe"></use>
+                            </svg>
+                            {{location}}
+                        </span>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    {{/foreach}}
+
+    </section>
