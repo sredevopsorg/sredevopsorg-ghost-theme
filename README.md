@@ -16,7 +16,7 @@ Our Ghost v6 Theme made for [SREDevOps.org](https://www.sredevops.org) based on 
 ## To Do / Roadmap
 
 - [x] Missing SVG Icons
-- [ ] Granular internationalization using custom post templates
+- [x] Granular internationalization using custom post templates: Since v1.4.2, using custom post template for Spanish locales is available.
 - [x] Ghost Cards assets CSS Cleanup
 - [ ] Migrate Tailwind classes from inline styles into stylesheets files
 - [x] Implement custom options
