@@ -1,5 +1,4 @@
 {{!< default-es}}
-<!-- This is the custom post template for Spanish content -->
 <main id="main post-wrapper">
 
   {{#post}}
@@ -27,7 +26,7 @@
       <div class="mb-2 text-xs text-light">
         {{#foreach authors}}
           Autor: <a href="{{url}}" class="hover:underline" rel="author" >{{name}}</a> 
-        {{/foreach}} | Publicado {{date published_at format="dd MMMM YYYY"}}
+        {{/foreach}} | Publicado {{date published_at format="DD MM YYYY"}}
       </div>
     {{/is}}
     </section>
@@ -50,7 +49,7 @@
 
 {{#is "post"}}
 <h2>Más contenido:</h2>
-{{#get "posts" include="authors" filter="id:-{{id}}+tags:[{{primary_tag.slug}}]" limit="2" as |next|}}
+{{#get "posts" filter="id:-{{id}}+tags:[es,{{primary_tag.slug}}]" limit="2" as |next|}}
 {{#if next}}
 <section id="post-list">
       {{#foreach next}}
