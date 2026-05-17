@@ -181,7 +181,7 @@ This triggers:
 
 When creating content in Ghost Admin or via Markdown import:
 
-```yaml
+```md
 ---
 title: "My Post Title"
 slug: "my-post-slug"
@@ -191,9 +191,11 @@ tags:
   - Kubernetes  # Topic tags
   - SRE
 ---
+
 ```
 
 ⚠️ **Critical**: Omitting either `en`/`es`/`br` **or** its `hash-*` counterpart will cause the post to not appear in locale-specific collections due to the `filter` logic in `routes.yaml`.
+
 
 ### Template Resolution Flow
 
@@ -202,9 +204,9 @@ graph LR
     A[Request: /es/my-post/] --> B[routes.yaml filter]
     B --> C{tag:es AND NOT en/br?}
     C -->|Yes| D[home-es.hbs]
-    D --> E[{{!< default-es.hbs}}]
-    E --> F[<html lang='es'> + assets]
-    F --> G[{{{body}}} ← custom-es.hbs content]
+    D --> E[Inherits default-es.hbs]
+    E --> F[Render html lang='es']
+    F --> G[Inject body from custom-es.hbs]
 ```
 
 ### Creating Locale-Specific Templates
