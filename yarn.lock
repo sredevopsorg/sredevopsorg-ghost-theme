@@ -302,9 +302,9 @@ caniuse-api@^4.0.0:
     caniuse-lite "^1.0.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001799:
-  version "1.0.30001799"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001799.tgz#5c909138c27f1a61219d3e092071c1cc7d32dc55"
-  integrity sha512-hG1bReV+OUU+MOqK4t/ZWI0tZOyz3rqS9XuhOUz1cIcbwBKjOyJEJuw9ER5JuNyqxNk8u/JUVbGibBOL1yrjFw==
+  version "1.0.30001800"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001800.tgz#b896c773e1c39400809415162bb5320371291b36"
+  integrity sha512-MMHtuAz9Ys840zAY5F4k6fV5GaivZ9sPk+nz0mY+GYVzRBnYkN0mpqkSR92oWRQ19yQWo4HvBV/FnC16AJX8MA==
 
 chalk@^2.4.1:
   version "2.4.2"
@@ -602,9 +602,9 @@ each-props@^3.0.0:
     object.defaults "^1.1.0"
 
 electron-to-chromium@^1.5.376:
-  version "1.5.380"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.380.tgz#6dbe112f22b35ccdf627f894ad7515cdd35f6388"
-  integrity sha512-W6d5AbuEoRayO447cqrg6lKJIlscgRnnxOZl/08kfV71BQDoEBC7Wwis68z87LjyK6f4kWyTaubuDbhHKrZkbA==
+  version "1.5.383"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.383.tgz#5bd22306497d454103b289b0fef97260c56d0855"
+  integrity sha512-I2484/KkAvl8lm9VyjH2JnbOIV0d/UCqT7gbzs6l+o6Vmn9wgB66uVcKX+Vk6HrXtY6fbWTOEXuv8waDTuFNCw==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -1720,10 +1720,10 @@ postcss-value-parser@^4.0.0, postcss-value-parser@^4.2.0:
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@^8.4.47, postcss@^8.5.15:
-  version "8.5.15"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.15.tgz#d1eaf677a324e9ec02196da2d3fecf4a0b9a735c"
-  integrity sha512-FfR8sjd4em2T6fb3I2MwAJU7HWVMr9zba+enmQeeWFfCbm+UOC/0X4DS8XtpUTMwWMGbjKYP7xjfNekzyGmB3A==
+postcss@^8.4.47, postcss@^8.5.16:
+  version "8.5.16"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.5.16.tgz#1230ce0b5df354c24c0ea45f99ce5f6a88279d28"
+  integrity sha512-vuwillviilfKZsg0VGj5R/YwwcHx4SLsIOI/7K6mQkWx+l5cUHTjj5g0AasTBcyXsbfTgrwsUNmVUb5xVwyPwg==
   dependencies:
     nanoid "^3.3.12"
     picocolors "^1.1.1"
