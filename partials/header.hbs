@@ -1,0 +1,47 @@
+<header class="sticky top-0 z-50 w-full bg-[#0d0e11]/80 backdrop-blur-md border-b border-white/10 py-3 min-h-[60px]">
+  {{!-- Inner container to keep spacing consistent with the rest of the theme --}}
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+
+    <div class="flex items-center">
+        {{#if @site.logo}}
+        <a href="{{@site.url}}" rel="me" alt="{{@site.title}}" aria-label="{{@site.title}}">
+          <img src="{{@site.logo}}" alt="{{@site.title}}" />
+        </a>
+        {{else}}
+        <a href="{{@site.url}}"
+          class="text-2xl font-bold text-white tracking-tight hover:text-brand-purple transition-colors">{{@site.title}}</a>
+        {{/if}}
+    </div>
+
+    {{!-- Desktop Navigation (Horizontal) --}}
+    <div class="hidden md:flex items-center space-x-8 text-sm font-medium font-mono">
+      {{#if @site.navigation}}
+      {{navigation type="primary"}}
+      {{else}}
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">Stories</a>
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">Wire</a>
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">About</a>
+      {{/if}}
+      <a href="/subscribe/"
+        class="bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 px-5 rounded-lg text-sm transition-colors">Subscribe</a>
+    </div>
+
+    {{!-- Mobile Menu Toggle --}}
+    <button id="mobile-toggle" class="text-gray-400 md:hidden"><i class="fas fa-bars text-xl"></i></button>
+
+    {{!-- Mobile Menu Overlay (Vertical items) --}}
+    <nav id="mobile-menu"
+      class="hidden absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex-col gap-4 text-sm font-medium font-mono z-50">
+      {{#if @site.navigation}}
+      {{navigation type="primary"}}
+      {{else}}
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">Stories</a>
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">Wire</a>
+      <a href="#" class="text-gray-400 hover:text-white transition-colors">About</a>
+      {{/if}}
+      <a href="/subscribe/"
+        class="bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 px-5 rounded-lg text-center transition-colors mt-2">Subscribe</a>
+    </nav>
+
+  </div>
+</header>

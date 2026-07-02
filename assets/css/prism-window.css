@@ -1,0 +1,70 @@
+/* --- PrismJS Tomorrow Theme Colors (compatible with your JS bundle) --- */
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: #8e8e8e; }
+.token.punctuation { color: #ccc; }
+.token.boolean, .token.number { color: #f08d49; }
+.token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #98c379; }
+.token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #56b6c2; }
+.token.atrule, .token.attr-value, .token.keyword { color: #c678dd; }
+.token.function, .token.class-name, .token.tag, .token.namespace { color: #e06c75; }
+.token.regex, .token.important, .token.variable { color: #f08d49; }
+
+/* --- macOS Window Styling for Code Blocks --- */
+pre[class*="language-"] {
+    background: #1e1e1e !important;
+    border-radius: 8px !important;
+    border: 1px solid #2a2c35 !important;
+    position: relative !important;
+    padding: 48px 16px 16px 16px !important;
+    overflow: hidden !important;
+    margin-bottom: 2rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* The macOS Window Header with Red, Yellow, Green dots */
+pre[class*="language-"]::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 40px !important;
+    background: #2d2f34 !important;
+    border-bottom: 1px solid #3a3c42 !important;
+    border-radius: 8px 8px 0 0 !important;
+    /* Three dots via radial gradients */
+    background-image: 
+        radial-gradient(circle, #ff5f57 6px, transparent 6px), 
+        radial-gradient(circle, #ffbd2e 6px, transparent 6px), 
+        radial-gradient(circle, #28ca41 6px, transparent 6px) !important;
+    background-size: 12px 12px, 12px 12px, 12px 12px !important;
+    background-repeat: no-repeat !important;
+    background-position: 16px 14px, 36px 14px, 56px 14px !important;
+    z-index: 10 !important;
+}
+
+/* Hide the default toolbar to keep the window clean */
+.toolbar { display: none !important; }
+
+/* --- Fix Line Numbers (Offset for the header) --- */
+pre.line-numbers {
+    padding-left: 4.2em !important;
+}
+pre.line-numbers .line-numbers-rows {
+    border-right: 1px solid #36393f !important;
+    left: -4.2em !important;
+    top: 48px !important; /* Push down under the header */
+    padding-right: 8px !important;
+}
+.line-numbers-rows > span::before { color: #858585 !important; }
+
+/* --- Fix Line Highlights (Offset for the header) --- */
+.line-highlight {
+    margin-top: 48px !important;
+    background: rgba(45, 75, 56, 0.6) !important; /* Dark green highlight */
+    pointer-events: none !important;
+    z-index: 5 !important;
+}
+
+code,kbd,pre,samp {
+    font-size: 0.8rem !important;
+}

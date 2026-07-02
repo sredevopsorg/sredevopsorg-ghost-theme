@@ -1,83 +1,90 @@
-{{!< default}}
+{{!< default}} {{#post}} {{#is "post" }} {{!-- Header Grid: 2/3 Text, 1/3 Image --}} <div
+  class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-gray-800 pb-8">
 
-<main id="main post-wrapper">
-
-  {{#post}}
-  <!-- Post Content Section -->
-  <article class="prose-invert prose-lg post-content text-light">
-    {{#is "page"}}
-      {{#if @page.show_title_and_feature_image}}
-        <h1 class="text-4xl text-center">{{title}}</h1>
-        {{> "feature-image"}}
+  {{!-- Left Column: Text Info (min 2/3 width) --}}
+  <div class="lg:col-span-8 flex flex-col justify-center">
+    <div class="flex items-center gap-3 mb-3">
+      {{#if primary_tag}}
+      <span
+        class="bg-brand-purple text-white text-[10px] font-bold px-3 py-1  tracking-wide uppercase font-mono">{{primary_tag.name}}</span>
       {{/if}}
-      {{!-- {{> social-share}} --}}
-    {{/is}}
+      <span class="text-gray-500 text-xs"><i class="far fa-clock mr-1"></i> {{reading_time minute=(t "Just a minute or less") minutes=(t "Takes about % minutes to read")}}</span>
+    </div>
 
-    {{#is "post"}}
-    <h1 class="text-4xl text-center">{{title}}</h1>
-    {{> social-share}}
+    <h1 class="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-white mb-3">{{title}}</h1>
 
-    <section class="mb-8 text-center post-meta">
-        <div class="space-x-2 tags">
-          {{#foreach tags}}
-            <a href="{{url}}" class="px-2 py-1 text-sm rounded bg-dark hover:bg-highlight">{{name}}</a>
-          {{/foreach}}
-        </div>
-      {{> "feature-image" }}
-      <div class="mb-2 text-xs text-light">
-        {{#foreach authors}}
-          {{t "Author"}}: <a href="{{url}}" class="hover:underline" rel="author" >{{name}}</a> 
-        {{/foreach}} | {{t "Published at"}} {{date published_at format="d MMMM YYYY"}}
-      </div>
-    {{/is}}
-    </section>
+    <p class="text-lg text-gray-400 leading-relaxed max-w-3xl mb-4">{{excerpt}}</p>
 
-    <!-- Main Post Content -->
-      {{#is "post"}}
-    <section class="gh-content grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-8">
-      <aside class="gh-sidebar">
-        <span>{{t "Table of Contents"}}</span>
-        <div class="gh-toc"></div>
-      </aside> {{! The TOC will be inserted here }}
-      <div class="lg:col-span-2 pr-4 contenido">
+    <div class="flex items-center text-sm text-gray-400">
+      {{#foreach authors}}
+      {{#if profile_image}}
+      <img class="h-6 w-6 rounded-full mr-2 object-cover" src="{{img_url profile_image size="xs"}}" alt="{{name}}">
       {{else}}
-        <section class="lg:col-span-2 pr-4 contenido">
-      {{/is}}
-      {{{content}}}
-      </div>
-    </section>
-
-
-{{#is "post"}}
-<h2>{{t "Related content"}}</h2>
-{{#get "posts" include="authors" filter="id:-{{id}}+tags:[{{primary_tag.slug}}]" limit="2" as |next|}}
-{{#if next}}
-<section id="post-list">
-      {{#foreach next}}
-      {{> "post-card"}}
+      <span
+        class="h-6 w-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-300 font-bold mr-2">{{name}}</span>
+      {{/if}}
       {{/foreach}}
-</section>
-{{/if}}
-{{/get}}
+      <span class="mr-2 text-gray-300 font-medium">{{authors}}</span>
+      <span class="mr-2 text-gray-600">|</span>
+      <span>{{date published_at format="d MMMM YYYY"}}</span>
+    </div>
+  </div>
 
-    <section id="comments">
-        {{#if comments}}
-        <div class="gh-comments gh-canvas">
-            {{#if @member}}
-                {{comments count=false mode=dark title="Opinions?"}}
-            {{else}}
-            {{> "social-sso"}}
-            {{comments count=false mode=dark title=" "}}
-            {{/if}}
-        </div>
-        {{/if}}
+  {{!-- Right Column: Featured Image (max 1/3 width) --}}
+  <div class="lg:col-span-4 mt-4 lg:mt-0">
+    {{> "feature-image" class="w-full h-auto object-cover rounded-xl border border-gray-800 shadow-2xl"}}
+    {{#if feature_image_caption}}
+    <p class="mt-2 text-center text-xs text-gray-600">{{feature_image_caption}}</p>
+    {{/if}}
+  </div>
+  </div>
+
+  {{!-- Main Content Grid (Unchanged) --}}
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8 relative">
+    <div class="lg:col-span-8 gh-content">
+      {{{content}}}
+    </div>
+    <aside class="lg:col-span-4 relative">
+      <div class="sticky top-8 space-y-10">
+        {{> "sidebar"}}
+      </div>
+    </aside>
+  </section>
+
+  {{/is}}
+
+  {{#is "page"}}
+  {{#if @page.show_title_and_feature_image}}
+  <h1 class="text-4xl text-center text-white font-bold">{{title}}</h1>
+  {{> "feature-image"}}
+  {{/if}}
+  <section class="mt-8 gh-content">
+    {{{content}}}
+  </section>
+  {{/is}}
+
+  {{#is "post"}}
+  <div class="mt-16 border-t border-gray-800 pt-8">
+    <h2 class="text-2xl font-bold text-white mb-6">Related content</h2>
+    {{#get "posts" include="authors" filter="id:-{{id}}+tags:[{{primary_tag.slug}}]" limit="2" as |next|}}
+    {{#if next}}
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {{#foreach next}}{{> "post-card"}}{{/foreach}}
     </section>
-        {{> "components/author-box"}}
+    {{/if}}
+    {{/get}}
+  </div>
 
+  <section id="comments" class="mt-8 border-t border-gray-800 pt-8">
+    {{#if comments}}
+    <div class="gh-comments">
+      {{#if @member}}{{comments count=false mode=dark title="Opinions?"}}
+      {{else}}{{> "social-sso"}}{{comments count=false mode=dark title=" "}}
+      {{/if}}
+    </div>
+    {{/if}}
+  </section>
 
-    {{/is}}
-  </article>
-
+  {{> "components/author-box"}}
+  {{/is}}
   {{/post}}
-
-</main>

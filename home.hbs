@@ -1,13 +1,20 @@
 {{!< default}}
-<main id="main" class="container pt-6 pb-6 mx-auto md:pl-64">
-{{> "tags-nav" }}
-{{#tag}}
-<h1 class="pb-4 text-4xl">{{name}}</h1>
-{{#if description}}
-<h2 class="pb-4 text-xl">{{description}}</h2>
-{{/if}}
-{{/tag}}
 
-{{> "posts-list" }}
+<div class="max-w-6xl mx-auto pb-12">
+    
+    {{!-- Page Title & Description --}}
+    <div class="mb-10 border-b border-gray-800 pb-6">
+        <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight">{{@site.title}}</h1>
+        <p class="text-gray-400 mt-2 text-lg">{{@site.description}}</p>
+    </div>
 
-</main>
+    {{!-- Post Grid --}}
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {{#foreach posts}}
+            {{> "post-card"}}
+        {{/foreach}}
+    </section>
+
+    {{!-- Pagination --}}
+    {{pagination}}
+</div>

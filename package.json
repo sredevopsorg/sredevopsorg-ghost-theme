@@ -2,7 +2,7 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost v6 Theme made for SREDevOps.org (https://www.sredevops.org) based on Tailwind CSS v3, responsive, dark color schema, SVG icons, sidebar + footer navgation, customized tags and recommendations pages.",
     "demo": "https://www.sredevops.org",
-    "version": "1.4.6",
+    "version": "2.0.0",
     "engines": {
         "ghost": ">=6.0.0"
     },
@@ -41,15 +41,15 @@
     ],
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.11",
-        "@tailwindcss/typography": "^0.5.19",
-        "autoprefixer": "^10.5.0",
-        "cssnano": "8.0.1",
+        "@tailwindcss/typography": "^0.5.20",
+        "autoprefixer": "^10.5.2",
+        "cssnano": "8.0.2",
         "gulp": "^5.0.1",
         "gulp-concat": "2.6.1",
         "gulp-livereload": "4.0.2",
         "gulp-postcss": "10.0.0",
         "gulp-uglify": "3.0.2",
-        "postcss": "^8.5.14",
+        "postcss": "^8.5.16",
         "postcss-import": "^16.1.1",
         "pump": "3.0.4",
         "tailwindcss": "^3.4.19"
@@ -63,38 +63,6 @@
     "config": {
         "posts_per_page": 12,
         "card_assets": true,
-        "custom": {
-            "background_color": {
-                "type": "color",
-                "default": "#0f172a",
-                "description": "Background color for the theme",
-                "group": "homepage"
-            },
-            "lazy_images": {
-                "type": "boolean",
-                "default": false,
-                "description": "Enable lazy loading for images",
-                "group": "homepage"
-            },
-            "share_buttons": {
-                "type": "boolean",
-                "default": true,
-                "description": "Enable share buttons on posts",
-                "group": "post"
-            },
-            "show_langs": {
-                "type": "boolean",
-                "default": false,
-                "description": "Enable language menu in sidebar",
-                "group": "homepage"
-            },
-            "show_sso": {
-                "type": "boolean",
-                "default": false,
-                "description": "Enable SSO menu in sidebar",
-                "group": "homepage"
-            }
-        },
         "image_sizes": {
             "xs": {
                 "width": 100

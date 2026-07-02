@@ -1,0 +1,154 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  --gh-font-heading: '';
+  --gh-font-body: '';
+}
+
+/* Custom tweaks for Ghost */
+.social-icon-box {
+  @apply w-[38px] h-[38px] flex items-center justify-center bg-white text-black rounded transition-colors hover:bg-gray-200 cursor-pointer;
+}
+
+/* Ghost Navigation Override */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav li a {
+  @apply text-gray-400 font-medium transition-colors hover:text-white;
+}
+
+/* --- Comfortable Reading Experience (Replaces default `prose`) --- */
+.gh-content {
+  @apply text-base leading-7 text-gray-300;
+}
+
+/* Heading Hierarchy */
+.gh-content h1 {
+  @apply text-3xl md:text-4xl font-bold text-white mb-8 mt-12 tracking-tight;
+}
+
+.gh-content h2 {
+  @apply text-2xl md:text-3xl font-bold text-white mb-6 mt-10 tracking-tight;
+}
+
+.gh-content h3 {
+  @apply text-xl md:text-2xl font-bold text-white mb-4 mt-8;
+}
+
+.gh-content h4 {
+  @apply text-lg md:text-xl font-semibold text-gray-200 mb-3 mt-6;
+}
+
+/* Paragraphs & Lists */
+.gh-content p {
+  @apply mb-6;
+}
+
+.gh-content strong,
+.gh-content b {
+  @apply font-semibold text-white;
+}
+
+.gh-content a {
+  @apply text-brand-blue hover:underline transition-colors;
+}
+
+.gh-content ul,
+.gh-content ol {
+  @apply pl-5 mb-6 space-y-1;
+}
+
+.gh-content ul {
+  @apply list-disc;
+}
+
+.gh-content ol {
+  @apply list-decimal;
+}
+
+.gh-content li {
+  @apply mb-1;
+}
+
+/* Blockquotes */
+.gh-content blockquote {
+  @apply border-l-4 border-brand-blue bg-dark-card/60 p-5 my-8 rounded-r-xl italic text-gray-300 text-base;
+}
+
+.gh-content blockquote p {
+  @apply mb-0;
+  /* Prevents double margins inside blockquotes */
+}
+
+/* Koenig Image Overrides (Fixing previous errors) */
+.kg-image-card,
+.kg-gallery-card {
+  width: 100%;
+}
+
+.kg-image-card img,
+.kg-gallery-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.kg-width-wide {
+  max-width: 1024px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.kg-width-full {
+  max-width: 100vw;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.kg-image-card.kg-width-wide img,
+.kg-image-card.kg-width-full img {
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .kg-width-wide {
+    max-width: 100%;
+  }
+}
+
+
+/* --- Tocbot Dark Theme Overrides --- */
+.toc-list {
+  @apply list-none !important;
+}
+
+.toc-list-item {
+  @apply text-gray-400 hover:text-white transition-colors text-sm leading-relaxed !important;
+}
+
+.is-active-link {
+  @apply text-white font-bold border-l-2 border-brand-blue pl-2 !important;
+}
+
+.is-active-link::before {
+  background-color: #3b82f6 !important;
+  /* brand-blue */
+}
+
+.toc-link::before {
+  background-color: transparent !important;
+}
+
+.toc-list-item+.toc-list-item {
+  @apply mt-1;
+}

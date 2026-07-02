@@ -1,66 +1,87 @@
 <!DOCTYPE html>
-<html lang="es">
-<!-- This is the default template for Spanish content -->
+<html lang="es" class="dark">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{meta_title}}</title>
-    <link rel="stylesheet" href="{{asset "built/screen.css"}}">
-    <!-- Excludes card_assets, cta_styles, comment_counts, announcement from ghost_head on home, tag, author and index template -->
-    {{#is "home, tag, author, index, paged"}}
-    {{ghost_head exclude="card_assets, cta_styles, comment_counts, announcement"}}
-    {{else}}
-    {{ghost_head exclude="cta_styles, comment_counts, announcement"}}
-    {{/is}}
-    <!-- End Excludes card_assets, cta_styles, comment_counts, announcement from ghost_head on home, tag, author and index template -->
 
+    {{!-- Google Fonts --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SUSE+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+        rel="stylesheet">
 
+    <link rel="stylesheet" type="text/css" href="{{asset "built/prism-window.css"}}" />
 
-    <!-- Loads PrismJS, Tocbot and card assets only on posts -->
-    {{#is "post, page"}}
-        <script src="{{asset "built/prism.js"}}"></script>
-        <link rel="stylesheet" href="{{asset "built/prism.css"}}">
-        <link rel="stylesheet" href="{{asset "built/tocbot.css"}}">
-        <link rel="stylesheet" href="{{asset "built/cards.css"}}">
-    {{/is}}
-    <!-- End Loads PrismJS, Tocbot and card assets only on posts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-
+    {{!-- Compiled Tailwind CSS --}}
+    <link rel="stylesheet" type="text/css" href="{{asset "built/main.css"}}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.8/dist/tocbot.min.css" />
+    {{ghost_head}}
 </head>
 
-<body class="{{body_class}}" style="background:{{@custom.background_color }}!important;">
+<body class="bg-dark-bg text-dark-text antialiased font-sans">
 
-    {{> "components/nav"}}
+    {{> "header"}}
 
-    {{!-- Main content, dynamically inserted here --}}
-    {{{body}}}
+    <main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
+        {{{body}}}
+    </main>
+    {{> "footer"}}
 
-    {{!-- Footer --}}
-    {{> "components/footer"}}
+    {{ghost_foot}}
+    
+    {{!-- Mobile Menu Script --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggle = document.getElementById('mobile-toggle');
+            const menu = document.getElementById('mobile-menu');
 
-<script src="{{asset "built/main.js"}}" defer></script>
+            if (toggle && menu) {
+                toggle.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    menu.classList.toggle('hidden');
+                    menu.classList.toggle('flex');
+                });
 
-<!-- Load Tocbot only on posts -->
-{{#is "post"}}
-    <script src="{{asset "built/tocbot.js"}}"></script>
-        <script>
-            tocbot.init({
-                // Where to render the table of contents.
-                tocSelector: '.gh-toc',
-                // Where to grab the headings to build the table of contents.
-                contentSelector: '.gh-content',
-                // Which headings to grab inside of the contentSelector element.
-                headingSelector: 'h1, h2, h3, h4',
-                // Ensure correct positioning
-                hasInnerContainers: true,
+                // Close menu when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== toggle) {
+                        menu.classList.add('hidden');
+                        menu.classList.remove('flex');
+                    }
+                });
+            }
+        });
+    </script>
+
+    {{!-- Tocbot JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/tocbot@4.36.8/dist/tocbot.min.js"></script>
+   
+     {{!-- Load PrismJS from the file you provided --}}
+    <script src="{{asset "built/prism.js"}}"></script>
+    
+    {{!-- Auto-Inject Line Numbers & Highlight Syntax on all Code Blocks --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add line-numbers to all pre code blocks automatically
+            document.querySelectorAll('pre[class*="language-"]').forEach(function (pre) {
+                if (!pre.classList.contains('line-numbers')) {
+                    pre.classList.add('line-numbers');
+                }
             });
-        </script>
-{{/is}}
-
-<!-- Load SVG Icons -->
-{{> "icons"}}
-
-{{ghost_foot}}
-
+    
+            // Re-run Prism highlighting (if needed)
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
+            }
+        });
+    </script>
 </body>
+
 </html>

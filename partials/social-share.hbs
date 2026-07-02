@@ -1,51 +1,34 @@
-{{#match @custom.share_buttons }}
+<a href="mailto:?subject={{title}}&body={{url absolute="true"}}" target="_blank" rel="noopener noreferrer"
+  class="social-icon-box" title="Share via Email"><i class="fa-regular fa-envelope text-sm"></i></a>
+
+<button onclick="navigator.clipboard.writeText('{{url absolute="true"}}'); alert('Link copied!');"
+  class="social-icon-box" title="Copy Link"><i class="fa-solid fa-link text-sm"></i></button>
+
 {{!-- Social Share Links --}}
-<div class="flex justify-center my-4 flex-wrap gap-4">
   <a href="https://x.com/intent/tweet?url={{url absolute="true"}}&text={{encode title}}" target="_blank"
-    rel="noopener noreferrer" class="text-lighter">
-    <svg class="w-5 h-5 text-light" role="img" aria-label="X">
-      <use xlink:href="#icon-x"></use>
-    </svg>
-    <span class="sr-only">X</span>
+    rel="noopener noreferrer" class="social-icon-box">
+    <i class="fa-brands fa-x text-sm"></i>
   </a>
-  <a href="https://facebook.com/sharer/sharer.php?u={{url absolute="true"}}" target="_blank"
-    rel="noopener noreferrer" class="text-lighter">
-    <svg class="w-5 h-5 text-light" role="img" aria-label="Facebook">
-      <use xlink:href="#icon-facebook"></use>
-    </svg>
-    <span class="sr-only">Facebook</span>
+  <a href="https://facebook.com/sharer/sharer.php?u={{url absolute="true"}}" target="_blank" rel="noopener noreferrer" class="social-icon-box">
+    <i class="fa-brands fa-facebook text-sm"></i>
   </a>
   <a href="https://linkedin.com/shareArticle?mini=true&url={{url absolute="true"}}&title={{encode title}}"
-    target="_blank" rel="noopener noreferrer" class="text-lighter">
-    <svg class="w-5 h-5 text-light" role="img" aria-label="LinkedIn">
-      <use xlink:href="#icon-linkedin"></use>
-    </svg>
-    <span class="sr-only">LinkedIn</span>
+    target="_blank" rel="noopener noreferrer" class="social-icon-box">
+  <i class="fa-brands fa-linkedin-in text-sm"></i>
   </a>
   <a href="https://api.whatsapp.com/send?text={{encode title}}%20{{url absolute="true"}}" target="_blank"
-    rel="noopener noreferrer" class="text-lighter">
-    <svg class="w-5 h-5 text-light" role="img" aria-label="WhatsApp">
-      <use xlink:href="#icon-whatsapp"></use>
-    </svg>
-    <span class="sr-only">WhatsApp</span>
+    rel="noopener noreferrer" class="social-icon-box">
+  <i class="fa-brands fa-whatsapp text-sm"></i>
   </a>
 
   <a href="https://reddit.com/submit?url={{url absolute="true"}}&title={{encode title}}" target="_blank"
-    rel="noopener noreferrer" class="text-lighter">
-    <svg class="w-5 h-5 text-light" role="img" aria-label="Reddit">
-      <use xlink:href="#icon-reddit"></use>
-    </svg>
-    <span class="sr-only">Reddit</span>
+    rel="noopener noreferrer" class="social-icon-box">
+    <i class="fa-brands fa-reddit text-sm"></i>
   </a>
 
   <a href="https://mastodon.social/share?text={{encode title}}%20{{url absolute="true"}}" target="_blank"
-    rel="noopener noreferrer" class="text-lighter">
-    <svg class="w-5 h-5 text-light" role="img" aria-label="Mastodon">
-      <use xlink:href="#icon-mastodon"></use>
-    </svg>
-    <span class="sr-only">Mastodon</span>
+    rel="noopener noreferrer" class="social-icon-box">
+    <i class="fa-brands fa-mastodon text-sm"></i>
   </a>
-</div>
-{{/match}}
 {{! End of social share links }}
 {{! End of partials/social-share.hbs }}

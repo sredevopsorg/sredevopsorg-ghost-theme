@@ -1,24 +1,23 @@
-<article id="{{slug}}">
-  <a href="{{url absolute=" true"}}" alt="{{title}}">
-    {{> "feature-image"}}
+<article
+  class="bg-dark-card border border-gray-700 rounded-xl overflow-hidden hover:border-gray-500 transition-colors group flex flex-col h-full">
+  {{#if feature_image}}
+  <a href="{{url}}" class="block aspect-[16/9] overflow-hidden">
+    <img src="{{img_url feature_image size="m"}}"
+      alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
   </a>
-  <div>
-
-    <h1>
-      <a href="{{url absolute=" true"}}">
-        {{title}}
-      </a>
-    </h1>
-
-    <p class="mt-2 text-sm line-clamp-3 text-light">
-      {{excerpt}}
-    </p>
-
-    <a href="{{url absolute=" true"}}" class="inline-flex items-center gap-1 mt-4 text-sm font-medium group"
-      alt="{{title}}" rel="bookmark">
-      <h4 class="block transition-all group-hover:ms-0.5" alt="{{title}}">
-        {{t "Read the full post"}} &rarr;
-      </h4>
-    </a>
+  {{/if}}
+  <div class="p-5 flex flex-col flex-grow">
+    {{#if primary_tag}}
+    <a href="{{primary_tag.url}}"
+      class="text-xs font-bold text-brand-purple uppercase tracking-wider mb-2 hover:underline font-mono">{{primary_tag.name}}</a>
+    {{/if}}
+    <h3 class="text-lg font-semibold text-white group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
+        href="{{url}}">{{title}}</a></h3>
+    <p class="text-sm text-gray-400 flex-grow line-clamp-2">{{excerpt words="20"}}</p>
+    <div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
+      <span>{{date published_at format="MMM d, YYYY"}}</span>
+      <span>{{reading_time minute=(t "Just a minute or less") minutes=(t "About % minutes read")}}</span>
+    </div>
   </div>
 </article>
