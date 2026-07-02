@@ -11,12 +11,12 @@
 
 - Improvements into Homepage content blocks/sections []
 - Update and migrate templates to the new design:
-  - `page.hbs` []
+  - `page.hbs` [X]
   - `page-recommendations.hbs` []
   - `page-tags.hbs` []
-  - `tag.hbs` []
+  - `tag.hbs` [X]
   - `custom-notocbot.hbs` []
-  - `author.hbs` []
+  - `author.hbs` [X]
 - Cleanup unused code []
 
 
@@ -64,7 +64,7 @@ This theme implements a **template inheritance + tag-based routing strategy** to
 ### Language Routing & Tag Filtering
 
 | Locale | URL Pattern | Required Tags | Exclusion Tags | Layout Shell |
-|--------|-------------|---------------|----------------|--------------|
+| -------- | ------------- | --------------- | ---------------- | -------------- |
 | **English (default)** | `/` or `/en/{slug}/` | `en`, `hash-en` | `-es`, `-br` | `default.hbs` |
 | **Spanish** | `/es/{slug}/` | `es`, `hash-es` | `-en`, `-br` | `default-es.hbs` |
 | **Portuguese (BR)** | `/br/{slug}/` | `br`, `hash-br` | `-en`, `-es` | `default-br.hbs` |

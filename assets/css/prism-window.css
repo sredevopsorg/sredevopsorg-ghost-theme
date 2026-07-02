@@ -51,7 +51,7 @@ pre.line-numbers {
 }
 pre.line-numbers .line-numbers-rows {
     border-right: 1px solid #36393f !important;
-    /* left: -4.2em !important; */
+    left: -4.2em !important;
     top: 48px !important; /* Push down under the header */
     padding-right: 8px !important;
 }
@@ -63,4 +63,8 @@ pre.line-numbers .line-numbers-rows {
     background: rgba(45, 75, 56, 0.6) !important; /* Dark green highlight */
     pointer-events: none !important;
     z-index: 5 !important;
+}
+
+code,kbd,pre,samp {
+    font-size: 0.8rem !important;
 }

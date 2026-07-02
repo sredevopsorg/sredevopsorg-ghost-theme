@@ -1,101 +1,85 @@
     <!-- Author Box -->
-    <section class="mt-8 author-box">
+    <section class="mt-8 border-t border-gray-800 pt-8">
     {{#foreach authors}}
-
-    <div class="flex flex-col w-full p-4">
-            <div class="flex flex-col gap-4 mb-4">
-                <span>
+        <div class="flex flex-col w-full p-4">
+            <div class="flex items-start gap-4 mb-4">
                 {{#if profile_image}}
-                    <img src="{{img_url profile_image size="xs" format="webp"}}" alt="{{name}}" class="rounded-full">
+                    <img src="{{img_url profile_image size="xs" format="webp"}}" alt="{{name}}" class="h-16 w-16 rounded-full object-cover border border-gray-700">
                 {{/if}}
-                </span>
-                <span class=" text-base font-normal text-light">{{name}}</span>
-                <span class="text-xs" ><a href="{{url}}">Ver más contenido por {{name}}</a></span>
-            {{#if bio}}
-                <span class="text-base">{{bio}}</span>
-            {{/if}}
+                <div class="flex-1">
+                    <p class="text-white font-semibold">{{name}}</p>
+                    <p class="text-xs text-brand-blue hover:underline transition-colors"><a href="{{url}}">Ver más contenido por {{name}}</a></p>
+                    {{#if bio}}
+                        <p class="text-gray-400 text-sm mt-1">{{bio}}</p>
+                    {{/if}}
+                </div>
             </div>
-
 
             <div class="flex flex-wrap gap-2 mb-4">
                 <div class="flex flex-wrap gap-2 text-sm">
                     {{#if website}}
-                        <a href="{{website}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Website">
-                                <use xlink:href="#icon-link"></use>
-                            </svg>
+                        <a href="{{website}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-solid fa-link"></i>
                             Website
                         </a>
                     {{/if}}
                     {{#if twitter}}
-                        <a href="{{social_url type="twitter"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Twitter">
-                                <use xlink:href="#icon-x"></use>
-                            </svg>
+                        <a href="{{social_url type="twitter"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-twitter"></i>
                             Twitter
                         </a>
                     {{/if}}
                     {{#if facebook}}
-                        <a href="{{social_url type="facebook"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Facebook">
-                                <use xlink:href="#icon-facebook"></use>
-                            </svg>
+                        <a href="{{social_url type="facebook"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-facebook"></i>
                             Facebook
                         </a>
                     {{/if}}
+                    {{#if linkedin}}
+                        <a href="{{social_url type="linkedin"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                            LinkedIn
+                        </a>
+                    {{/if}}
                     {{#if threads}}
-                        <a href="{{social_url type="threads"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Threads">
-                                <use xlink:href="#icon-threads"></use>
-                            </svg>
+                        <a href="{{social_url type="threads"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-threads"></i>
                             Threads
                         </a>
                     {{/if}}
                     {{#if bluesky}}
-                        <a href="{{social_url type="bluesky"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Bluesky">
-                                <use xlink:href="#icon-bluesky"></use>
-                            </svg>
+                        <a href="{{social_url type="bluesky"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-bluesky"></i>
                             Bluesky
                         </a>
                     {{/if}}
                     {{#if mastodon}}
-                        <a href="{{social_url type="mastodon"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Mastodon">
-                                <use xlink:href="#icon-mastodon"></use>
-                            </svg>
+                        <a href="{{social_url type="mastodon"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-mastodon"></i>
                             Mastodon
                         </a>
                     {{/if}}
                     {{#if tiktok}}
-                        <a href="{{social_url type="tiktok"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="TikTok">
-                                <use xlink:href="#icon-tiktok"></use>
-                            </svg>
+                        <a href="{{social_url type="tiktok"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-tiktok"></i>
                             TikTok
                         </a>
                     {{/if}}
                     {{#if youtube}}
-                        <a href="{{social_url type="youtube"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="YouTube">
-                                <use xlink:href="#icon-youtube"></use>
-                            </svg>
+                        <a href="{{social_url type="youtube"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-youtube"></i>
                             YouTube
                         </a>
                     {{/if}}
                     {{#if instagram}}
-                        <a href="{{social_url type="instagram"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Instagram">
-                                <use xlink:href="#icon-instagram"></use>
-                            </svg>
+                        <a href="{{social_url type="instagram"}}" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                            <i class="fa-brands fa-instagram"></i>
                             Instagram
                         </a>
                     {{/if}}
                     {{#if location}}
-                        <span class="flex items-center gap-2 px-4 py-2 rounded-lg hover:text-lighter hover:bg-dark text-light">
-                            <svg class="w-5 h-5 text-light" role="img" aria-label="Location">
-                                <use xlink:href="#icon-globe"></use>
-                            </svg>
+                        <span class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 text-sm">
+                            <i class="fa-solid fa-location-dot"></i>
                             {{location}}
                         </span>
                     {{/if}}
