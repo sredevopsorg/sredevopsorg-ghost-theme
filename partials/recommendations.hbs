@@ -1,0 +1,32 @@
+{{!-- Overrides Ghost's default {{recommendations}} markup. --}}
+{{!-- See: https://ghost.org/docs/themes/helpers/recommendations/ --}}
+{{#if recommendations}}
+<ul class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 list-none p-0 m-0">
+    {{#foreach recommendations as |rec|}}
+    <li class="list-none">
+        <a href="{{rec.url}}" data-recommendation="{{rec.id}}" target="_blank" rel="noopener"
+            class="group block h-full bg-dark-card border border-gray-800 rounded-xl p-5 hover:border-gray-500 transition-colors">
+            <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center overflow-hidden mb-4">
+                {{#if rec.favicon}}
+                <img src="{{rec.favicon}}" alt="{{rec.title}}" loading="lazy" class="w-full h-full object-cover"
+                    onerror="this.style.display='none';">
+                {{else}}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5" fill="none"
+                    stroke="#0d0e11" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+                {{/if}}
+            </div>
+            <h3 class="text-sm font-semibold text-white group-hover:text-brand-purple transition-colors mb-1">
+                {{rec.title}}</h3>
+            {{#if rec.description}}
+            <p class="text-xs text-gray-500 line-clamp-2">{{rec.description}}</p>
+            {{/if}}
+        </a>
+    </li>
+    {{/foreach}}
+</ul>
+{{else}}
+<p class="text-gray-500">{{t "No posts"}}</p>
+{{/if}}

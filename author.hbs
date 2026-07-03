@@ -1,6 +1,5 @@
         {{!< default}}
 <main id="main" class="container pt-6 pb-6 mx-auto md:pl-64">
-{{> "tags-nav" }}
 
         {{#author}}
         <header class="flex flex-col">
@@ -122,8 +121,14 @@
         </header>
         {{/author}}
 
+    {{!-- Post Grid --}}
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+        {{#foreach posts}}
+            {{> "post-card"}}
+        {{/foreach}}
+    </section>
 
-
-{{> "posts-list" }}
+    {{!-- Pagination --}}
+    {{pagination}}
 
 </main>

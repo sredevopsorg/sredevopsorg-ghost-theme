@@ -9,7 +9,7 @@
 ---
 # v2 To Do:
 
-- Improvements into Homepage content blocks/sections []
+- Improvements into Homepage content blocks/sections [X] — featured-post hero added to `home.hbs`, `home-es.hbs`, `home-en.hbs`, `home-br.hbs` via `{{#get}}`
 - Update and migrate templates to the new design:
   - `page.hbs` [X]
   - `page-recommendations.hbs` []
@@ -17,7 +17,13 @@
   - `tag.hbs` [X]
   - `custom-notocbot.hbs` []
   - `author.hbs` [X]
-- Cleanup unused code []
+  - `home-en.hbs` [X]
+  - `home-br.hbs` [X]
+- Cleanup unused code [X] — removed orphaned `posts-list.hbs`, `tags-nav.hbs`, `icons.hbs`, `navigation.hbs` partials
+
+### Known issues (tracked separately)
+- `author.hbs` and the old author-box social icons rely on an SVG sprite (`partials/icons.hbs`) that's no longer included anywhere in the layout shells — those icons currently don't render. Needs migrating to Font Awesome (already used in `partials/components/author-box.hbs`) to match.
+- `home-br.hbs` inherits `default.hbs` (English shell, `lang="en"`) — there's no `default-br.hbs` yet, so `/br/` pages don't get proper `lang="pt"`/OG-locale metadata despite `locales/pt.json` existing. Needs a dedicated Portuguese layout shell per the multi-locale pattern documented above.
 
 
 ## 🌐 Multi-Locale Architecture

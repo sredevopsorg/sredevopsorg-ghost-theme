@@ -1,21 +1,12 @@
 {{!< default}}
 
+{{#page}}
+    <h1 class="text-4xl text-white font-bold mb-4">{{title}}</h1>
+    {{#if custom_excerpt}}
+    <p class="text-gray-400 text-lg mb-10">{{custom_excerpt}}</p>
+    {{/if}}
+{{/page}}
 
-<main id="main">
-
-<article class="container p-6 md:ml-32 md:pl-32">
-<section class="py-0 md:py-0">
-
-        <div class="l-content">
-            <div class="l-wrapper" data-animate="fade-up">
-                <div class="l-recommendations-container">
-                    {{recommendations limit="100" }}
-                </div>
-            </div>
-        </div>
-
-
-</section>
-
-</article>
-</main>
+<div class="max-w-6xl mx-auto pb-12">
+    {{recommendations limit="100"}}
+</div>
