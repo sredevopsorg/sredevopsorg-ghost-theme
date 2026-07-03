@@ -9,10 +9,11 @@
 ---
 # v2 To Do:
 
-- Improvements into Homepage content blocks/sections [X] — featured-post hero added to `home.hbs`, `home-es.hbs`, `home-en.hbs`, `home-br.hbs` via `{{#get}}`
+- Improvements into Homepage content blocks/sections [X]
+— featured-post hero added to `home.hbs`, `home-es.hbs`, `home-en.hbs`, `home-br.hbs` via `{{#get}}`
 - Update and migrate templates to the new design:
   - `page.hbs` [X]
-  - `page-recommendations.hbs` []
+  - `page-recommendations.hbs` [X]
   - `page-tags.hbs` []
   - `tag.hbs` [X]
   - `custom-notocbot.hbs` []
@@ -281,7 +282,7 @@ graph LR
 
 ---
 
-## ⚙️ Theme Configuration
+## ⚙️ Theme Configuration (To be implemented)
 
 Customize behavior via **Ghost Admin → Settings → Theme**:
 
@@ -447,6 +448,6 @@ We welcome contributions aligned with our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
-> 🌎 **LatAm Note**: This theme was built with LatAm infrastructure constraints in mind — minimal external dependencies, optimized asset delivery, and community-driven localization patterns. For questions about deploying in Chile/Argentina/Brazil contexts, open an issue or reach out via [SREDevOps.org](https://www.sredevops.org).
+> This theme was built in Chile 🇨🇱 with a proud latin American identity and fully committed to the principles and philosophy of FLOSS (Free/Libre and Open Source Software) — We ought to minimize external dependencies, optimized asset delivery, and community-driven localization patterns. For questions about deploying in Chile/Argentina/Brazil contexts, open an issue or reach out via [SREDevOps.org](https://www.sredevops.org).
 
-*Last updated: June 2026 | Ghost v6 compatible*
+*Last updated: July 2026 | Ghost v6 compatible*
