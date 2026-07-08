@@ -2,15 +2,12 @@
 
   {{!-- Secondary Navigation (Footer Links) --}}
   {{#if @site.secondary_navigation}}
-  <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-6 text-sm font-medium text-gray-400">
+  <div
+    class="flex flex-col items-center gap-y-3 text-xs mb-6 font-medium text-gray-400 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-6 sm:gap-y-2 sm:text-sm">
     {{navigation type="secondary"}}
   </div>
   {{else}}
-  {{!-- Fallback links if no secondary navigation is set in Ghost Admin --}}
-  <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-6 text-sm font-medium text-gray-500">
-    <a href="#" class="hover:text-gray-300 transition-colors">Privacy Policy</a>
-    <a href="#" class="hover:text-gray-300 transition-colors">Terms of Service</a>
-    <a href="#" class="hover:text-gray-300 transition-colors">Contact</a>
+  <div>
   </div>
   {{/if}}
 

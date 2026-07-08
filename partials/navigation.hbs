@@ -1,0 +1,17 @@
+{{#if isSecondary}}
+    <ul class="flex flex-wrap justify-center space-x-2" role="menu">
+        {{#foreach navigation}}
+            <li class="flex items-center gap-2 px-4 py-2" role="menuitem">
+                <a href="{{url absolute="true"}}">{{label}}</a>
+            </li>
+        {{/foreach}}
+    </ul>
+{{else}}
+    <ul class="space-y-1 nav" role="menu">
+        {{#foreach navigation}}
+            <li class="{{link_class for=(url) class=(concat "nav-"slug)}} flex items-center gap-2 rounded-lg px-4 py-2 text-light hover:text-lighter hover:bg-dark" role="menuitem">
+                <a href="{{url absolute="true"}}" class="text-light hover:text-lighter">{{label}}</a>
+            </li>
+        {{/foreach}}
+    </ul>
+{{/if}}

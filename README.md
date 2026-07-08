@@ -10,20 +10,21 @@
 # v2 To Do:
 
 - Improvements into Homepage content blocks/sections [X]
-— featured-post hero added to `home.hbs`, `home-es.hbs`, `home-en.hbs`, `home-br.hbs` via `{{#get}}`
+- Display improvements and fixes for HTML elements to be displayed responsively in posts/pages, like tables [ ]
+- Fix primary navigation breaking in mobile views [ ]
+— featured-post hero added to `home.hbs`, `home-es.hbs`, `home-en.hbs`, `home-br.hbs` via `{{#get}}` [X]
 - Update and migrate templates to the new design:
   - `page.hbs` [X]
   - `page-recommendations.hbs` [X]
-  - `page-tags.hbs` []
+  - `page-tags.hbs` [ ]
   - `tag.hbs` [X]
-  - `custom-notocbot.hbs` []
+  - `custom-notocbot.hbs` [X]
   - `author.hbs` [X]
   - `home-en.hbs` [X]
   - `home-br.hbs` [X]
 - Cleanup unused code [X] — removed orphaned `posts-list.hbs`, `tags-nav.hbs`, `icons.hbs`, `navigation.hbs` partials
 
-### Known issues (tracked separately)
-- `author.hbs` and the old author-box social icons rely on an SVG sprite (`partials/icons.hbs`) that's no longer included anywhere in the layout shells — those icons currently don't render. Needs migrating to Font Awesome (already used in `partials/components/author-box.hbs`) to match.
+### Known issues (tracked separately, not prioritized)
 - `home-br.hbs` inherits `default.hbs` (English shell, `lang="en"`) — there's no `default-br.hbs` yet, so `/br/` pages don't get proper `lang="pt"`/OG-locale metadata despite `locales/pt.json` existing. Needs a dedicated Portuguese layout shell per the multi-locale pattern documented above.
 
 
