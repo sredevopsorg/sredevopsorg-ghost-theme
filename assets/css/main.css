@@ -126,7 +126,6 @@
   }
 }
 
-
 /* --- Tocbot Dark Theme Overrides --- */
 .toc-list {
   @apply list-none !important;
@@ -151,4 +150,16 @@
 
 .toc-list-item+.toc-list-item {
   @apply mt-1;
+}
+
+.pagination {
+  @apply flex flex-wrap justify-center items-center gap-3 py-4;
+}
+
+.pagination-link {
+  @apply inline-flex items-center justify-center rounded-full border border-white/20 bg-brand-purple px-4 py-2 text-[10px] font-bold uppercase tracking-[0.25em] text-white transition-colors duration-200 hover:bg-white/10;
+}
+
+.pagination-page {
+  @apply text-[10px] font-bold uppercase tracking-[0.25em] text-gray-300;
 }

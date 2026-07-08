@@ -2,7 +2,7 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost v6 Theme for SREDevOps.org (https://www.sredevops.org) — Multi-locale, Tailwind CSS v3, responsive, dark-mode first and tag-based language filtering.",
     "demo": "https://www.sredevops.org",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "engines": {
         "ghost": ">=6.0.0"
     },
