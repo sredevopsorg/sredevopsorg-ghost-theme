@@ -79,6 +79,38 @@
   @apply mb-1;
 }
 
+.gh-content .table-responsive {
+  @apply overflow-x-auto rounded-xl border border-white/10 bg-dark-card/30 my-6;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gh-content .table-responsive table {
+  @apply min-w-[640px] w-full border-collapse text-sm;
+}
+
+.gh-content table {
+  @apply w-full border-collapse text-sm mb-6;
+  border-color: rgba(255,255,255,0.12);
+}
+
+.gh-content table th,
+.gh-content table td {
+  @apply px-4 py-3 align-top text-left;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.gh-content table thead th {
+  @apply bg-white/5 text-white font-semibold;
+}
+
+.gh-content table tr:nth-child(odd) {
+  background-color: rgba(255,255,255,0.03);
+}
+
+.gh-content table tr:hover {
+  background-color: rgba(255,255,255,0.08);
+}
+
 /* Blockquotes */
 .gh-content blockquote {
   @apply border-l-4 border-brand-blue bg-dark-card/60 p-5 my-8 rounded-r-xl italic text-gray-300 text-base;

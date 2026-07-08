@@ -10,13 +10,13 @@
 # v2 To Do:
 
 - Improvements into Homepage content blocks/sections [X]
-- Display improvements and fixes for HTML elements to be displayed responsively in posts/pages, like tables [ ]
+- Display improvements and fixes for HTML elements to be displayed responsively in posts/pages, like tables [X]
 - Fix primary navigation breaking in mobile views [ ]
 — featured-post hero added to `home.hbs`, `home-es.hbs`, `home-en.hbs`, `home-br.hbs` via `{{#get}}` [X]
 - Update and migrate templates to the new design:
   - `page.hbs` [X]
   - `page-recommendations.hbs` [X]
-  - `page-tags.hbs` [ ]
+  - `page-tags.hbs` [X]
   - `tag.hbs` [X]
   - `custom-notocbot.hbs` [X]
   - `author.hbs` [X]

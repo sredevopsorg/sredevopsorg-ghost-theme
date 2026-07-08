@@ -5,7 +5,9 @@
 `sredevopsorg-ghost-theme` is a Ghost theme built with Tailwind CSS and Gulp. The theme follows a modular architecture, focusing on reusability and maintainability.
 
 ## Major Components
-
+0. **Important notes**:
+  - Theme is managed using `package.json` file and yarn.
+  - Files into `assets/built/*` are automatically generated and should not be edited directly.
 1. **HTML Templates (`*.hbs`)**: Handlebars templates define the structure of the site.
 2. **CSS (`assets/css/*.css`)**: Tailwind CSS is used for styling, with custom configurations in `tailwind.config.js`.
 3. **JavaScript (`assets/js/*.js`)**: Scripts are written in JavaScript and minified using Gulp.
@@ -21,14 +23,14 @@
 ### Build Process
 To build the theme:
 ```bash
-npm run build
+yarn build
 ```
 This command compiles CSS and JavaScript files, placing them in `assets/built/`.
 
 ### Development Server
 To start a development server with live reloading:
 ```bash
-npm start
+yarn dev
 ```
 This command builds the theme and serves it on a local server. Changes to HTML, CSS, or JavaScript files will trigger automatic rebuilds and reloads.
 
@@ -38,7 +40,7 @@ The project does not include automated tests. Manual testing is recommended for 
 ## Project-Specific Conventions
 
 1. **Tailwind CSS**: Custom configurations are defined in `tailwind.config.js`. Ensure that any new styles align with the existing theme.
-2. **Gulp Tasks**: Gulp tasks are defined in `gulpfile.js`. Use `npm run build` to compile assets and `npm start` for development.
+2. **Gulp Tasks**: Gulp tasks are defined in `gulpfile.js`. Use `yarn build` to compile assets and `yarn dev` for development.
 
 ## Integration Points
 
@@ -47,7 +49,7 @@ The project does not include automated tests. Manual testing is recommended for 
 
 ## External Dependencies
 
-- **Node Modules**: Managed via npm. Key dependencies include Tailwind CSS, Gulp, and PostCSS plugins.
+- **Node Modules**: Managed via yarn. Key dependencies include Tailwind CSS, Gulp, and PostCSS plugins.
 - **Ghost**: The theme is built for Ghost, a headless CMS.
 
 ## Cross-Component Communication Patterns

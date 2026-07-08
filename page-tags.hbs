@@ -2,43 +2,44 @@
 
 
 {{#post}}
-<main id="main">
+<div class="gh-content">
+<div class="table-responsive">
 
-<article class="prose-lg post-content prose-invert text-light">
-<section class="py-0 md:py-0">
-          <div class="l-content">
-              <div class="l-wrapper" data-animate="fade-up">
-                <div class="l-tags-container">
-                  {{#get 'tags' limit='100' include='count.posts,description,feature_image' order='count.posts desc'}}
-                    {{#foreach tags}}
-                      <div class="m-tag-card">
-                        <a href="{{url}}" class="m-tag-card__link {{#unless feature_image}}no-picture{{/unless}}" aria-label="{{name}}">
-                          {{#if feature_image}}
-                            <img class="m-tag-card__picture" src="{{img_url feature_image size="xs"}}" loading="lazy" alt="{{name}}">
-                          {{/if}}
-                          <div class="m-tag-card__info {{#unless feature_image}}no-picture{{/unless}}">
-                            <h4 class="text-xl font-semibold">{{name}}</h4>
-                            <span class="text-sm text-clip font-extralight max-h-fit">{{description}}</span>
-                            <span class="m-tag-card__counter">
-                              {{plural count.posts empty=(t "No posts") singular=(t "1 post") plural=(t "% posts")}}
-                            </span>
-                          </div>
-                        </a>
-                      </div>
-                      {{else}}
-                        <p class="m-not-found">
-                          {{t "No tags found :("}}
-                        </p>
-                    {{/foreach}}
-                  {{/get}}
-                </div>
-              </div>
-          </div>
-
-
-</section>
-
-</article>
-</main>
-
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{{t "Name"}}</th>
+                        <th>{{t "Description"}}</th>
+                        <th>{{t "Posts"}}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {{#get 'tags' limit='100' include='count.posts,description,feature_image' order='count.posts desc'}}
+                        {{#foreach tags}}
+                          <tr>
+                            <td>
+                              <a href="{{url}}">{{name}}</a>
+                            </td>
+                            <td>
+                              <span>{{description}}</span>
+                            </td>
+                            <td>
+                              <span>
+                                {{plural count.posts empty=(t "No posts") singular=(t "1 post") plural=(t "% posts")}}
+                              </span>
+                            </td>
+                           </tr>
+                        {{else}}
+                          <tr>
+                            <td colspan="3" class="border border-gray-200 dark:border-gray-700 px-4 py-8 text-center text-gray-500">
+                              {{t "No tags found"}}
+                            </td>
+                          </tr>
+                        {{/foreach}}
+                      {{/get}}
+                    </tbody>
+                  </table>
+</div>
+</div>
+  
 {{/post}}
