@@ -21,7 +21,7 @@
 
     {{!-- Compiled Tailwind CSS --}}
     <link rel="stylesheet" type="text/css" href="{{asset "built/main.css"}}" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.8/dist/tocbot.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{asset "built/tocbot.css"}}" />
     {{ghost_head}}
 </head>
 
@@ -36,29 +36,6 @@
 
     {{ghost_foot}}
     
-    {{!-- Mobile Menu Script --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const toggle = document.getElementById('mobile-toggle');
-            const menu = document.getElementById('mobile-menu');
-
-            if (toggle && menu) {
-                toggle.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    menu.classList.toggle('hidden');
-                    menu.classList.toggle('flex');
-                });
-
-                // Close menu when clicking outside
-                document.addEventListener('click', function (e) {
-                    if (!menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== toggle) {
-                        menu.classList.add('hidden');
-                        menu.classList.remove('flex');
-                    }
-                });
-            }
-        });
-    </script>
 
     {{!-- Tocbot JS --}}
     <script src="https://cdn.jsdelivr.net/npm/tocbot@4.36.8/dist/tocbot.min.js"></script>
@@ -69,22 +46,6 @@
      {{!-- Load main.js built file --}}
     <script src="{{asset "built/main.js"}}"></script>
     
-    {{!-- Auto-Inject Line Numbers & Highlight Syntax on all Code Blocks --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Add line-numbers to all pre code blocks automatically
-            document.querySelectorAll('pre[class*="language-"]').forEach(function (pre) {
-                if (!pre.classList.contains('line-numbers')) {
-                    pre.classList.add('line-numbers');
-                }
-            });
-    
-            // Re-run Prism highlighting (if needed)
-            if (typeof Prism !== 'undefined') {
-                Prism.highlightAll();
-            }
-        });
-    </script>
 </body>
 
 </html>

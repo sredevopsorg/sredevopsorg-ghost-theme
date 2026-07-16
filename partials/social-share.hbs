@@ -1,10 +1,11 @@
-<a href="mailto:?subject={{title}}&body={{url absolute="true"}}" target="_blank" rel="noopener noreferrer"
+{{!-- Social Share Links --}}
+
+  <a href="mailto:?subject={{title}}&body={{url absolute="true"}}" target="_blank" rel="noopener noreferrer"
   class="social-icon-box" title="Share via Email"><i class="fa-regular fa-envelope text-sm"></i></a>
 
-<button onclick="navigator.clipboard.writeText('{{url absolute="true"}}'); alert('Link copied!');"
+  <button onclick="navigator.clipboard.writeText('{{url absolute="true"}}'); alert('Link copied!');"
   class="social-icon-box" title="Copy Link"><i class="fa-solid fa-link text-sm"></i></button>
 
-{{!-- Social Share Links --}}
   <a href="https://x.com/intent/tweet?url={{url absolute="true"}}&text={{encode title}}" target="_blank"
     rel="noopener noreferrer" class="social-icon-box">
     <i class="fa-brands fa-x text-sm"></i>

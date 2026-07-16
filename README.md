@@ -7,22 +7,11 @@
 [![Node Engine](https://img.shields.io/badge/Node-%3E%3D22-green)](https://nodejs.org)
 
 ---
-# v2 To Do:
 
-- Improvements into Homepage content blocks/sections [X]
-- Display improvements and fixes for HTML elements to be displayed responsively in posts/pages, like tables [X]
-- Fix primary navigation breaking in mobile views [ ]
-— featured-post hero added to `home.hbs`, `home-es.hbs`, `home-en.hbs`, `home-br.hbs` via `{{#get}}` [X]
-- Update and migrate templates to the new design:
-  - `page.hbs` [X]
-  - `page-recommendations.hbs` [X]
-  - `page-tags.hbs` [X]
-  - `tag.hbs` [X]
-  - `custom-notocbot.hbs` [X]
-  - `author.hbs` [X]
-  - `home-en.hbs` [X]
-  - `home-br.hbs` [X]
-- Cleanup unused code [X] — removed orphaned `posts-list.hbs`, `tags-nav.hbs`, `icons.hbs`, `navigation.hbs` partials
+## v2 To Do
+
+- Fix primary menu navigation, breaking in mobile views and small screens []
+- Improve responsive design for secondary navigation elements []
 
 ### Known issues (tracked separately, not prioritized)
 - `home-br.hbs` inherits `default.hbs` (English shell, `lang="en"`) — there's no `default-br.hbs` yet, so `/br/` pages don't get proper `lang="pt"`/OG-locale metadata despite `locales/pt.json` existing. Needs a dedicated Portuguese layout shell per the multi-locale pattern documented above.

@@ -15,7 +15,8 @@ pre[class*="language-"] {
     border: 1px solid #2a2c35 !important;
     position: relative !important;
     padding: 48px 16px 16px 16px !important;
-    overflow: hidden !important;
+    overflow-y: hidden !important;
+    overflow-x: auto !important;
     margin-bottom: 2rem !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
 }
@@ -66,5 +67,5 @@ pre.line-numbers .line-numbers-rows {
 }
 
 code,kbd,pre,samp {
-    font-size: 0.8rem !important;
+    font-size: 1rem !important;
 }

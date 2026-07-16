@@ -1,6 +1,6 @@
 {{#is "post"}}
 <div class="border border-gray-700 rounded-lg p-5 bg-dark-card sticky-top">
-  <h4 class="text-white font-bold text-sm tracking-wider uppercase border-b border-gray-700 pb-2 mb-3">Table of Contents
+  <h4 class="text-white font-bold text-sm tracking-wider uppercase border-b border-gray-700 pb-2 mb-3">{{t "Table of Contents"}}
   </h4>
   <div id="toc-container" class="js-toc"></div>
 </div>
@@ -31,6 +31,9 @@
 {{/is}}
 
 <div>
+    <h4 class="text-white text-lg font-bold mb-1">
+      {{t "Share this post:"}}
+    </h4>
   <div class="flex gap-2">
     {{> "social-share"}}
   </div>
@@ -43,7 +46,9 @@
     <div class="flex flex-col gap-2">
       <form data-members-form=>
         <input type="email" required data-members-email class="w-full bg-dark-bg border border-gray-700 rounded-md py-2 px-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all">
-        <button type="submit" class="w-full bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 rounded-md text-sm transition-colors">Subscribe</button>
+        <button type="submit" class="w-full bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 rounded-md text-sm transition-colors">
+        {{t "Register with Email"}}
+        </button>
       </form>
     </div>
     {{!-- <a href="#" class="text-gray-500 text-[10px] hover:text-gray-300 transition-colors block mt-1">Skip for now</a> --}}
