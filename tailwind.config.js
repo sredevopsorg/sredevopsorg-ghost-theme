@@ -12,13 +12,13 @@ module.exports = {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
         mono: [
-          "SUSE Mono",
+          "Roboto Mono",
           "ui-monospace",
+          "monospace",
           "SFMono-Regular",
           "Consolas",
-          "Liberation Mono",
           "Menlo",
-          "monospace",
+          "Liberation Mono",
         ],
       },
       colors: {

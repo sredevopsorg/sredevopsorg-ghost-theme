@@ -1,6 +1,6 @@
 <header class="sticky top-0 z-50 w-full bg-[#0d0e11]/80 backdrop-blur-md border-b border-white/10 py-3 min-h-[60px]">
   {{!-- Inner container to keep spacing consistent with the rest of the theme --}}
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
 
     <div class="flex items-center">
         {{#if @site.logo}}
@@ -27,7 +27,7 @@
     </div>
 
     {{!-- Mobile Menu Toggle --}}
-    <button id="mobile-toggle" class="text-gray-400 md:hidden"><i class="fas fa-bars text-xl"></i></button>
+    <button id="mobile-toggle" type="button" class="rounded-lg p-2 text-gray-400 transition-colors hover:text-white md:hidden" aria-label="Toggle navigation menu" aria-controls="mobile-menu" aria-expanded="false"><i class="fas fa-bars text-xl"></i></button>
 
     {{!-- Mobile Menu Overlay (Vertical items) --}}
     <nav id="mobile-menu"

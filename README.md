@@ -10,12 +10,9 @@
 
 ## v2 To Do
 
-- Fix primary menu navigation, breaking in mobile views and small screens []
-- Improve responsive design for secondary navigation elements []
-
-### Known issues (tracked separately, not prioritized)
-- `home-br.hbs` inherits `default.hbs` (English shell, `lang="en"`) — there's no `default-br.hbs` yet, so `/br/` pages don't get proper `lang="pt"`/OG-locale metadata despite `locales/pt.json` existing. Needs a dedicated Portuguese layout shell per the multi-locale pattern documented above.
-
+- [x] Fix primary menu navigation, mobile views and small screens doesn't render correctly
+- [ ] Improve responsive design for secondary navigation menu
+- [ ] Create login and search forms for the main navigation menu, as optional features (Ghost Docs: <https://docs.ghost.org/themes/custom-settings>)
 
 ## 🌐 Multi-Locale Architecture
 

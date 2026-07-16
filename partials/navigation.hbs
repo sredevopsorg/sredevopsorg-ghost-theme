@@ -1,5 +1,5 @@
 {{#if isSecondary}}
-    <ul class="flex flex-wrap justify-center space-x-2" role="menu">
+    <ul class="flex flex-wrap justify-center gap-2" role="menu">
         {{#foreach navigation}}
             <li class="flex items-center gap-2 px-4 py-2" role="menuitem">
                 <a href="{{url absolute="true"}}">{{label}}</a>
@@ -7,10 +7,10 @@
         {{/foreach}}
     </ul>
 {{else}}
-    <ul class="space-y-1 nav" role="menu">
+    <ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center md:gap-6" role="menu">
         {{#foreach navigation}}
-            <li class="{{link_class for=(url) class=(concat "nav-"slug)}} flex items-center gap-2 rounded-lg px-4 py-2 text-light hover:text-lighter hover:bg-dark" role="menuitem">
-                <a href="{{url absolute="true"}}" class="text-light hover:text-lighter">{{label}}</a>
+            <li class="{{link_class for=(url) class=(concat "nav-"slug)}} flex items-center rounded-lg px-0 py-2 text-left font-mono md:px-4 md:py-2" role="menuitem">
+                <a href="{{url absolute="true"}}" class="block w-full text-gray-400 transition-colors hover:text-white">{{label}}</a>
             </li>
         {{/foreach}}
     </ul>
