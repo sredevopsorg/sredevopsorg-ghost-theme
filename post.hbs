@@ -65,7 +65,7 @@
 
   {{#is "post"}}
   <div class="mt-16 border-t border-gray-800 pt-8">
-    <h2 class="text-2xl font-bold text-white mb-6">Related content</h2>
+    <h2 class="text-2xl font-bold text-white mb-6">{{t "Related content"}}</h2>
     {{#get "posts" include="authors" filter="id:-{{id}}+tags:[{{primary_tag.slug}}]" limit="2" as |next|}}
     {{#if next}}
     <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -79,7 +79,7 @@
     {{#if comments}}
     <div class="gh-comments">
       {{#if @member}}{{comments count=false mode=dark title="Opinions?"}}
-      {{else}}{{> "social-sso"}}{{comments count=false mode=dark title=" "}}
+      {{else}}{{comments count=false mode=dark title=" "}}
       {{/if}}
     </div>
     {{/if}}

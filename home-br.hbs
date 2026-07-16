@@ -1,7 +1,7 @@
-{{!< default}}
+{{!< default-br}}
 
 <div class="max-w-6xl mx-auto pb-12">
-
+    
     {{!-- Page Title & Description --}}
     <div class="mb-10 border-b border-gray-800 pb-6">
         <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight">{{@site.title}}</h1>
@@ -9,12 +9,12 @@
     </div>
 
     {{!-- Featured Post --}}
-    {{> "featured-hero" tag="br"}}
+    {{> "featured-hero"}}
 
     {{!-- Post Grid --}}
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {{#foreach posts}}
-            {{> "post-card"}}
+            {{> "post-card-br"}}
         {{/foreach}}
     </section>
 
