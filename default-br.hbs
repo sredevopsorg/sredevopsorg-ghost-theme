@@ -14,14 +14,13 @@
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
         rel="stylesheet">
-
+{{#is "post"}}
     <link rel="stylesheet" type="text/css" href="{{asset "built/prism-window.css"}}" />
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
+    <link rel="stylesheet" type="text/css" href="{{asset "built/tocbot.css"}}" />
+{{/is}}
     {{!-- Compiled Tailwind CSS --}}
     <link rel="stylesheet" type="text/css" href="{{asset "built/main.css"}}" />
-    <link rel="stylesheet" type="text/css" href="{{asset "built/tocbot.css"}}" />
     {{ghost_head}}
 </head>
 
@@ -35,17 +34,18 @@
     {{> "footer"}}
 
     {{ghost_foot}}
-
+    
+{{#is "post"}}
     {{!-- Tocbot JS --}}
     <script src="https://cdn.jsdelivr.net/npm/tocbot@4.36.8/dist/tocbot.min.js"></script>
    
-     {{!-- Load PrismJS from the file you provided --}}
+     {{!-- Load PrismJS --}}
     <script src="{{asset "built/prism.js"}}"></script>
-
-    {{!-- Load main.js built file --}}
-    <script src="{{asset "built/main.js"}}"></script>
+{{/is}}
    
-
+     {{!-- Load main.js built file --}}
+    <script src="{{asset "built/main.js"}}"></script>
+    
 </body>
 
 </html>
