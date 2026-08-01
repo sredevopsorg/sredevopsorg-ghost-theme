@@ -38,25 +38,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   });
 
-
-// Search modal
-
-function openModal() {
-  document.getElementById("searchModal").style.display = "block";
-}
-
-function closeModal() {
-  document.getElementById("searchModal").style.display = "none";
-}
-
-// Close the modal when the user clicks anywhere outside of it
-window.onclick = function (event) {
-  const modal = document.getElementById("searchModal");
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-};
-
 /* Responsive HTML table */
 (function () {
   const tables = document.querySelectorAll("div > table, section > table");
@@ -96,9 +77,11 @@ document.addEventListener("keydown", function (e) {
     e.key === "/" &&
     !["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)
   ) {
+    const searchTrigger = document.querySelector("[data-ghost-search]");
+    if (!searchTrigger) return;
     e.preventDefault();
     // Trigger Ghost search
-    document.querySelector("[data-ghost-search]").click();
+    searchTrigger.click();
   }
 });
 
