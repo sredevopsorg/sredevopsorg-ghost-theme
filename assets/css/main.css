@@ -28,19 +28,32 @@
 }
 
 .nav li a {
-  @apply block w-full text-gray-400 font-medium transition-colors hover:text-white;
+  @apply block w-full text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple rounded-sm;
 }
 
 @media (min-width: 768px) {
   .nav {
     flex-direction: row;
     align-items: center;
-    gap: 1.5rem;
+    gap: 2rem;
   }
 
   .nav li {
     width: auto;
   }
+}
+
+/* --- Header icon pill (search / account / mode toggles) --- */
+.icon-pill {
+  @apply inline-flex items-center gap-0.5 rounded-full border border-white/10 bg-white/5 p-1;
+}
+
+.icon-pill > * {
+  @apply flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple;
+}
+
+.icon-pill > .is-active {
+  @apply text-white bg-white/10;
 }
 
 /* --- Comfortable Reading Experience (Replaces default `prose`) --- */

@@ -5,16 +5,23 @@
     <div class="flex items-center">
         {{#if @site.logo}}
         <a href="{{@site.url}}" rel="me" alt="{{@site.title}}" aria-label="{{@site.title}}">
-          <img src="{{@site.logo}}" alt="{{@site.title}}" />
+          <img src="{{@site.logo}}" alt="{{@site.title}}" class="h-7 w-auto sm:h-8" />
         </a>
         {{else}}
         <a href="{{@site.url}}"
-          class="text-2xl font-bold text-white tracking-tight hover:text-brand-purple transition-colors">{{@site.title}}</a>
+          class="text-2xl font-bold tracking-tight text-white transition-colors hover:text-brand-purple">{{@site.title}}<span class="text-brand-orange">.</span></a>
+        {{/if}}
+        {{#if @site.icon}}
+        <span class="mx-3 hidden h-6 w-px bg-white/15 sm:inline-block" aria-hidden="true"></span>
+        <a href="{{@site.url}}" rel="me" aria-hidden="true" tabindex="-1"
+          class="hidden rounded-md sm:inline-flex">
+          <img src="{{@site.icon}}" alt="" class="h-7 w-7 rounded-md" />
+        </a>
         {{/if}}
     </div>
 
     {{!-- Desktop Navigation (Horizontal) --}}
-    <div class="hidden md:flex items-center space-x-8 text-sm font-medium font-mono">
+    <div class="hidden md:flex items-center">
       {{#if @site.navigation}}
       {{navigation type="primary"}}
       {{/if}}
@@ -23,19 +30,17 @@
     </div>
 
     {{!-- Search & Account (opt-in via theme settings) --}}
-    <div class="hidden md:flex items-center gap-1">
+    <div class="icon-pill hidden md:inline-flex">
       {{#if @custom.show_search}}
       <button type="button" data-ghost-search
-        class="rounded-lg p-2 text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple"
         aria-label="{{t "Search"}}" title="{{t "Search"}}">
-        <i class="fas fa-magnifying-glass"></i>
+        <i class="fas fa-magnifying-glass text-xs"></i>
       </button>
       {{/if}}
       {{#if @custom.show_login}}
       <a href="#/portal/signin" data-portal="signin"
-        class="rounded-lg p-2 text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple"
         aria-label="{{t "Sign in"}}" title="{{t "Sign in"}}">
-        <i class="fas fa-user"></i>
+        <i class="fas fa-user text-xs"></i>
       </a>
       {{/if}}
     </div>
@@ -45,7 +50,7 @@
 
     {{!-- Mobile Menu Overlay (Vertical items) --}}
     <nav id="mobile-menu"
-      class="hidden absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex-col gap-4 text-sm font-medium font-mono z-50">
+      class="hidden absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex-col gap-4 text-sm font-medium z-50">
       {{#if @site.navigation}}
       {{navigation type="primary"}}
       {{/if}}
