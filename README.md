@@ -11,8 +11,8 @@
 ## v2 To Do
 
 - [x] Fix primary menu navigation, mobile views and small screens doesn't render correctly
-- [ ] Improve responsive design for secondary navigation menu
-- [ ] Create login and search forms for the main navigation menu, as optional features (Ghost Docs: <https://docs.ghost.org/themes/custom-settings>)
+- [x] Improve responsive design for secondary navigation menu
+- [x] Create login and search forms for the main navigation menu, as optional features (Ghost Docs: <https://docs.ghost.org/themes/custom-settings>)
 
 ## 🌐 Multi-Locale Architecture
 

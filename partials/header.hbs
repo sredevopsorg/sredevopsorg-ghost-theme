@@ -17,13 +17,27 @@
     <div class="hidden md:flex items-center space-x-8 text-sm font-medium font-mono">
       {{#if @site.navigation}}
       {{navigation type="primary"}}
-      {{else}}
-      <a href="#" class="text-gray-400 hover:text-white transition-colors">Stories</a>
-      <a href="#" class="text-gray-400 hover:text-white transition-colors">Wire</a>
-      <a href="#" class="text-gray-400 hover:text-white transition-colors">About</a>
       {{/if}}
       {{!-- <a href="/subscribe/"
         class="bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 px-5 rounded-lg text-sm transition-colors">Subscribe</a> --}}
+    </div>
+
+    {{!-- Search & Account (opt-in via theme settings) --}}
+    <div class="hidden md:flex items-center gap-1">
+      {{#if @custom.show_search}}
+      <button type="button" data-ghost-search
+        class="rounded-lg p-2 text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple"
+        aria-label="{{t "Search"}}" title="{{t "Search"}}">
+        <i class="fas fa-magnifying-glass"></i>
+      </button>
+      {{/if}}
+      {{#if @custom.show_login}}
+      <a href="#/portal/signin" data-portal="signin"
+        class="rounded-lg p-2 text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple"
+        aria-label="{{t "Sign in"}}" title="{{t "Sign in"}}">
+        <i class="fas fa-user"></i>
+      </a>
+      {{/if}}
     </div>
 
     {{!-- Mobile Menu Toggle --}}
@@ -34,13 +48,21 @@
       class="hidden absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex-col gap-4 text-sm font-medium font-mono z-50">
       {{#if @site.navigation}}
       {{navigation type="primary"}}
-      {{else}}
-      <a href="#" class="text-gray-400 hover:text-white transition-colors">Stories</a>
-      <a href="#" class="text-gray-400 hover:text-white transition-colors">Wire</a>
-      <a href="#" class="text-gray-400 hover:text-white transition-colors">About</a>
       {{/if}}
       {{!-- <a href="/subscribe/"
         class="bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 px-5 rounded-lg text-center transition-colors mt-2">Subscribe</a> --}}
+      {{#if @custom.show_search}}
+      <button type="button" data-ghost-search
+        class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
+        <i class="fas fa-magnifying-glass"></i> {{t "Search"}}
+      </button>
+      {{/if}}
+      {{#if @custom.show_login}}
+      <a href="#/portal/signin" data-portal="signin"
+        class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
+        <i class="fas fa-user"></i> {{t "Sign in"}}
+      </a>
+      {{/if}}
     </nav>
 
   </div>
