@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ghost Compatibility](https://img.shields.io/badge/Ghost-%3E%3D6.0.0-lightgrey)](https://ghost.org)
 [![Node Engine](https://img.shields.io/badge/Node-%3E%3D22-green)](https://nodejs.org)
-
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sredevopsorg/sredevopsorg-ghost-theme)
 ---
 
 ## v2 To Do
