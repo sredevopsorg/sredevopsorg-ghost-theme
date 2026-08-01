@@ -1,13 +1,31 @@
-# Copilot Instructions for sredevopsorg-ghost-theme
-
 ## Overview
 
-`sredevopsorg-ghost-theme` is a Ghost theme built with Tailwind CSS and Gulp. The theme follows a modular architecture, focusing on reusability and maintainability.
+`sredevopsorg-ghost-theme` is a Ghost v6 theme built with Tailwind CSS and Gulp. The theme follows a modular architecture, focusing on reusability and maintainability.
 
-## Major Components
+## Ghost theme docs 
+https://docs.ghost.org/themes
+
+
+## Commands
+
+Use yarn for this repo.
+
+```bash
+yarn install # Install dependencies
+yarn dev # Start development server
+yarn build # Build the theme
+yarn test:dev # Run development tests
+```
+
+Run the test command before opening a PR when theme files, generated assets, dependencies, or CI change.
+
+## Boundaries
+
 0. **Important notes**:
-  - Theme is managed using `package.json` file and yarn.
-  - Files into `assets/built/*` are automatically generated and should not be edited directly.
+  -- Theme is managed using `package.json` file and yarn.
+  -- Files into `assets/built/*` are automatically generated and should not be edited directly.
+  -- Edit source CSS, JavaScript, Handlebars templates, partials, and package metadata intentionally.
+  -- Do not commit node_modules/, local Ghost content, generated zip files outside tracked release expectations, or secrets.
 1. **HTML Templates (`*.hbs`)**: Handlebars templates define the structure of the site.
 2. **CSS (`assets/css/*.css`)**: Tailwind CSS is used for styling, with custom configurations in `tailwind.config.js`.
 3. **JavaScript (`assets/js/*.js`)**: Scripts are written in JavaScript and minified using Gulp.
@@ -34,8 +52,6 @@ yarn dev
 ```
 This command builds the theme and serves it on a local server. Changes to HTML, CSS, or JavaScript files will trigger automatic rebuilds and reloads.
 
-### Testing
-The project does not include automated tests. Manual testing is recommended for verifying changes.
 
 ## Project-Specific Conventions
 
@@ -60,12 +76,10 @@ The project does not include automated tests. Manual testing is recommended for 
 
 ## Key Files/Directories
 
+- `package.json`: Contains theme metadata and dependency information.
+- `README.md`: Contains documentation for the theme, development instructions and todo list.
 - `gulpfile.js`: Defines Gulp tasks for building and serving the theme.
 - `tailwind.config.js`: Contains Tailwind CSS configurations.
 - `assets/css/*.css`: Source CSS files for Tailwind CSS.
 - `assets/js/*.js`: JavaScript source files.
 - `*.hbs` and `partials/**/*.hbs`: Handlebars templates.
-
-## Feedback
-
-Please review the above instructions. Let me know if any sections are unclear or incomplete, and I will iterate accordingly.

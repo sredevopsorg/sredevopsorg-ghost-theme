@@ -59,7 +59,7 @@ window.onclick = function (event) {
 
 /* Responsive HTML table */
 (function () {
-  const tables = document.querySelectorAll("section > table");
+  const tables = document.querySelectorAll("div > table, section > table");
 
   tables.forEach(function (table) {
     const wrapper = document.createElement("div");
