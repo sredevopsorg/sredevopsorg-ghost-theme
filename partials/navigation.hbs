@@ -9,9 +9,9 @@
         </ul>
     </nav>
 {{else}}
-    <ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center md:gap-6" role="menu">
+    <ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
         {{#foreach navigation}}
-            <li class="{{link_class for=(url) class=(concat "nav-"slug)}} flex items-center rounded-lg px-0 py-2 text-left font-mono md:px-4 md:py-2" role="menuitem">
+            <li class="{{link_class for=(url) class=(concat "nav-"slug)}} flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
                 <a href="{{url absolute="true"}}" class="block w-full text-gray-400 transition-colors hover:text-white">{{label}}</a>
             </li>
         {{/foreach}}
