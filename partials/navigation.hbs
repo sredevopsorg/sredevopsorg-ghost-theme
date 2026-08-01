@@ -1,11 +1,13 @@
 {{#if isSecondary}}
-    <ul class="flex flex-wrap justify-center gap-2" role="menu">
-        {{#foreach navigation}}
-            <li class="flex items-center gap-2 px-4 py-2" role="menuitem">
-                <a href="{{url absolute="true"}}">{{label}}</a>
-            </li>
-        {{/foreach}}
-    </ul>
+    <nav aria-label="{{t "Secondary navigation"}}">
+        <ul class="flex flex-wrap items-center justify-center divide-x divide-gray-800" role="menu">
+            {{#foreach navigation}}
+                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+                    <a href="{{url absolute="true"}}" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">{{label}}</a>
+                </li>
+            {{/foreach}}
+        </ul>
+    </nav>
 {{else}}
     <ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center md:gap-6" role="menu">
         {{#foreach navigation}}
