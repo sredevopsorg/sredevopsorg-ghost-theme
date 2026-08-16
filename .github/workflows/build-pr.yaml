@@ -1,0 +1,55 @@
+name: Rebuild theme assets on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rebuild-assets-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build theme assets
+        run: yarn build
+
+      - name: Push rebuilt assets to PR branch
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/built/
+          if git diff --cached --quiet; then
+            echo "Built assets are up to date — nothing to push."
+          else
+            git commit -m "chore: rebuild theme assets"
+            git push origin "HEAD:${HEAD_REF}"
+          fi
+
+      - name: Fork PR notice
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: echo "::notice::PR is from a fork — GITHUB_TOKEN cannot push to the fork's branch, so rebuilt assets were not committed."
