@@ -1,7 +1,7 @@
 {{!-- Featured Post Hero — shown at the top of page 1 only. --}}
 {{!-- Usage: {{> "featured-hero" tag="en"}} — tag scopes the featured post to the current locale. --}}
 {{^is "paged"}}
-{{#get "posts" filter="featured:true" limit="1" include="authors,tags" as |featuredPosts|}}
+{{#get "posts" filter="featured:true+tag:{{tag}}" limit="1" include="authors,tags" as |featuredPosts|}}
 {{#foreach featuredPosts}}
 <a href="{{url}}"
     class="group block mb-12 rounded-2xl overflow-hidden border border-gray-800 bg-dark-card hover:border-brand-purple transition-colors">
