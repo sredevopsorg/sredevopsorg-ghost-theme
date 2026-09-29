@@ -2,14 +2,14 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost v6 Theme for SREDevOps.org (https://www.sredevops.org) — Multi-locale, Tailwind CSS v3, responsive, dark-mode first and tag-based language filtering.",
     "demo": "https://www.sredevops.org",
-    "version": "2.1.3",
+    "version": "2.1.4",
     "engines": {
         "ghost": ">=6.0.0"
     },
     "license": "MIT",
     "scripts": {
         "dev": "rm -fv ./assets/built/* && gulp",
-        "build": "gulp build",
+        "build": "rm -fv ./assets/built/* && gulp build",
         "test:dev": "npx gscan --verbose .",
         "test:ci": "gscan --fatal --verbose ."
     },
@@ -43,7 +43,7 @@
         "@tailwindcss/forms": "^0.5.11",
         "@tailwindcss/typography": "^0.5.20",
         "autoprefixer": "^10.6.1",
-        "cssnano": "9.0.5",
+        "cssnano": "9.1.1",
         "gulp": "^5.0.1",
         "gulp-concat": "2.6.1",
         "gulp-livereload": "4.0.2",
@@ -76,9 +76,6 @@
             }
         },
         "image_sizes": {
-            "xs": {
-                "width": 100
-            },
             "s": {
                 "width": 220
             },
