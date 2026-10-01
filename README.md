@@ -269,17 +269,14 @@ graph LR
 
 ---
 
-## ⚙️ Theme Configuration (To be implemented)
+## ⚙️ Theme Configuration
 
 Customize behavior via **Ghost Admin → Settings → Theme**:
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `background_color` | Color | `#0f172a` | Base background for dark theme |
-| `lazy_images` | Boolean | `false` | Enable native lazy-loading on homepage |
-| `share_buttons` | Boolean | `true` | Show social share UI on posts |
-| `show_langs` | Boolean | `false` | Display language switcher in sidebar |
-| `show_sso` | Boolean | `false` | Show SSO login option in sidebar |
+| `show_search` | Boolean | `true` | Show a search icon in the main navigation |
+| `show_login` | Boolean | `true` | Show a sign-in link in the main navigation |
 
 ### Image Size Presets
 
@@ -354,22 +351,21 @@ Run via Chrome DevTools
 
 ### Option 2: GitHub Actions (Recommended)
 
-This repo includes a [Deploy Ghost Theme Action](.github/workflows/deploy.yml) that:
+This repo includes a [Deploy Ghost Theme Action](.github/workflows/deploy-theme.yaml) that:
 
-- Builds assets on push to `main`
-- Deploys via Ghost Admin API
-- Supports environment-specific config (staging/prod)
+- Builds theme assets (`yarn build`) before deploying
+- Deploys via the Ghost Admin API (triggered manually via `workflow_dispatch`)
 
 Configure secrets:
 
-- `GHOST_ADMIN_API_URL`
+- `GHOST_API_URL`
 - `GHOST_ADMIN_API_KEY`
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions aligned with our [Code of Conduct](CODE_OF_CONDUCT.md).
+We welcome contributions aligned with our project conventions.
 
 ### Development Guidelines
 
@@ -437,4 +433,4 @@ We welcome contributions aligned with our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 > This theme was built in Chile 🇨🇱 with a proud latin American identity and fully committed to the principles and philosophy of FLOSS (Free/Libre and Open Source Software) — We ought to minimize external dependencies, optimized asset delivery, and community-driven localization patterns. For questions about deploying in Chile/Argentina/Brazil contexts, open an issue or reach out via [SREDevOps.org](https://www.sredevops.org).
 
-*Last updated: July 2026 | Ghost v6 compatible*
+*Ghost v6 compatible*

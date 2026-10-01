@@ -1,33 +1,22 @@
 {{!< default}}
 
-<main id="main post-wrapper">
-
-<article class="max-w-full px-4 mx-auto prose-lg post-content prose-invert text-light md:px-32">
-
-<section>
-<section class="error-message">
-    <h1 class="error-code">Error 404</h1>
-    <a href="{{@site.url}}" title="Go to the front page of {{@site.title}} or try searching below."
-        referrerpolicy="no-referrer-when-downgrade" rel="home">Go to the front page of {{@site.title}}</a> or try searching
-    below.
-</section>
-<!-- Search button -->
-    <section class="mb-6">
-    <button 
-        class="flex items-center w-full gap-2 px-4 py-2 transition-colors duration-200 border rounded-md border-dark bg-dark text-lighter hover:bg-darker" 
-        data-ghost-search 
-        aria-label="Search site content"
-        title="Press / to search"
-    >
-        <span class="flex-grow text-left">Search</span>
-        <kbd class="hidden px-2 py-1 text-xs rounded md:inline-block bg-darker">
-            /
-        </kbd>
-    </button>
+<article class="max-w-2xl mx-auto py-16 text-center">
+    <section class="mb-8">
+        <h1 class="text-6xl md:text-7xl font-bold text-white tracking-tight mb-4">404</h1>
+        <p class="text-xl text-gray-400 mb-2">Page not found</p>
+        <p class="text-gray-600">
+            Go to the front page of <a href="{{@site.url}}" class="text-brand-blue hover:underline" rel="home">{{@site.title}}</a> or try searching below.
+        </p>
     </section>
 
+    <section class="max-w-md mx-auto">
+        <button
+            class="flex items-center w-full gap-2 px-4 py-2 rounded-md border border-gray-700 bg-dark-card text-gray-400 hover:text-white transition-colors duration-200"
+            data-ghost-search
+            aria-label="{{t "Search"}}"
+            title="Press / to search">
+            <span class="flex-grow text-left">{{t "Search"}}</span>
+            <kbd class="hidden px-2 py-1 text-xs rounded border border-gray-700 text-gray-500 md:inline-block">/</kbd>
+        </button>
+    </section>
 </article>
-
-
-</main>
-

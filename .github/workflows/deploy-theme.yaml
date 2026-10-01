@@ -5,20 +5,31 @@ on:
   #   branches:
   #     - main
 permissions:
-  contents: read 
-jobs: 
+  contents: read
+jobs:
   deploy:
     if: ${{ github.event_name == 'push' && github.actor == 'ngeorger' || github.event_name == 'workflow_dispatch' && github.actor == 'ngeorger' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         name: Checkout Repository
-      
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build theme assets
+        run: yarn build
+
       - name: Deploy Ghost Theme to website
-        uses: sredevopsorg/action-deploy-theme@68d7b0f98e20212068a39ea90c0f84ce4ab770a8 # v1.7.3  
+        uses: sredevopsorg/action-deploy-theme@68d7b0f98e20212068a39ea90c0f84ce4ab770a8 # v1.7.3
         continue-on-error: false
         with:
           api-url: ${{ secrets.GHOST_API_URL }}
           api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
           exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md .pre-commit-config.yaml routes.yaml tailwind.config.js"
-

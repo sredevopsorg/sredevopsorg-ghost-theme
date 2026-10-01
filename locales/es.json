@@ -41,5 +41,10 @@
   "Just a minute or less": "Menos de un minuto",
   "Takes about % minutes to read": "Alrededor de % minutos para leer",
   "Secondary navigation": "Navegación secundaria",
-  "Sign in": "Iniciar sesión"
+  "Sign in": "Iniciar sesión",
+  "Name": "Nombre",
+  "Description": "Descripción",
+  "Posts": "Artículos",
+  "No tags found": "No se encontraron etiquetas",
+  "Stay in the loop": "Mantente al día"
 }

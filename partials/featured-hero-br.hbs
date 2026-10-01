@@ -1,14 +1,13 @@
-{{!-- Featured Post Hero — shown at the top of page 1 only. --}}
-{{!-- Usage: {{> "featured-hero" tag="en"}} — tag scopes the featured post to the current locale. --}}
+{{!-- Portuguese (BR) Featured Post Hero — shown at the top of page 1 only. --}}
 {{^is "paged"}}
-{{#get "posts" filter="featured:true+tag:{{tag}}" limit="1" include="authors,tags" as |featuredPosts|}}
+{{#get "posts" filter="featured:true+tag:br" limit="1" include="authors,tags" as |featuredPosts|}}
 {{#foreach featuredPosts}}
 <a href="{{url}}"
     class="group block mb-12 rounded-2xl overflow-hidden border border-gray-800 bg-dark-card hover:border-brand-purple transition-colors">
     <div class="grid grid-cols-1 lg:grid-cols-2">
         {{#if feature_image}}
         <div class="aspect-[16/9] lg:aspect-auto overflow-hidden">
-            <img src="{{img_url feature_image size="l"}}"
+            <img src="{{img_url feature_image size="l" format="webp"}}"
                 alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
                 loading="eager"
                 fetchpriority="high"
@@ -17,7 +16,7 @@
         </div>
         {{/if}}
         <div class="p-6 md:p-8 flex flex-col justify-center">
-            <span class="text-xs font-bold text-brand-purple uppercase tracking-wider mb-3 font-mono">Featured</span>
+            <span class="text-xs font-bold text-brand-purple uppercase tracking-wider mb-3 font-mono">Destaque</span>
             {{#if primary_tag}}
             <span class="text-xs text-gray-500 uppercase tracking-wider mb-2">{{primary_tag.name}}</span>
             {{/if}}
@@ -28,9 +27,9 @@
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                 {{#foreach authors limit="1"}}<span>{{name}}</span>{{/foreach}}
                 <span>&middot;</span>
-                <span>{{date published_at format="MMM d, YYYY"}}</span>
+                <span>{{date published_at format="DD/MM/YYYY"}}</span>
                 <span>&middot;</span>
-                <span>{{reading_time minute=(t "Just a minute or less") minutes=(t "About % minutes read")}}</span>
+                <span>{{reading_time minute="Menos de um minuto" minutes="% minutos aprox."}}</span>
             </div>
         </div>
     </div>

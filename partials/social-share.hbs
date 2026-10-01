@@ -1,6 +1,6 @@
 {{!-- Social Share Links --}}
 
-  <a href="mailto:?subject={{title}}&body={{url absolute="true"}}" target="_blank" rel="noopener noreferrer"
+  <a href="mailto:?subject={{encode title}}&body={{url absolute="true"}}" target="_blank" rel="noopener noreferrer"
   class="social-icon-box" title="Share via Email"><i class="fa-regular fa-envelope text-sm"></i></a>
 
   <button onclick="navigator.clipboard.writeText('{{url absolute="true"}}'); alert('Link copied!');"
