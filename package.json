@@ -4,7 +4,8 @@
     "demo": "https://www.sredevops.org",
     "version": "2.1.4",
     "engines": {
-        "ghost": ">=6.0.0"
+        "ghost": ">=6.0.0",
+        "node": ">=22"
     },
     "license": "MIT",
     "scripts": {
@@ -76,6 +77,9 @@
             }
         },
         "image_sizes": {
+            "xs": {
+                "width": 100
+            },
             "s": {
                 "width": 220
             },

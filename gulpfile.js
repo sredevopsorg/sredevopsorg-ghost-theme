@@ -1,7 +1,6 @@
 const {series, watch, src, dest, parallel} = require('gulp');
 const pump = require('pump');
 const tailwind = require("tailwindcss");
-// const concat = require('gulp-concat');
 
 // gulp plugins and utils
 const livereload = require('gulp-livereload');
@@ -27,14 +26,17 @@ const handleError = (done) => {
     };
 };
 
-function hbs(done) {
+const reloadHbs = (done) => {
     pump([
-        src(["*.hbs", "**/**/*.hbs", "!node_modules/**/*.hbs"]),
+        src(["*.hbs", "partials/**/*.hbs"]),
         livereload()],
         handleError(done)
     );
-    css(done);
-}
+};
+
+// When templates change, rebuild CSS first (Tailwind scans .hbs for classes),
+// then reload the templates in the browser.
+const hbs = series(css, reloadHbs);
 
 function css(done) {
     pump([
@@ -56,7 +58,6 @@ function js(done) {
             // pull in lib files first so our own code can depend on it
             'assets/js/*.js'
         ], {sourcemaps: false}),
-        // concat('main.js'),
         uglify(),
         dest('assets/built/', {sourcemaps: '.'}),
         livereload()

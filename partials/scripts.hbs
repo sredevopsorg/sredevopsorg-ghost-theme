@@ -1,0 +1,10 @@
+{{#is "post"}}
+{{!-- Tocbot JS --}}
+<script src="https://cdn.jsdelivr.net/npm/tocbot@4.36.8/dist/tocbot.min.js"></script>
+
+{{!-- Load PrismJS --}}
+<script src="{{asset "built/prism.js"}}"></script>
+{{/is}}
+
+{{!-- Load main.js built file --}}
+<script src="{{asset "built/main.js"}}"></script>

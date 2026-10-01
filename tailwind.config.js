@@ -2,10 +2,8 @@
 module.exports = {
   content: [
     "./*.hbs",
-    "./**/*.hbs",
+    "./partials/**/*.hbs",
     "./assets/js/*.js",
-    "./node_modules/**/*.hbs",
-    "./assets/built/*.js",
   ],
   theme: {
     extend: {
