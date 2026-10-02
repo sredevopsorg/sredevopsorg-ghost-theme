@@ -50,7 +50,9 @@ sound.
 2. Tag it: `git tag v3.0.0 && git push origin v3.0.0`.
 3. Attach `dist/<name>-<version>.zip` to a GitHub release, with the changelog entry.
 4. Upload it in Ghost admin (**Settings → Design → Change theme → Upload**), or to the
-   marketplace.
+   marketplace. The `deploy-theme` workflow does the same thing on demand
+   (`workflow_dispatch`): it builds, checks, packages, and hands that archive to the
+   deploy action — the same file, not a second packaging path.
 
 ## 6. Smoke test the live site
 
