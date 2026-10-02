@@ -1,4 +1,6 @@
-    <!-- Author Box -->
+{{!-- Author box. Kept per locale: the "more content by" label sits inside
+     `{{#foreach authors}}`, where a partial argument is not visible, so the string
+     cannot be selected by argument — see docs/v3-roadmap.md, Phase 4 notes. --}}
     <section class="mt-8 border-t border-gray-800 pt-8">
     {{#foreach authors}}
         <div class="flex flex-col w-full p-4">

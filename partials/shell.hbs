@@ -1,0 +1,34 @@
+{{!-- Single document shell for every locale. {{{body}}} resolves inside a partial
+     called from a layout (verified against Ghost 6.67), so default.hbs and the locale
+     shells are one-liners that differ only in `lang`.
+     `lang` is the BCP-47 tag for the collection's language; the default shell passes
+     the site locale.
+
+     Why the fallback is the site locale and not the post's language: a layout cannot
+     see the post context. {{#has}} in a layout is always false, {{#post}} yields nothing
+     there, and a {{#contentFor}} does reach the layout but is evaluated in the layout's
+     own context, so a tag test inside it is false too (all three verified against Ghost
+     6.67). The remedy is the documented one: a locale template on the post — which is
+     what custom-es.hbs is. See docs/v3-roadmap.md, Phase 4 notes. --}}
+<!DOCTYPE html>
+<html lang="{{#if lang}}{{lang}}{{else}}{{@site.locale}}{{/if}}" class="dark">
+
+<head>
+    {{> "head"}}
+</head>
+
+<body class="{{body_class}} bg-dark-bg text-dark-text antialiased font-sans">
+
+    {{> "header"}}
+
+    <main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
+        {{{body}}}
+    </main>
+    {{> "footer"}}
+
+    {{ghost_foot}}
+
+    {{> "scripts"}}
+</body>
+
+</html>

@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="es" class="dark">
-
 <head>
-    <meta charset="utf-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Qué es Platform Engineering? SRE? DevOps?</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
-    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
-    rel="stylesheet">
+href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
-    rel="stylesheet">
+rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" type="text/css" href="/assets/vendor/prism-window.css?v=HASH" />
 <link rel="stylesheet" href="/assets/built/index-HASH.css?v=HASH">
@@ -21,417 +19,282 @@
 {"readingProgress":"Reading progress","closeMenu":"Close menu","openMenu":"Open menu","shareVia":"Share via Email","share":"Share","linkCopied":"Link copied!","copyLink":"Copy link","toc":"Table of Contents","locale":"en","siteUrl":"http://localhost:2368"}
 </script>
 <link rel="icon" href="http://localhost:2368/content/images/size/w256h256/2024/07/Icon-App-76x76@2x.png" type="image/png">
-    <link rel="canonical" href="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
-    <link rel="alternate" type="text/markdown" href="http://localhost:2368/es/que-es-platform-engineering-sre-devops.md">
-    <meta name="referrer" content="no-referrer-when-downgrade">
-
-    <meta property="og:site_name" content="Local Dev">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Qué es Platform Engineering? SRE? DevOps?">
-    <meta property="og:description" content="(O del por qué DevOps es sólo una parte...)
-
+<link rel="canonical" href="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
+<link rel="alternate" type="text/markdown" href="http://localhost:2368/es/que-es-platform-engineering-sre-devops.md">
+<meta name="referrer" content="no-referrer-when-downgrade">
+<meta property="og:site_name" content="Local Dev">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Qué es Platform Engineering? SRE? DevOps?">
+<meta property="og:description" content="(O del por qué DevOps es sólo una parte...)
 Actualizado: Julio 2024
-
 En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.
-
 Nota: Como todo blog, ésta es una nota basada en experiencias y">
-    <meta property="og:url" content="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;2000">
-    <meta property="article:published_time" content="TIMESTAMP">
-    <meta property="article:modified_time" content="TIMESTAMP">
-    <meta property="article:tag" content="Opinion">
-    <meta property="article:tag" content="Español">
-    <meta property="article:tag" content="Platform Engineering">
-    <meta property="article:tag" content="SRE">
-    <meta property="article:tag" content="DevOps">
-    <meta property="article:tag" content="Empresas">
-    <meta property="article:tag" content="Internal Developer Platform">
-    <meta property="article:tag" content="Observability">
-    <meta property="article:tag" content="SREDevOps">
-
-    <meta property="article:publisher" content="https://www.facebook.com/sredevops">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Qué es Platform Engineering? SRE? DevOps?">
-    <meta name="twitter:description" content="(O del por qué DevOps es sólo una parte...)
-
+<meta property="og:url" content="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
+<meta property="og:image" content="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;2000">
+<meta property="article:published_time" content="TIMESTAMP">
+<meta property="article:modified_time" content="TIMESTAMP">
+<meta property="article:tag" content="Opinion">
+<meta property="article:tag" content="Español">
+<meta property="article:tag" content="Platform Engineering">
+<meta property="article:tag" content="SRE">
+<meta property="article:tag" content="DevOps">
+<meta property="article:tag" content="Empresas">
+<meta property="article:tag" content="Internal Developer Platform">
+<meta property="article:tag" content="Observability">
+<meta property="article:tag" content="SREDevOps">
+<meta property="article:publisher" content="https://www.facebook.com/sredevops">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Qué es Platform Engineering? SRE? DevOps?">
+<meta name="twitter:description" content="(O del por qué DevOps es sólo una parte...)
 Actualizado: Julio 2024
-
 En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.
-
 Nota: Como todo blog, ésta es una nota basada en experiencias y">
-    <meta name="twitter:url" content="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;2000">
-    <meta name="twitter:label1" content="Written by">
-    <meta name="twitter:data1" content="local">
-    <meta name="twitter:label2" content="Filed under">
-    <meta name="twitter:data2" content="Opinion, Español, Platform Engineering, SRE, DevOps, Empresas, Internal Developer Platform, Observability, SREDevOps">
-    <meta name="twitter:site" content="@sredevopsorg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="675">
-
-    <script type="application/ld+json">
+<meta name="twitter:url" content="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;2000">
+<meta name="twitter:label1" content="Written by">
+<meta name="twitter:data1" content="local">
+<meta name="twitter:label2" content="Filed under">
+<meta name="twitter:data2" content="Opinion, Español, Platform Engineering, SRE, DevOps, Empresas, Internal Developer Platform, Observability, SREDevOps">
+<meta name="twitter:site" content="@sredevopsorg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<script type="application/ld+json">
 {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "publisher": {
-        "@type": "Organization",
-        "name": "Local Dev",
-        "url": "http://localhost:2368/",
-        "logo": {
-            "@type": "ImageObject",
-            "url": "http://localhost:2368/content/images/2024/11/sredevopsorg.svg"
-        }
-    },
-    "author": {
-        "@type": "Person",
-        "name": "local",
-        "url": "http://localhost:2368/author/local-2/",
-        "sameAs": []
-    },
-    "headline": "Qué es Platform Engineering? SRE? DevOps?",
-    "url": "http://localhost:2368/es/que-es-platform-engineering-sre-devops/",
-    "datePublished": "TIMESTAMP",
-    "dateModified": "TIMESTAMP",
-    "image": {
-        "@type": "ImageObject",
-        "url": "https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&ixlib=rb-4.0.3&q=80&w=2000",
-        "width": 1200,
-        "height": 675
-    },
-    "keywords": "Opinion, Español, Platform Engineering, SRE, DevOps, Empresas, Internal Developer Platform, Observability, SREDevOps",
-    "description": "(O del por qué DevOps es sólo una parte...)\n\nActualizado: Julio 2024\n\nEn esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.\n\nNota: Como todo blog, ésta es una nota basada en experiencias y opiniones personales, no es una guía oficial ni un documento técnico. Toda corrección, sugerencia o comentario es bienvenido.\n\n\nPlatform Engineering\n\nProceso de desarrollo, mantenimiento y me",
-    "mainEntityOfPage": "http://localhost:2368/es/que-es-platform-engineering-sre-devops/"
+"@context": "https://schema.org",
+"@type": "Article",
+"publisher": {
+"@type": "Organization",
+"name": "Local Dev",
+"url": "http://localhost:2368/",
+"logo": {
+"@type": "ImageObject",
+"url": "http://localhost:2368/content/images/2024/11/sredevopsorg.svg"
 }
-    </script>
-
-    <meta name="generator" content="Ghost 6.67">
-    <link rel="alternate" type="application/rss+xml" title="Local Dev" href="http://localhost:2368/es/rss/">
-    <script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.71/umd/portal.min.js" data-i18n="true" data-ghost="http://localhost:2368/" data-key="7d4e0c71149feae71b36b6efca" data-api="http://localhost:2368/ghost/api/content/" data-locale="en" crossorigin="anonymous">
+},
+"author": {
+"@type": "Person",
+"name": "local",
+"url": "http://localhost:2368/author/local-2/",
+"sameAs": []
+},
+"headline": "Qué es Platform Engineering? SRE? DevOps?",
+"url": "http://localhost:2368/es/que-es-platform-engineering-sre-devops/",
+"datePublished": "TIMESTAMP",
+"dateModified": "TIMESTAMP",
+"image": {
+"@type": "ImageObject",
+"url": "https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&ixlib=rb-4.0.3&q=80&w=2000",
+"width": 1200,
+"height": 675
+},
+"keywords": "Opinion, Español, Platform Engineering, SRE, DevOps, Empresas, Internal Developer Platform, Observability, SREDevOps",
+"description": "(O del por qué DevOps es sólo una parte...)\n\nActualizado: Julio 2024\n\nEn esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.\n\nNota: Como todo blog, ésta es una nota basada en experiencias y opiniones personales, no es una guía oficial ni un documento técnico. Toda corrección, sugerencia o comentario es bienvenido.\n\n\nPlatform Engineering\n\nProceso de desarrollo, mantenimiento y me",
+"mainEntityOfPage": "http://localhost:2368/es/que-es-platform-engineering-sre-devops/"
+}
 </script>
-<style id="gh-members-styles">.gh-post-upgrade-cta-content,
+<meta name="generator" content="Ghost 6.67">
+<link rel="alternate" type="application/rss+xml" title="Local Dev" href="http://localhost:2368/es/rss/">
+<script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.71/umd/portal.min.js" data-i18n="true" data-ghost="http://localhost:2368/" data-key="7d4e0c71149feae71b36b6efca" data-api="http://localhost:2368/ghost/api/content/" data-locale="en" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
 .gh-post-upgrade-cta {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    text-align: center;
-    width: 100%;
-    color: #ffffff;
-    font-size: 16px;
+display: flex;
+flex-direction: column;
+align-items: center;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+text-align: center;
+width: 100%;
+color: #ffffff;
+font-size: 16px;
 }
-
 .gh-post-upgrade-cta-content {
-    border-radius: 8px;
-    padding: 40px 4vw;
+border-radius: 8px;
+padding: 40px 4vw;
 }
-
 .gh-post-upgrade-cta h2 {
-    color: #ffffff;
-    font-size: 28px;
-    letter-spacing: -0.2px;
-    margin: 0;
-    padding: 0;
+color: #ffffff;
+font-size: 28px;
+letter-spacing: -0.2px;
+margin: 0;
+padding: 0;
 }
-
 .gh-post-upgrade-cta p {
-    margin: 20px 0 0;
-    padding: 0;
+margin: 20px 0 0;
+padding: 0;
 }
-
 .gh-post-upgrade-cta small {
-    font-size: 16px;
-    letter-spacing: -0.2px;
+font-size: 16px;
+letter-spacing: -0.2px;
 }
-
 .gh-post-upgrade-cta a {
-    color: #ffffff;
-    cursor: pointer;
-    font-weight: 500;
-    box-shadow: none;
-    text-decoration: underline;
+color: #ffffff;
+cursor: pointer;
+font-weight: 500;
+box-shadow: none;
+text-decoration: underline;
 }
-
 .gh-post-upgrade-cta a:hover {
-    color: #ffffff;
-    opacity: 0.8;
-    box-shadow: none;
-    text-decoration: underline;
+color: #ffffff;
+opacity: 0.8;
+box-shadow: none;
+text-decoration: underline;
 }
-
 .gh-post-upgrade-cta a.gh-btn {
-    display: block;
-    background: #ffffff;
-    text-decoration: none;
-    margin: 28px 0 0;
-    padding: 8px 18px;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 600;
+display: block;
+background: #ffffff;
+text-decoration: none;
+margin: 28px 0 0;
+padding: 8px 18px;
+border-radius: 4px;
+font-size: 16px;
+font-weight: 600;
 }
-
 .gh-post-upgrade-cta a.gh-btn:hover {
-    opacity: 0.92;
+opacity: 0.92;
 }</style>
-    <script defer src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/sodo-search.min.js" data-key="7d4e0c71149feae71b36b6efca" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/main.css" data-sodo-search="http://localhost:2368/" data-locale="en" crossorigin="anonymous">
-</script>
-
-    <link href="http://localhost:2368/webmentions/receive/" rel="webmention">
-    <script defer src="/public/cards.min.js?v=HASH">
-</script>
-    <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=HASH">
-    <script defer src="/public/comment-counts.min.js?v=HASH" data-ghost-comments-counts-api="http://localhost:2368/members/api/comments/counts/">
-</script>
-<style>:root {--ghost-accent-color: #aa3cfd;}</style>
+<script defer src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/sodo-search.min.js" data-key="7d4e0c71149feae71b36b6efca" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/main.css" data-sodo-search="http://localhost:2368/" data-locale="en" crossorigin="anonymous"></script>
+<link href="http://localhost:2368/webmentions/receive/" rel="webmention">
+<script defer src="/public/cards.min.js?v=HASH"></script>
+<link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=HASH">
+<script defer src="/public/comment-counts.min.js?v=HASH" data-ghost-comments-counts-api="http://localhost:2368/members/api/comments/counts/"></script><style>:root {--ghost-accent-color: #aa3cfd;}</style>
 </head>
-
 <body class="post-template tag-opinion tag-hash-ngeorger tag-hash-es tag-es tag-hash-home tag-platform-engineering tag-sre tag-devops tag-empresas tag-internal-developer-platform tag-observability tag-sredevops tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 bg-dark-bg text-dark-text antialiased font-sans">
-
-    <header class="sticky top-0 z-50 w-full bg-[#0d0e11]/80 backdrop-blur-md border-b border-white/10 py-3 min-h-[60px]">
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-
-    <div class="flex items-center">
-        <a href="http://localhost:2368" rel="me" alt="Local Dev" aria-label="Local Dev">
-          <img src="http://localhost:2368/content/images/2024/11/sredevopsorg.svg" alt="Local Dev" class="h-7 w-auto sm:h-8" />
-        </a>
-        <span class="mx-3 hidden h-6 w-px bg-white/15 sm:inline-block" aria-hidden="true">
-</span>
-        <a href="http://localhost:2368" rel="me" aria-hidden="true" tabindex="-1"
-          class="hidden rounded-md sm:inline-flex">
-          <img src="http://localhost:2368/content/images/2024/07/Icon-App-76x76@2x.png" alt="" class="h-7 w-7 rounded-md" />
-        </a>
-    </div>
-
-    <div class="hidden md:flex items-center">
-          <ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
-            <li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/en/" class="block w-full text-gray-400 transition-colors hover:text-white">English</a>
-            </li>
-            <li class="nav-espanol nav-current-parent flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/es/" class="block w-full text-gray-400 transition-colors hover:text-white">Español</a>
-            </li>
-            <li class="nav-brazil flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/br/" class="block w-full text-gray-400 transition-colors hover:text-white">Brazil</a>
-            </li>
-            <li class="nav-projects flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/our-open-source-projects/" class="block w-full text-gray-400 transition-colors hover:text-white">Projects</a>
-            </li>
-            <li class="nav-categories flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/tags/" class="block w-full text-gray-400 transition-colors hover:text-white">Categories</a>
-            </li>
-            <li class="nav-about-us flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/about-us/" class="block w-full text-gray-400 transition-colors hover:text-white">About Us</a>
-            </li>
-            <li class="nav-links flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/recommendations/" class="block w-full text-gray-400 transition-colors hover:text-white">Links</a>
-            </li>
-    </ul>
-
-    </div>
-
-    <div class="icon-pill hidden md:inline-flex">
-      <button type="button" data-ghost-search
-        aria-label="Search in SREDevOps.org" title="Search in SREDevOps.org">
-        <i class="fas fa-magnifying-glass text-xs">
-</i>
-      </button>
-      <a href="#/portal/signin" data-portal="signin"
-        aria-label="Sign in" title="Sign in">
-        <i class="fas fa-user text-xs">
-</i>
-      </a>
-    </div>
-
-    <details id="mobile-menu" data-island="MobileMenu" data-desktop-min-width="768" class="group md:hidden">
-      <summary
-        class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:text-white"
-        aria-label="Open menu">
-        <i class="fas fa-bars text-xl group-open:hidden">
-</i>
-        <i class="fas fa-xmark hidden text-xl group-open:inline">
-</i>
-      </summary>
-
-      <nav
-        class="absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex flex-col gap-4 text-sm font-medium z-50">
-            <ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
-            <li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/en/" class="block w-full text-gray-400 transition-colors hover:text-white">English</a>
-            </li>
-            <li class="nav-espanol nav-current-parent flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/es/" class="block w-full text-gray-400 transition-colors hover:text-white">Español</a>
-            </li>
-            <li class="nav-brazil flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/br/" class="block w-full text-gray-400 transition-colors hover:text-white">Brazil</a>
-            </li>
-            <li class="nav-projects flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/our-open-source-projects/" class="block w-full text-gray-400 transition-colors hover:text-white">Projects</a>
-            </li>
-            <li class="nav-categories flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/tags/" class="block w-full text-gray-400 transition-colors hover:text-white">Categories</a>
-            </li>
-            <li class="nav-about-us flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/about-us/" class="block w-full text-gray-400 transition-colors hover:text-white">About Us</a>
-            </li>
-            <li class="nav-links flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-                <a href="http://localhost:2368/recommendations/" class="block w-full text-gray-400 transition-colors hover:text-white">Links</a>
-            </li>
-    </ul>
-
-        <button type="button" data-ghost-search
-          class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
-          <i class="fas fa-magnifying-glass">
-</i> Search in SREDevOps.org
-        </button>
-        <a href="#/portal/signin" data-portal="signin"
-          class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
-          <i class="fas fa-user">
-</i> Sign in
-        </a>
-    </nav>
-
-  </div>
+<header class="sticky top-0 z-50 w-full bg-[#0d0e11]/80 backdrop-blur-md border-b border-white/10 py-3 min-h-[60px]">
+<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+<div class="flex items-center">
+<a href="http://localhost:2368" rel="me" alt="Local Dev" aria-label="Local Dev">
+<img src="http://localhost:2368/content/images/2024/11/sredevopsorg.svg" alt="Local Dev" class="h-7 w-auto sm:h-8" />
+</a>
+<span class="mx-3 hidden h-6 w-px bg-white/15 sm:inline-block" aria-hidden="true"></span>
+<a href="http://localhost:2368" rel="me" aria-hidden="true" tabindex="-1"
+class="hidden rounded-md sm:inline-flex">
+<img src="http://localhost:2368/content/images/2024/07/Icon-App-76x76@2x.png" alt="" class="h-7 w-7 rounded-md" />
+</a>
+</div>
+<div class="hidden md:flex items-center">
+<ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
+<li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/en/" class="block w-full text-gray-400 transition-colors hover:text-white">English</a>
+</li>
+<li class="nav-espanol nav-current-parent flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/es/" class="block w-full text-gray-400 transition-colors hover:text-white">Español</a>
+</li>
+<li class="nav-brazil flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/br/" class="block w-full text-gray-400 transition-colors hover:text-white">Brazil</a>
+</li>
+<li class="nav-projects flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/our-open-source-projects/" class="block w-full text-gray-400 transition-colors hover:text-white">Projects</a>
+</li>
+<li class="nav-categories flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/tags/" class="block w-full text-gray-400 transition-colors hover:text-white">Categories</a>
+</li>
+<li class="nav-about-us flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/about-us/" class="block w-full text-gray-400 transition-colors hover:text-white">About Us</a>
+</li>
+<li class="nav-links flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/recommendations/" class="block w-full text-gray-400 transition-colors hover:text-white">Links</a>
+</li>
+</ul>
+</div>
+<div class="icon-pill hidden md:inline-flex">
+<button type="button" data-ghost-search
+aria-label="Search in SREDevOps.org" title="Search in SREDevOps.org">
+<i class="fas fa-magnifying-glass text-xs"></i>
+</button>
+<a href="#/portal/signin" data-portal="signin"
+aria-label="Sign in" title="Sign in">
+<i class="fas fa-user text-xs"></i>
+</a>
+</div>
+<details id="mobile-menu" data-island="MobileMenu" data-desktop-min-width="768" class="group md:hidden">
+<summary
+class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:text-white"
+aria-label="Open menu">
+<i class="fas fa-bars text-xl group-open:hidden"></i>
+<i class="fas fa-xmark hidden text-xl group-open:inline"></i>
+</summary>
+<nav
+class="absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex flex-col gap-4 text-sm font-medium z-50">
+<ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
+<li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/en/" class="block w-full text-gray-400 transition-colors hover:text-white">English</a>
+</li>
+<li class="nav-espanol nav-current-parent flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/es/" class="block w-full text-gray-400 transition-colors hover:text-white">Español</a>
+</li>
+<li class="nav-brazil flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/br/" class="block w-full text-gray-400 transition-colors hover:text-white">Brazil</a>
+</li>
+<li class="nav-projects flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/our-open-source-projects/" class="block w-full text-gray-400 transition-colors hover:text-white">Projects</a>
+</li>
+<li class="nav-categories flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/tags/" class="block w-full text-gray-400 transition-colors hover:text-white">Categories</a>
+</li>
+<li class="nav-about-us flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/about-us/" class="block w-full text-gray-400 transition-colors hover:text-white">About Us</a>
+</li>
+<li class="nav-links flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/recommendations/" class="block w-full text-gray-400 transition-colors hover:text-white">Links</a>
+</li>
+</ul>
+<button type="button" data-ghost-search
+class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
+<i class="fas fa-magnifying-glass"></i> Search in SREDevOps.org
+</button>
+<a href="#/portal/signin" data-portal="signin"
+class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
+<i class="fas fa-user"></i> Sign in
+</a>
+</nav>
+</div>
 </header>
-
-    <main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
-
-  <div data-island="ReadingProgress" data-target=".gh-content">
-</div> <div
-  class="post tag-opinion tag-hash-ngeorger tag-hash-es tag-es tag-hash-home tag-platform-engineering tag-sre tag-devops tag-empresas tag-internal-developer-platform tag-observability tag-sredevops tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 featured grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-gray-800 pb-8">
-
-  <div class="lg:col-span-8 flex flex-col justify-center">
-    <div class="flex items-center gap-3 mb-3">
-      <span
-        class="bg-brand-purple text-white text-[10px] font-bold px-3 py-1  tracking-wide uppercase font-mono">Opinion</span>
-      <span class="text-gray-500 text-xs">
-<i class="far fa-clock mr-1">
-</i> Alrededor de 4 minutos para leer</span>
-    </div>
-
-    <h1 class="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-white mb-3">Qué es Platform Engineering? SRE? DevOps?</h1>
-
-    <p class="text-lg text-gray-400 leading-relaxed max-w-3xl mb-4">(O del por qué DevOps es sólo una parte...)
-
+<main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
+<div data-island="ReadingProgress" data-target=".gh-content"></div>
+<div
+class="post tag-opinion tag-hash-ngeorger tag-hash-es tag-es tag-hash-home tag-platform-engineering tag-sre tag-devops tag-empresas tag-internal-developer-platform tag-observability tag-sredevops tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 featured grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-gray-800 pb-8">
+<div class="lg:col-span-8 flex flex-col justify-center">
+<div class="flex items-center gap-3 mb-3">
+<span
+class="bg-brand-purple text-white text-[10px] font-bold px-3 py-1 tracking-wide uppercase font-mono">Opinion</span>
+<span class="text-gray-500 text-xs"><i class="far fa-clock mr-1"></i> Alrededor de 4 minutos para leer</span>
+</div>
+<h1 class="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-white mb-3">Qué es Platform Engineering? SRE? DevOps?</h1>
+<p class="text-lg text-gray-400 leading-relaxed max-w-3xl mb-4">(O del por qué DevOps es sólo una parte...)
 Actualizado: Julio 2024
-
 En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.
-
 Nota: Como todo blog, ésta es una nota basada en experiencias y</p>
-
-    <div class="flex items-center text-sm text-gray-400">
-      <span
-        class="h-6 w-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-300 font-bold mr-2">local</span>
-      <span class="mr-2 text-gray-300 font-medium">
-<a href="/author/local-2/">local</a>
-</span>
-      <span class="mr-2 text-gray-600">|</span>
-      <span>01/07/2024</span>
-    </div>
-  </div>
-
-  <div class="lg:col-span-4 mt-4 lg:mt-0">
-    <figure>
-    <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;900"
-        alt="Qué es Platform Engineering? SRE? DevOps?"
-        class="w-full h-auto object-cover rounded-xl border border-gray-800 shadow-2xl">
+<div class="flex items-center text-sm text-gray-400">
+<span
+class="h-6 w-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-300 font-bold mr-2">local</span>
+<span class="mr-2 text-gray-300 font-medium"><a href="/author/local-2/">local</a></span>
+<span class="mr-2 text-gray-600">|</span>
+<span>01/07/2024</span>
+</div>
+</div>
+<div class="lg:col-span-4 mt-4 lg:mt-0">
+<figure>
+<img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;900"
+alt="Qué es Platform Engineering? SRE? DevOps?"
+class="w-full h-auto object-cover rounded-xl border border-gray-800 shadow-2xl">
 </figure>
-    <p class="mt-2 text-center text-xs text-gray-600">
-<span style="white-space:pre-wrap">Photo by </span>
-<a href="https://unsplash.com/@growtika?utm_source=ghost&amp;utm_medium=referral&amp;utm_campaign=api-credit">
-<span style="white-space:pre-wrap">Growtika</span>
-</a>
-<span style="white-space:pre-wrap"> / </span>
-<a href="https://unsplash.com/?utm_source=ghost&amp;utm_medium=referral&amp;utm_campaign=api-credit">
-<span style="white-space:pre-wrap">Unsplash</span>
-</a>
-</p>
-  </div>
-  </div>
-
-  <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8 relative">
-    <div class="lg:col-span-8 gh-content" data-island="CodeBlocks" data-prismjs-copy="Copy" data-prismjs-copy-success="Copied!">
-      <p>
-<em>(O del por qué DevOps es sólo una parte...)</em>
-</p>
-<blockquote>
-<em>Actualizado: Julio 2024</em>
-</blockquote>
-<p>En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.</p>
-<p>Nota: Como todo blog, ésta es una nota basada en experiencias y opiniones personales, no es una guía oficial ni un documento técnico. Toda corrección, sugerencia o comentario es bienvenido.</p>
-<h3 id="platform-engineering">Platform Engineering</h3>
-<p>Proceso de desarrollo, mantenimiento y mejora de una plataforma o ecosistema donde vivirá tu proyecto, que puede incluir desde la creación de una infraestructura hasta APIs para la provisión interna de los servicios e infraestructura, en conjunto con sistemas tipo <a href="http://localhost:2368/tag/internal-developer-platform/" rel="noreferrer">"Internal Developer Portals" (IdP) y similares.</a>
-</p>
-<figure class="kg-card kg-bookmark-card">
-<a class="kg-bookmark-container" href="http://localhost:2368/tag/internal-developer-platform/">
-<div class="kg-bookmark-content">
-<div class="kg-bookmark-title">Internal Developer Platform - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div>
-<div class="kg-bookmark-description">
-</div>
-<div class="kg-bookmark-metadata">
-<img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt="">
-<span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span>
+<p class="mt-2 text-center text-xs text-gray-600"><span style="white-space:pre-wrap">Photo by </span><a href="https://unsplash.com/@growtika?utm_source=ghost&amp;utm_medium=referral&amp;utm_campaign=api-credit"><span style="white-space:pre-wrap">Growtika</span></a><span style="white-space:pre-wrap"> / </span><a href="https://unsplash.com/?utm_source=ghost&amp;utm_medium=referral&amp;utm_campaign=api-credit"><span style="white-space:pre-wrap">Unsplash</span></a></p>
 </div>
 </div>
-<div class="kg-bookmark-thumbnail">
-<img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'">
-</div>
-</a>
-</figure>
-<h3 id="site-reliability-engineering-sre">Site Reliability Engineering (SRE)</h3>
-<p>enfoque para garantizar la disponibilidad y el rendimiento de un sistema o aplicación. Se centra en automatizar y optimizar procesos para garantizar que el sistema esté disponible y funcione correctamente en todo momento.</p>
-<figure class="kg-card kg-bookmark-card">
-<a class="kg-bookmark-container" href="http://localhost:2368/tag/sre/">
-<div class="kg-bookmark-content">
-<div class="kg-bookmark-title">SRE - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div>
-<div class="kg-bookmark-description">
-</div>
-<div class="kg-bookmark-metadata">
-<img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt="">
-<span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span>
-</div>
-</div>
-<div class="kg-bookmark-thumbnail">
-<img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'">
-</div>
-</a>
-</figure>
-<h3 id="devops">DevOps</h3>
-<p>DevOps es una cultura y conjunto de prácticas que busca unir el desarrollo de software y la operación de sistemas para mejorar la velocidad y la eficiencia del desarrollo de aplicaciones.</p>
-<figure class="kg-card kg-bookmark-card">
-<a class="kg-bookmark-container" href="http://localhost:2368/tag/devops/">
-<div class="kg-bookmark-content">
-<div class="kg-bookmark-title">DevOps - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div>
-<div class="kg-bookmark-description">
-</div>
-<div class="kg-bookmark-metadata">
-<img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt="">
-<span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span>
-</div>
-</div>
-<div class="kg-bookmark-thumbnail">
-<img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'">
-</div>
-</a>
-</figure>
-<p>En resumen, Platform Engineering se enfoca en desarrollar y mantener una plataforma tecnológica, SRE en garantizar la disponibilidad y rendimiento de un sistema y DevOps en unir el desarrollo de software y operación de sistemas para mejorar la velocidad y eficiencia del desarrollo de aplicaciones.</p>
-<table>
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8 relative">
+<div class="lg:col-span-8 gh-content" data-island="CodeBlocks" data-prismjs-copy="Copy" data-prismjs-copy-success="Copied!">
+<p><em>(O del por qué DevOps es sólo una parte...)</em></p><blockquote><em>Actualizado: Julio 2024</em></blockquote><p>En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.</p><p>Nota: Como todo blog, ésta es una nota basada en experiencias y opiniones personales, no es una guía oficial ni un documento técnico. Toda corrección, sugerencia o comentario es bienvenido.</p><h3 id="platform-engineering">Platform Engineering</h3><p>Proceso de desarrollo, mantenimiento y mejora de una plataforma o ecosistema donde vivirá tu proyecto, que puede incluir desde la creación de una infraestructura hasta APIs para la provisión interna de los servicios e infraestructura, en conjunto con sistemas tipo <a href="http://localhost:2368/tag/internal-developer-platform/" rel="noreferrer">"Internal Developer Portals" (IdP) y similares.</a></p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="http://localhost:2368/tag/internal-developer-platform/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">Internal Developer Platform - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div><div class="kg-bookmark-description"></div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt=""><span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'"></div></a></figure><h3 id="site-reliability-engineering-sre">Site Reliability Engineering (SRE)</h3><p>enfoque para garantizar la disponibilidad y el rendimiento de un sistema o aplicación. Se centra en automatizar y optimizar procesos para garantizar que el sistema esté disponible y funcione correctamente en todo momento.</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="http://localhost:2368/tag/sre/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">SRE - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div><div class="kg-bookmark-description"></div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt=""><span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'"></div></a></figure><h3 id="devops">DevOps</h3><p>DevOps es una cultura y conjunto de prácticas que busca unir el desarrollo de software y la operación de sistemas para mejorar la velocidad y la eficiencia del desarrollo de aplicaciones.</p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="http://localhost:2368/tag/devops/"><div class="kg-bookmark-content"><div class="kg-bookmark-title">DevOps - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div><div class="kg-bookmark-description"></div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt=""><span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span></div></div><div class="kg-bookmark-thumbnail"><img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'"></div></a></figure><p>En resumen, Platform Engineering se enfoca en desarrollar y mantener una plataforma tecnológica, SRE en garantizar la disponibilidad y rendimiento de un sistema y DevOps en unir el desarrollo de software y operación de sistemas para mejorar la velocidad y eficiencia del desarrollo de aplicaciones.</p><table>
 <thead>
 <tr>
 <th>Nombre</th>
 <th>Ideas clave -&gt;</th>
-<th>
-</th>
-<th>
-</th>
-<th>
-</th>
-<th>
-</th>
+<th></th>
+<th></th>
+<th></th>
+<th></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>
-<strong>Platform Eng.</strong> -&gt;</td>
+<td><strong>Platform Eng.</strong> -&gt;</td>
 <td>cultura org.</td>
 <td>proyectos</td>
 <td>automatización</td>
@@ -439,8 +302,7 @@ Nota: Como todo blog, ésta es una nota basada en experiencias y</p>
 <td>self service</td>
 </tr>
 <tr>
-<td>
-<strong>SRE</strong>         -&gt;</td>
+<td><strong>SRE</strong> -&gt;</td>
 <td>arquitectura</td>
 <td>observabilidad</td>
 <td>infraestructura</td>
@@ -448,8 +310,7 @@ Nota: Como todo blog, ésta es una nota basada en experiencias y</p>
 <td>escalabilidad</td>
 </tr>
 <tr>
-<td>
-<strong>DevOps</strong>       -&gt;</td>
+<td><strong>DevOps</strong> -&gt;</td>
 <td>colaboración</td>
 <td>desarrollo</td>
 <td>entrega continua</td>
@@ -458,263 +319,201 @@ Nota: Como todo blog, ésta es una nota basada en experiencias y</p>
 </tr>
 </tbody>
 </table>
-<h3 id="pero-qu%C3%A9-realmente-necesito-y-para-qu%C3%A9-lo-har%C3%ADa">Pero, qué realmente necesito y para qué lo haría?</h3>
-<p>El tiempo y esfuerzo requerido para una adopción exitosa de SRE, DevOps o Ingeniería de Plataformas puede variar dependiendo de la organización específica y del estado actual de su infraestructura y procesos de TI. Por lo general, se tarda varios meses a varios años para que una organización adopte completamente y vea los beneficios de estas prácticas.</p>
-<p>Un ejemplo de estudio de caso de una adopción exitosa de SRE es Google. Desarrollaron el concepto de SRE y lo han estado utilizando durante muchos años. Google ha reportado un aumento significativo en la eficiencia, disponibilidad y confiabilidad de sus sistemas desde la adopción de SRE. En su caso, se tardaron varios años en integrar completamente las prácticas de SRE en su cultura y procesos de ingeniería, pero los resultados valieron la pena el esfuerzo.</p>
-<p>Otro ejemplo de adopción exitosa de DevOps es Spotify, comenzaron su viaje en 2010 y lograron un aumento significativo en la eficiencia y velocidad de entrega al implementar prácticas de integración continua y entrega continua, así como otras metodologías de DevOps.</p>
-<h3 id="seg%C3%BAn-la-literatura-y-los-expertos-en-la-industria-hay-varios-errores-comunes-que-las-organizaciones-cometen-al-implementar-devops">Según la literatura y los expertos en la industria, hay varios errores comunes que las organizaciones cometen al implementar DevOps</h3>
-<p>Existen varios errores comunes que cometen las organizaciones al intentar adoptar DevOps, Platform Engineering, etc, entre ellas están:</p>
-<ul>
-<li>Falta de objetivos y metas claros: Sin una comprensión clara de los resultados deseados y beneficios de la ingeniería de plataformas, puede ser difícil medir el progreso y determinar si la implementación es exitosa.</li>
-<li>Recursos insuficientes: Adoptar la ingeniería de plataformas requiere una inversión significativa de tiempo y recursos. Sin recursos adecuados, puede ser difícil implementar y mantener la infraestructura y procesos necesarios.</li>
-<li>Falta de comunicación y colaboración: La ingeniería de plataformas requiere un alto nivel de colaboración y comunicación entre equipos. Sin una comunicación efectiva, puede ser difícil coordinar esfuerzos y asegurar que todos trabajen hacia los mismos objetivos.</li>
-<li>Enfoque excesivo en la tecnología: Las organizaciones también deben enfocarse en construir una cultura y procesos que respalden la ingeniería de plataformas.</li>
-<li>Negligencia de la seguridad y cumplimiento: La ingeniería de plataformas requiere un enfoque en la seguridad y cumplimiento para garantizar que los sistemas sean seguros y cumplan con las regulaciones de la industria.</li>
-<li>Negligencia de la monitorización y observabilidad: La ingeniería de plataformas requiere un enfoque en la monitorización y observabilidad para garantizar que los sistemas funcionen correctamente y que los problemas puedan ser identificados y resueltos rápidamente.</li>
-<li>No involucrar a los miembros del equipo adecuados: La ingeniería de plataformas requiere un equipo diverso con diferentes experticias y antecedentes. No involucrar a las personas adecuadas puede llevar a malentendidos y soluciones inefectivas.</li>
-</ul>
-<p>Para tener éxito con una cultura de ingeniería de plataformas, las organizaciones deben enfocarse en objetivos y metas claros, proporcionar recursos suficientes, comunicarse y colaborar efectivamente, enfocarse en construir una cultura y procesos que respalden, priorizar la seguridad y cumplimiento, invertir en monitorización y observabilidad, e involucrar a los miembros del equipo adecuados</p>
-    </div>
-    <aside class="lg:col-span-4 relative">
-      <div class="sticky top-8 space-y-10">
-        <div data-island="TableOfContents" data-island-lazy data-target=".gh-content" data-headings="h2, h3">
+<h3 id="pero-qu%C3%A9-realmente-necesito-y-para-qu%C3%A9-lo-har%C3%ADa">Pero, qué realmente necesito y para qué lo haría?</h3><p>El tiempo y esfuerzo requerido para una adopción exitosa de SRE, DevOps o Ingeniería de Plataformas puede variar dependiendo de la organización específica y del estado actual de su infraestructura y procesos de TI. Por lo general, se tarda varios meses a varios años para que una organización adopte completamente y vea los beneficios de estas prácticas.</p><p>Un ejemplo de estudio de caso de una adopción exitosa de SRE es Google. Desarrollaron el concepto de SRE y lo han estado utilizando durante muchos años. Google ha reportado un aumento significativo en la eficiencia, disponibilidad y confiabilidad de sus sistemas desde la adopción de SRE. En su caso, se tardaron varios años en integrar completamente las prácticas de SRE en su cultura y procesos de ingeniería, pero los resultados valieron la pena el esfuerzo.</p><p>Otro ejemplo de adopción exitosa de DevOps es Spotify, comenzaron su viaje en 2010 y lograron un aumento significativo en la eficiencia y velocidad de entrega al implementar prácticas de integración continua y entrega continua, así como otras metodologías de DevOps.</p><h3 id="seg%C3%BAn-la-literatura-y-los-expertos-en-la-industria-hay-varios-errores-comunes-que-las-organizaciones-cometen-al-implementar-devops">Según la literatura y los expertos en la industria, hay varios errores comunes que las organizaciones cometen al implementar DevOps</h3><p>Existen varios errores comunes que cometen las organizaciones al intentar adoptar DevOps, Platform Engineering, etc, entre ellas están:</p><ul><li>Falta de objetivos y metas claros: Sin una comprensión clara de los resultados deseados y beneficios de la ingeniería de plataformas, puede ser difícil medir el progreso y determinar si la implementación es exitosa.</li><li>Recursos insuficientes: Adoptar la ingeniería de plataformas requiere una inversión significativa de tiempo y recursos. Sin recursos adecuados, puede ser difícil implementar y mantener la infraestructura y procesos necesarios.</li><li>Falta de comunicación y colaboración: La ingeniería de plataformas requiere un alto nivel de colaboración y comunicación entre equipos. Sin una comunicación efectiva, puede ser difícil coordinar esfuerzos y asegurar que todos trabajen hacia los mismos objetivos.</li><li>Enfoque excesivo en la tecnología: Las organizaciones también deben enfocarse en construir una cultura y procesos que respalden la ingeniería de plataformas.</li><li>Negligencia de la seguridad y cumplimiento: La ingeniería de plataformas requiere un enfoque en la seguridad y cumplimiento para garantizar que los sistemas sean seguros y cumplan con las regulaciones de la industria.</li><li>Negligencia de la monitorización y observabilidad: La ingeniería de plataformas requiere un enfoque en la monitorización y observabilidad para garantizar que los sistemas funcionen correctamente y que los problemas puedan ser identificados y resueltos rápidamente.</li><li>No involucrar a los miembros del equipo adecuados: La ingeniería de plataformas requiere un equipo diverso con diferentes experticias y antecedentes. No involucrar a las personas adecuadas puede llevar a malentendidos y soluciones inefectivas.</li></ul><p>Para tener éxito con una cultura de ingeniería de plataformas, las organizaciones deben enfocarse en objetivos y metas claros, proporcionar recursos suficientes, comunicarse y colaborar efectivamente, enfocarse en construir una cultura y procesos que respalden, priorizar la seguridad y cumplimiento, invertir en monitorización y observabilidad, e involucrar a los miembros del equipo adecuados</p>
 </div>
-
+<aside class="lg:col-span-4 relative">
+<div class="sticky top-8 space-y-10">
+<div data-island="TableOfContents" data-island-lazy data-target=".gh-content" data-headings="h2, h3"></div>
 <div>
-    <h4 class="text-white text-lg font-bold mb-1">
-      Share this post:
-    </h4>
-  <div class="flex gap-2">
-
+<h4 class="text-white text-lg font-bold mb-1">
+Share this post:
+</h4>
+<div class="flex gap-2">
 <a href="mailto:?subject=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F&body=http://localhost:2368/es/que-es-platform-engineering-sre-devops/" target="_blank" rel="noopener noreferrer"
-  class="social-icon-box" aria-label="Share via Email" title="Share via Email">
-  <i class="fa-regular fa-envelope text-sm" aria-hidden="true">
-</i>
+class="social-icon-box" aria-label="Share via Email" title="Share via Email">
+<i class="fa-regular fa-envelope text-sm" aria-hidden="true"></i>
 </a>
-
 <a href="https://x.com/intent/tweet?url=http://localhost:2368/es/que-es-platform-engineering-sre-devops/&text=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F" target="_blank"
-  rel="noopener noreferrer" class="social-icon-box" aria-label="X" title="X">
-  <i class="fa-brands fa-x text-sm" aria-hidden="true">
-</i>
+rel="noopener noreferrer" class="social-icon-box" aria-label="X" title="X">
+<i class="fa-brands fa-x text-sm" aria-hidden="true"></i>
 </a>
-
 <a href="https://facebook.com/sharer/sharer.php?u=http://localhost:2368/es/que-es-platform-engineering-sre-devops/" target="_blank" rel="noopener noreferrer"
-  class="social-icon-box" aria-label="Facebook" title="Facebook">
-  <i class="fa-brands fa-facebook text-sm" aria-hidden="true">
-</i>
+class="social-icon-box" aria-label="Facebook" title="Facebook">
+<i class="fa-brands fa-facebook text-sm" aria-hidden="true"></i>
 </a>
-
 <a href="https://linkedin.com/shareArticle?mini=true&url=http://localhost:2368/es/que-es-platform-engineering-sre-devops/&title=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F"
-  target="_blank" rel="noopener noreferrer" class="social-icon-box" aria-label="LinkedIn" title="LinkedIn">
-  <i class="fa-brands fa-linkedin-in text-sm" aria-hidden="true">
-</i>
+target="_blank" rel="noopener noreferrer" class="social-icon-box" aria-label="LinkedIn" title="LinkedIn">
+<i class="fa-brands fa-linkedin-in text-sm" aria-hidden="true"></i>
 </a>
-
 <a href="https://api.whatsapp.com/send?text=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F%20http://localhost:2368/es/que-es-platform-engineering-sre-devops/" target="_blank"
-  rel="noopener noreferrer" class="social-icon-box" aria-label="WhatsApp" title="WhatsApp">
-  <i class="fa-brands fa-whatsapp text-sm" aria-hidden="true">
-</i>
+rel="noopener noreferrer" class="social-icon-box" aria-label="WhatsApp" title="WhatsApp">
+<i class="fa-brands fa-whatsapp text-sm" aria-hidden="true"></i>
 </a>
-
 <a href="https://reddit.com/submit?url=http://localhost:2368/es/que-es-platform-engineering-sre-devops/&title=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F" target="_blank"
-  rel="noopener noreferrer" class="social-icon-box" aria-label="Reddit" title="Reddit">
-  <i class="fa-brands fa-reddit text-sm" aria-hidden="true">
-</i>
+rel="noopener noreferrer" class="social-icon-box" aria-label="Reddit" title="Reddit">
+<i class="fa-brands fa-reddit text-sm" aria-hidden="true"></i>
 </a>
-
 <a href="https://mastodon.social/share?text=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F%20http://localhost:2368/es/que-es-platform-engineering-sre-devops/" target="_blank"
-  rel="noopener noreferrer" class="social-icon-box" aria-label="Mastodon" title="Mastodon">
-  <i class="fa-brands fa-mastodon text-sm" aria-hidden="true">
-</i>
+rel="noopener noreferrer" class="social-icon-box" aria-label="Mastodon" title="Mastodon">
+<i class="fa-brands fa-mastodon text-sm" aria-hidden="true"></i>
 </a>
-
-<div data-island="ShareButtons" data-island-lazy class="contents">
+<div data-island="ShareButtons" data-island-lazy class="contents"></div>
 </div>
-  </div>
 </div>
-
 <div class="border border-gray-700/70 rounded-lg p-6 bg-dark-card text-center shadow-lg">
-  <h4 class="text-white text-lg font-bold mb-1">Stay in the loop</h4>
-  <p class="text-gray-400 text-xs mb-4">Get the latest posts delivered right to your inbox</p>
-  <div class="space-y-3">
-    <div class="flex flex-col gap-2">
-      <form data-members-form="subscribe">
-        <input type="email" required data-members-email class="w-full bg-dark-bg border border-gray-700 rounded-md py-2 px-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all">
-        <button type="submit" class="w-full bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 rounded-md text-sm transition-colors">
-        Register with Email
-        </button>
-        <p class="message-success text-xs text-green-400 mt-2" role="status">Almost finished! Please check your inbox to confirm your subscription.</p>
-        <p class="message-error text-xs text-red-400 mt-2" role="alert">Sorry, something went wrong. Please try again.</p>
-      </form>
-    </div>
-  </div>
-</div>      </div>
-    </aside>
-  </section>
-
-
-
-
-  <div class="mt-16 border-t border-gray-800 pt-8">
-    <h2 class="text-2xl font-bold text-white mb-6">Contenido relacionado</h2>
-    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <article
-  class="bg-dark-card border border-gray-700 rounded-xl overflow-hidden hover:border-gray-500 transition-colors group flex flex-col h-full">
-  <a href="/es/que-es-platform-engineering-sre-devops-2/" class="block aspect-[16/9] overflow-hidden">
-    <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
-      alt="Qué es Platform Engineering? SRE? DevOps?"
-      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-  </a>
-  <div class="p-5 flex flex-col flex-grow">
-    <h3 class="text-lg font-semibold text-white group-hover:text-brand-purple transition-colors leading-tight mb-2">
-<a
-        href="/es/que-es-platform-engineering-sre-devops-2/">Qué es Platform Engineering? SRE? DevOps?</a>
-</h3>
-    <p class="text-sm text-gray-400 flex-grow line-clamp-2">(O del por qué DevOps es sólo una parte...)
-
-Actualizado: Julio 2024
-
-En esta columna intentaré definir y explicar los</p>
-    <div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
-      <span>01/07/2024</span>
-      <span>4 minutos aprox.</span>
-    </div>
-  </div>
-</article>
+<h4 class="text-white text-lg font-bold mb-1">Stay in the loop</h4>
+<p class="text-gray-400 text-xs mb-4">Get the latest posts delivered right to your inbox</p>
+<div class="space-y-3">
+<div class="flex flex-col gap-2">
+<form data-members-form="subscribe">
+<input type="email" required data-members-email class="w-full bg-dark-bg border border-gray-700 rounded-md py-2 px-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple transition-all">
+<button type="submit" class="w-full bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 rounded-md text-sm transition-colors">
+Register with Email
+</button>
+<p class="message-success text-xs text-green-400 mt-2" role="status">Almost finished! Please check your inbox to confirm your subscription.</p>
+<p class="message-error text-xs text-red-400 mt-2" role="alert">Sorry, something went wrong. Please try again.</p>
+</form>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</section>
+<div class="mt-16 border-t border-gray-800 pt-8">
+<h2 class="text-2xl font-bold text-white mb-6">Contenido relacionado</h2>
+<section class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <article
-  class="bg-dark-card border border-gray-700 rounded-xl overflow-hidden hover:border-gray-500 transition-colors group flex flex-col h-full">
-  <a href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instancia-sin-ip-publica/" class="block aspect-[16/9] overflow-hidden">
-    <img src="/content/images/size/w300/format/webp/2024/08/ec2-instance-connect-endpoint.png"
-      alt="No más bastiones en AWS: Con EC2 Instance Connect llegas a tu instancia sin IP pública"
-      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-  </a>
-  <div class="p-5 flex flex-col flex-grow">
-    <h3 class="text-lg font-semibold text-white group-hover:text-brand-purple transition-colors leading-tight mb-2">
-<a
-        href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instancia-sin-ip-publica/">No más bastiones en AWS: Con EC2 Instance Connect llegas a tu instancia sin IP pública</a>
-</h3>
-    <p class="text-sm text-gray-400 flex-grow line-clamp-2">Desde hoy puedes conectarte a un servidor EC2 en Amazon Web Services (AWS) utilizando &quot;EC2 Instance Connect&quot;, sin necesidad de una IP pública ni un host bastión . Este artículo te ayudará a entender cómo configurar correctamente tu endpoint y obtener una conexión segura a tu servidor EC2 en AWS.</p>
-    <div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
-      <span>10/07/2023</span>
-      <span>2 minutos aprox.</span>
-    </div>
-  </div>
+class="bg-dark-card border border-gray-700 rounded-xl overflow-hidden hover:border-gray-500 transition-colors group flex flex-col h-full">
+<a href="/es/que-es-platform-engineering-sre-devops-2/" class="block aspect-[16/9] overflow-hidden">
+<img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
+alt="Qué es Platform Engineering? SRE? DevOps?"
+class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+</a>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-semibold text-white group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
+href="/es/que-es-platform-engineering-sre-devops-2/">Qué es Platform Engineering? SRE? DevOps?</a></h3>
+<p class="text-sm text-gray-400 flex-grow line-clamp-2">(O del por qué DevOps es sólo una parte...)
+Actualizado: Julio 2024
+En esta columna intentaré definir y explicar los</p>
+<div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
+<span>01/07/2024</span>
+<span>4 minutos aprox.</span>
+</div>
+</div>
+</article><article
+class="bg-dark-card border border-gray-700 rounded-xl overflow-hidden hover:border-gray-500 transition-colors group flex flex-col h-full">
+<a href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instancia-sin-ip-publica/" class="block aspect-[16/9] overflow-hidden">
+<img src="/content/images/size/w300/format/webp/2024/08/ec2-instance-connect-endpoint.png"
+alt="No más bastiones en AWS: Con EC2 Instance Connect llegas a tu instancia sin IP pública"
+class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+</a>
+<div class="p-5 flex flex-col flex-grow">
+<h3 class="text-lg font-semibold text-white group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
+href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instancia-sin-ip-publica/">No más bastiones en AWS: Con EC2 Instance Connect llegas a tu instancia sin IP pública</a></h3>
+<p class="text-sm text-gray-400 flex-grow line-clamp-2">Desde hoy puedes conectarte a un servidor EC2 en Amazon Web Services (AWS) utilizando &quot;EC2 Instance Connect&quot;, sin necesidad de una IP pública ni un host bastión . Este artículo te ayudará a entender cómo configurar correctamente tu endpoint y obtener una conexión segura a tu servidor EC2 en AWS.</p>
+<div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
+<span>10/07/2023</span>
+<span>2 minutos aprox.</span>
+</div>
+</div>
 </article>
-    </section>
-  </div>
-
-  <section id="comments" class="mt-8 border-t border-gray-800 pt-8">
-    <div class="gh-comments">
-
-        <script defer src="https://cdn.jsdelivr.net/ghost/comments-ui@~1.6/umd/comments-ui.min.js" data-locale="en" data-ghost-comments="http://localhost:2368/" data-api="http://localhost:2368/ghost/api/content/" data-admin="http://localhost:2368/ghost/" data-key="7d4e0c71149feae71b36b6efca" data-title=" " data-count="false" data-post-id="6abf50e348156c00014afbe2" data-color-scheme="auto" data-avatar-saturation="60" data-accent-color="#aa3cfd" data-comments-enabled="all" data-publication="Local Dev" crossorigin="anonymous">
-</script>
-
-    </div>
-  </section>
-
-      <!-- Author Box -->
-    <section class="mt-8 border-t border-gray-800 pt-8">
-        <div class="flex flex-col w-full p-4">
-            <div class="flex items-start gap-4 mb-4">
-                <div class="flex-1">
-                    <p class="text-white font-semibold">local</p>
-                    <p class="text-xs text-brand-blue hover:underline transition-colors">
-<a href="/author/local-2/">Ver más contenido por local</a>
-</p>
-                </div>
-            </div>
-
-            <div class="flex flex-wrap gap-2 mb-4">
-                <div class="flex flex-wrap gap-2 text-sm">
-                </div>
-            </div>
-        </div>
-
-    </section>
-
-    </main>
-    <footer class="mt-16 pt-8 border-t border-gray-800 pb-12">
-
-  <div class="mb-6 text-xs font-medium sm:text-sm">
-        <nav aria-label="Secondary navigation">
-        <ul class="flex flex-wrap items-center justify-center divide-x divide-gray-800" role="menu">
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/about-us/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">About Us</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/que-es-sredevops/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Nosotros</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/our-open-source-projects/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Our Projects</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/contact-us/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Contact us</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/terms-of-service/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Terms of Service</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/privacy-policy/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Privacy</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/es/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Español</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/br/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Portugues</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/en/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">English</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/tags/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Categories</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/recommendations/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Recommendations</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/sitemap.xml" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Sitemap</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="http://localhost:2368/rss/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">RSS</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="https://github.com/sredevopsorg" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Github</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="https://www.linkedin.com/company/sredevops/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">LinkedIn</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="https://discord.com/invite/bK9rXFTvpk" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Discord</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="https://x.com/sredevopsorg" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">X</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="https://mastodon.social/@sredevopsorg" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Mastodon</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="https://www.instagram.com/sredevopsorg/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Instagram</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="https://threads.net/sredevopsorg" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Threads</a>
-                </li>
-                <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-                    <a href="https://www.reddit.com/r/sredevops/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Reddit</a>
-                </li>
-        </ul>
-    </nav>
-
-  </div>
-
-  <div class="text-center text-xs text-gray-600 pt-4 border-t border-gray-800/50">
-    &copy; 2026 Local Dev. Built with Ghost.
-  </div>
+</section>
+</div>
+<section id="comments" class="mt-8 border-t border-gray-800 pt-8">
+<div class="gh-comments">
+<script defer src="https://cdn.jsdelivr.net/ghost/comments-ui@~1.6/umd/comments-ui.min.js" data-locale="en" data-ghost-comments="http://localhost:2368/" data-api="http://localhost:2368/ghost/api/content/" data-admin="http://localhost:2368/ghost/" data-key="7d4e0c71149feae71b36b6efca" data-title=" " data-count="false" data-post-id="6abf50e348156c00014afbe2" data-color-scheme="auto" data-avatar-saturation="60" data-accent-color="#aa3cfd" data-comments-enabled="all" data-publication="Local Dev" crossorigin="anonymous"></script>
+</div>
+</section>
+<!-- Author Box -->
+<section class="mt-8 border-t border-gray-800 pt-8">
+<div class="flex flex-col w-full p-4">
+<div class="flex items-start gap-4 mb-4">
+<div class="flex-1">
+<p class="text-white font-semibold">local</p>
+<p class="text-xs text-brand-blue hover:underline transition-colors"><a href="/author/local-2/">Ver más contenido por local</a></p>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<div class="flex flex-wrap gap-2 text-sm">
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="mt-16 pt-8 border-t border-gray-800 pb-12">
+<div class="mb-6 text-xs font-medium sm:text-sm">
+<nav aria-label="Secondary navigation">
+<ul class="flex flex-wrap items-center justify-center divide-x divide-gray-800" role="menu">
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/about-us/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">About Us</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/que-es-sredevops/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Nosotros</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/our-open-source-projects/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Our Projects</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/contact-us/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Contact us</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/terms-of-service/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Terms of Service</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/privacy-policy/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Privacy</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/es/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Español</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/br/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Portugues</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/en/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">English</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/tags/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Categories</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/recommendations/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Recommendations</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/sitemap.xml" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Sitemap</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/rss/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">RSS</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://github.com/sredevopsorg" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Github</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://www.linkedin.com/company/sredevops/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">LinkedIn</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://discord.com/invite/bK9rXFTvpk" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Discord</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://x.com/sredevopsorg" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">X</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://mastodon.social/@sredevopsorg" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Mastodon</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://www.instagram.com/sredevopsorg/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Instagram</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://threads.net/sredevopsorg" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Threads</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://www.reddit.com/r/sredevops/" class="rounded-sm text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Reddit</a>
+</li>
+</ul>
+</nav>
+</div>
+<div class="text-center text-xs text-gray-600 pt-4 border-t border-gray-800/50">
+&copy; 2026 Local Dev. Built with Ghost.
+</div>
 </footer>
-
-
-
-<script type="module" src="/assets/built/index-HASH.js?v=HASH">
-</script>
+<script type="module" src="/assets/built/index-HASH.js?v=HASH"></script>
 </body>
-
 </html>

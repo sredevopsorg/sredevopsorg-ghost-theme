@@ -259,7 +259,7 @@ tags:
 ⚠️ **Critical**: Omitting either `en`/`es`/`br` **or** its `hash-*` counterpart will cause the post to not appear in locale-specific collections due to the `filter` logic in `routes.yaml`.
 
 ⚠️ **Also required for the document language**: a post in a locale collection must be
-assigned that locale's template — `custom-es` or `custom-notocbot` for Spanish — in the
+assigned that locale's template — `custom-es` or `custom-es` for Spanish — in the
 post's settings. Collections are served by the locale shells (`default-es.hbs`,
 `default-br.hbs`) which set `<html lang>`, but an *individual* post that has no locale
 template falls back to `post.hbs` → `default.hbs` and renders with the site locale. A

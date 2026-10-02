@@ -16,8 +16,16 @@
         href="{{url}}">{{title}}</a></h3>
     <p class="text-sm text-gray-400 flex-grow line-clamp-2">{{excerpt words="20"}}</p>
     <div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
+      {{#match locale "=" "es"}}
+      <span>{{date published_at format="DD/MM/YYYY"}}</span>
+      <span>{{reading_time minute="Menos de un minuto" minutes="% minutos aprox."}}</span>
+      {{else match locale "=" "br"}}
+      <span>{{date published_at format="DD/MM/YYYY"}}</span>
+      <span>{{reading_time minute="Menos de um minuto" minutes="% minutos aprox."}}</span>
+      {{else}}
       <span>{{date published_at format="MMM d, YYYY"}}</span>
       <span>{{reading_time minute=(t "Just a minute or less") minutes=(t "Takes about % minutes to read")}}</span>
+      {{/match}}
     </div>
   </div>
 </article>

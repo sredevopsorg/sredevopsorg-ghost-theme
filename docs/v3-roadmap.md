@@ -62,6 +62,33 @@ individual posts (23 of 26 posts use `custom-es`). `README.md` now states that a
 a locale collection must be assigned the locale template, otherwise it renders with the
 site locale.
 
+### What a partial argument can and cannot do (measured, Phase 4b)
+
+The Phase 4b goal was one shared partial per component, parameterised by `locale`. That
+works only at scopes where a partial hash argument survives, and it does not survive
+every block:
+
+| Where the argument is read | Visible? |
+| --- | --- |
+| The partial's own top level | yes |
+| Inside `{{#is}}`, `{{#if}}` (helpers that do not change context) | yes |
+| Inside `{{#post}}`, `{{#get}}`, `{{#foreach}}` (context-changing) | **no** — silently empty, so the fallback branch is taken |
+| `{{#has tag="x"}}` as a locale test | **no** — it matches only the *primary* tag, and a locale tag is secondary by convention |
+
+Both were verified against a real Ghost 6.67 with markers rendered into the page. The
+silent part is what matters: a dropped argument does not error, it just renders the
+default language.
+
+So `locale` is passed as a **literal at each call site** where the surrounding block
+would drop a variable, and components keep a per-locale variant only where a locale
+string sits inside such a block — `featured-hero` (×3, its label/date/reading time live
+inside `{{#get}}` + `{{#foreach}}`) and `author-box` (×2, inside `{{#foreach authors}}`).
+Everything else is one partial plus one-line wrappers.
+
+Result for Phase 4b: **793 lines across 18 templates → 533 across 16, of which 11 are
+one- to two-line wrappers.** The goldens' tag sequences are byte-identical before and
+after, which is the evidence that the refactor changed no markup.
+
 ## Island contract (applies to every Phase 3 branch)
 
 Implemented in Phase 2 by `assets/js/islands.js` (runtime) and
