@@ -1,4 +1,8 @@
-{{!-- English Featured Post Hero — shown at the top of page 1 only. --}}
+{{!-- Featured post hero — page 1 of a locale collection only.
+     One file per locale rather than one parameterised partial: the label, date format
+     and reading time are rendered inside `{{#get}}` + `{{#foreach}}`, and a partial
+     argument does not survive either (Ghost's context-changing blocks drop partial
+     hash arguments — verified). The tag it draws from is fixed per locale too. --}}
 {{^is "paged"}}
 {{#get "posts" filter="featured:true+tag:en" limit="1" include="authors,tags" as |featuredPosts|}}
 {{#foreach featuredPosts}}

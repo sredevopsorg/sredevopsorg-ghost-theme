@@ -1,0 +1,40 @@
+{{!-- Shared listing layout for the root channel and the locale collections.
+{{!--
+     `locale` selects the featured post, the cards' date format and reading time.
+     `header` is "site" for the root channel (title + description) or "tag" for a
+     collection that carries tag data (routes.yaml `data: tag.<slug>`), which is what
+     /es/ and /br/ use. --}}
+<div class="max-w-6xl mx-auto pb-12">
+    {{#match header "=" "site"}}
+    {{!-- Page Title & Description --}}
+    <div class="mb-10 border-b border-gray-800 pb-6">
+        <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight">{{@site.title}}</h1>
+        <p class="text-gray-400 mt-2 text-lg">{{@site.description}}</p>
+    </div>
+    {{else}}
+    {{#is "tag" }}
+    {{#tag}}
+    {{!-- Tag Name & Description --}}
+    <div class="mb-10 border-b border-gray-800 pb-6">
+        <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight">{{name}}</h1>
+        {{#if description}}
+        <p class="text-gray-400 mt-2 text-lg">{{description}}</p>
+        {{/if}}
+    </div>
+    {{/tag}}
+    {{/is}}
+    {{/match}}
+
+    {{!-- Featured Post --}}
+    {{#match locale "=" "es"}}{{> "featured-hero-es"}}{{else match locale "=" "br"}}{{> "featured-hero-br"}}{{else}}{{> "featured-hero"}}{{/match}}
+
+    {{!-- Post Grid --}}
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {{#match locale "=" "es"}}{{#foreach posts}}{{> "post-card" locale="es"}}{{/foreach}}
+        {{else match locale "=" "br"}}{{#foreach posts}}{{> "post-card" locale="br"}}{{/foreach}}
+        {{else}}{{#foreach posts}}{{> "post-card" locale="en"}}{{/foreach}}{{/match}}
+    </section>
+
+    {{!-- Pagination --}}
+    {{pagination}}
+</div>
