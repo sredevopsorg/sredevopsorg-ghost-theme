@@ -70,6 +70,10 @@ const NORMALISERS = [
   // the diff show what was actually added or removed. Applied to both sides, so it
   // stays meaningful (including inside <pre>/<code>, where it is equally deterministic).
   [/></g, ">\n<"],
+  // Vite's content hash inside the filename. Without this, every build changes the
+  // golden files even when no markup changed, which buries real differences.
+  // Anchored to assets/built so it cannot touch a content image filename.
+  [/\/assets\/built\/([A-Za-z0-9_.-]+?)-[A-Za-z0-9_-]{8}\.(js|css)/g, "/assets/built/$1-HASH.$2"],
   [/[?&]v=[0-9a-zA-Z._-]+/g, "?v=HASH"], // {{asset}} cache-busting query
   [/nonce="[^"]*"/g, 'nonce="NONCE"'], // CSP nonces (Ghost code injection)
   [/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})/g, "TIMESTAMP"],
