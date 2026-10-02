@@ -42,6 +42,7 @@
 const registry = {
   MobileMenu: () => import("./islands/MobileMenu.js"),
   ReadingProgress: () => import("./islands/ReadingProgress.jsx"),
+  ShareButtons: () => import("./islands/ShareButtons.jsx"),
   TableOfContents: () => import("./islands/TableOfContents.jsx"),
 };
 

@@ -17,6 +17,7 @@ const FALLBACKS = {
   openMenu: "Open menu",
   closeMenu: "Close menu",
   readingProgress: "Reading progress",
+  share: "Share",
   toc: "Table of Contents",
 };
 
