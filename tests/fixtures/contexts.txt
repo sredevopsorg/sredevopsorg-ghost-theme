@@ -1,20 +1,25 @@
 # Contexts captured as golden HTML fixtures.
 #
 # Format: <fixture-name>  <path>  [# note]
-# Paths marked "adjust" must point at content that exists in your local Ghost
-# instance, otherwise capture fails loudly (by design).
 #
-# Cover every template Ghost can select, in every locale the theme serves.
+# These paths are the ones the committed goldens in ./golden were captured from.
+# They point at content restored from the local development export, so they are only
+# reproducible where that content exists — adjust them, then re-capture and
+# re-promote (see README.md). Capture fails loudly on a missing path, by design.
+#
+# A note may carry `expect=NNN` for contexts whose correct response is not 200.
+#
+# Not covered by the current goldens, and worth adding when the content exists:
+#   page           /about/                      # adjust: an existing page (page.hbs)
+#   br-home        /br/                         # home-br.hbs -> default-br.hbs
+#   members-signin /signin/                     # once members/ templates exist
+#   post-en        /en/a-post-slug/             # a post in the /en/ collection
 
-home            /                               # home.hbs (channel template from routes.yaml)
-home-paged      /page/2/                         # requires at least two pages of posts
-post            /en/a-post-slug/                # adjust: an existing post in the /en/ collection
-page            /about/                         # adjust: an existing page
-tag             /tag/en/                        # tag.hbs (taxonomy route from routes.yaml)
-author          /author/ngeorger/               # adjust: an existing author slug
-es-home         /es/                            # home-es.hbs -> default-es.hbs
-es-post         /es/un-post-slug/               # adjust: an existing post in the /es/ collection
-br-home         /br/                            # home-br.hbs -> default-br.hbs
-not-found       /this-page-does-not-exist/      # error-404.hbs; expect=404
-# Enable once members pages exist in the theme (members/signin.hbs etc.):
-# members-signin  /signin/
+home            /                                           # home.hbs (channel template from routes.yaml)
+home-paged      /page/2/                                    # requires at least two pages of posts
+post-es         /es/que-es-platform-engineering-sre-devops/  # post with feature image, tags and author
+post-code       /es/como-desplegar-ghost-en-kubernetes/     # the only context that exercises CodeBlocks/Prism
+es-home         /es/                                        # home-es.hbs -> default-es.hbs
+tag             /tag/news/                                  # tag.hbs (tag taxonomy)
+author          /author/local/                              # author.hbs
+not-found       /this-page-does-not-exist/                  # error-404.hbs; expect=404

@@ -1,19 +1,5 @@
 import reframe from "./lib/reframe.js";
 
-// Auto-Inject Line Numbers & Highlight Syntax on all Code Blocks
-  document.addEventListener('DOMContentLoaded', function () {
-      // Add line-numbers to all pre code blocks automatically
-      document.querySelectorAll('pre[class*="language-"]').forEach(function (pre) {
-          if (!pre.classList.contains('line-numbers')) {
-              pre.classList.add('line-numbers');
-          }
-      });
-      // Re-run Prism highlighting (if needed)
-      if (typeof Prism !== 'undefined') {
-          Prism.highlightAll();
-      }
-  });
-
 /* Responsive HTML table */
 (function () {
   const tables = document.querySelectorAll("div > table, section > table");
