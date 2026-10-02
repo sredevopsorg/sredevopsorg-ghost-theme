@@ -15,6 +15,6 @@ author          /author/ngeorger/               # adjust: an existing author slu
 es-home         /es/                            # home-es.hbs -> default-es.hbs
 es-post         /es/un-post-slug/               # adjust: an existing post in the /es/ collection
 br-home         /br/                            # home-br.hbs -> default-br.hbs
-not-found       /this-page-does-not-exist/      # error-404.hbs
+not-found       /this-page-does-not-exist/      # error-404.hbs; expect=404
 # Enable once members pages exist in the theme (members/signin.hbs etc.):
 # members-signin  /signin/
