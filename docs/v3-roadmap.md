@@ -89,6 +89,66 @@ Result for Phase 4b: **793 lines across 18 templates → 533 across 16, of which
 one- to two-line wrappers.** The goldens' tag sequences are byte-identical before and
 after, which is the evidence that the refactor changed no markup.
 
+## Phase 5 notes
+
+### The last two third-party dependencies, and what replacing them cost
+
+Fonts (Inter, Roboto Mono) and icons (Font Awesome) were the only off-site requests the
+theme made. Both are local now.
+
+| | Before | After |
+| --- | --- | --- |
+| Fonts | 2 stylesheets + 2 preconnects to `fonts.googleapis.com` / `fonts.gstatic.com` | 262 kB of woff2 in the theme, latin + latin-ext, 4 `@font-face` rules |
+| Icons | Font Awesome's full stylesheet from cdnjs (~100 kB) plus its webfonts | ~16 kB of inline SVG covering exactly the twenty glyphs used |
+| Requests to other origins | 3 stylesheets, 2 preconnects, N webfont files | 0 |
+
+Neither is fetched at build time: `scripts/sync-fonts.mjs` and `scripts/sync-icons.mjs`
+download once and write committed files, so builds stay offline and reproducible. Licence
+texts are fetched alongside and committed.
+
+Three things this phase caught that are worth remembering:
+
+- **Tailwind's preflight makes `<svg>` a block element** (`display: block`), so an inline
+  icon sitting in a line of text breaks the line. Every icon carries `inline-block` plus
+  `align-[-0.125em]`, which is Font Awesome's own vertical alignment.
+- **Replacing an element class-by-class loses classes.** The first pass rewrote 47 call
+  sites and silently dropped `hidden` and `group-open:inline` from the mobile menu's close
+  button, which would have left it visible next to the open/close toggle.
+- **The CSS coverage guard cannot see a class inside a JSX ternary.** Two Font Awesome
+  classes survived in `ShareButtons.jsx` for exactly that reason, which is why
+  `tests/no-third-party.test.mjs` now greps templates *and* island source for them.
+
+Not done, deliberately: preloading the fonts. They are referenced from the theme's own
+hashed CSS with `font-display: swap`, which is one request behind the stylesheet that
+already blocks first paint; a `<link rel="preload">` would need the hashed filename
+exposed through the manifest bridge, and is worth doing only with a real measurement.
+
+### The gate was blind to error-level findings (found in production, fixed)
+
+Ghost logged this while booting the theme:
+
+```
+WARN The currently active theme "sredevopsorg-ghost-theme" has errors, but will still work.
+  GS001-DEPR-LANG   partials/shell.hbs   {{lang}}
+  GS080-NO-EMPTY-TRANSLATIONS  error.hbs  {{t}}
+```
+
+Both were mine, and both had passed `yarn verify` for five phases:
+
+- a partial argument named `lang` (`{{> "shell" lang="es"}}`) reads as the removed
+  `{{lang}}` helper — the argument is now `documentLang`;
+- the *comment* in error.hbs listed the helpers it avoids, and the rule scans comments,
+  so the literal `{{t}}` in prose counted as an empty translation.
+
+Cause: the gate ran `gscan --fatal`, and **`--fatal` only fails on fatal issues.** On a
+theme with these two errors, `gscan --fatal .` exits 0 while plain `gscan .` exits 1.
+The flag reads like a strictness switch and is the opposite of one.
+
+The gate now runs plain `gscan` (pinned in devDependencies, so CI and local runs agree)
+and was verified to exit 1 when `{{lang}}` is reintroduced. Note also that gscan's
+*programmatic* API returned zero errors for the same theme with every `checkVersion` —
+only the CLI reproduced Ghost's own validation, so the CLI is what the gate uses.
+
 ## Island contract (applies to every Phase 3 branch)
 
 Implemented in Phase 2 by `assets/js/islands.js` (runtime) and

@@ -1,7 +1,7 @@
 {{!-- Single document shell for every locale. {{{body}}} resolves inside a partial
      called from a layout (verified against Ghost 6.67), so default.hbs and the locale
-     shells are one-liners that differ only in `lang`.
-     `lang` is the BCP-47 tag for the collection's language; the default shell passes
+     shells are one-liners that differ only in the document language.
+     `documentLang` is the BCP-47 tag for the collection's language; the default shell passes
      the site locale.
 
      Why the fallback is the site locale and not the post's language: a layout cannot
@@ -11,7 +11,7 @@
      6.67). The remedy is the documented one: a locale template on the post — which is
      what custom-es.hbs is. See docs/v3-roadmap.md, Phase 4 notes. --}}
 <!DOCTYPE html>
-<html lang="{{#if lang}}{{lang}}{{else}}{{@site.locale}}{{/if}}" class="dark">
+<html lang="{{#if documentLang}}{{documentLang}}{{else}}{{@site.locale}}{{/if}}" class="dark">
 
 <head>
     {{> "head"}}

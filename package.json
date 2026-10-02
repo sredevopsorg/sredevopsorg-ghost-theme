@@ -12,10 +12,10 @@
     "scripts": {
         "dev": "vite build --watch",
         "build": "vite build",
-        "test:dev": "npx gscan --verbose .",
-        "test:ci": "gscan --fatal --verbose .",
+        "test:dev": "gscan --verbose .",
+        "test:ci": "gscan --verbose .",
         "test:ship": "node scripts/ship-manifest.mjs --check",
-        "verify": "yarn build && npx --yes gscan@6.6.1 --fatal . && node scripts/ship-manifest.mjs --check && yarn test:unit && yarn test:bundle && yarn test:classes",
+        "verify": "yarn build && gscan . && node scripts/ship-manifest.mjs --check && yarn test:unit && yarn test:bundle && yarn test:classes",
         "ghost:up": "docker compose -f docker-compose.dev.yml up -d",
         "ghost:down": "docker compose -f docker-compose.dev.yml down",
         "ghost:restart": "docker compose -f docker-compose.dev.yml restart ghost",
@@ -56,6 +56,7 @@
     "devDependencies": {
         "@tailwindcss/vite": "^4.3.3",
         "@vitejs/plugin-react": "^5.2.0",
+        "gscan": "6.6.1",
         "prismjs": "^1.30.0",
         "react": "^19.3.0",
         "react-dom": "^19.3.0",

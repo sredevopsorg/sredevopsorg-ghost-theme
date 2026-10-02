@@ -73,11 +73,6 @@ export const ALLOWLIST_PATTERNS = [
   /^author-/, // Ghost-injected: author context class, e.g. author-jane.
   /^nav-/, // Dynamic Handlebars output: link_class builds `nav-<slug>` from a runtime slug.
   /^page-/, // Dynamic Handlebars output: pagination/label classes built from runtime values.
-  // External stylesheet: Font Awesome 6 is loaded from cdnjs in
-  // partials/head.hbs, so its icon classes are absent from the Tailwind build
-  // by design. No Tailwind utility starts with `fa-`, so this cannot mask one.
-  /^fa-/,
-  /^(?:fas|far|fab|fal|fat|fad)$/, // External stylesheet: legacy Font Awesome style shorthands.
   // Prism markup generated at runtime by the highlighter (assets/js/islands/
   // prism-setup.js): the toolbar wrapper, its items (language label, copy button)
   // and the line-number sizer. prism-window.css styles the toolbar, the button and

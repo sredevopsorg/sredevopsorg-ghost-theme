@@ -24,76 +24,76 @@
                     {{#if website}}
                     <a href="{{website}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-solid fa-link"></i>
+                        {{> "icon" name="link" class="w-4 h-4"}}
                         Website
                     </a>
                     {{/if}}
                     {{#if twitter}}
                     <a href="{{social_url type="twitter"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-twitter"></i>
+                        {{> "icon" name="twitter" class="w-4 h-4"}}
                         Twitter
                     </a>
                     {{/if}}
                     {{#if facebook}}
                     <a href="{{social_url type="facebook"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-facebook"></i>
+                        {{> "icon" name="facebook" class="w-4 h-4"}}
                         Facebook
                     </a>
                     {{/if}}
                     {{#if linkedin}}
                     <a href="{{social_url type="linkedin"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-linkedin-in"></i>
+                        {{> "icon" name="linkedin" class="w-4 h-4"}}
                         LinkedIn
                     </a>
                     {{/if}}
                     {{#if threads}}
                     <a href="{{social_url type="threads"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-threads"></i>
+                        {{> "icon" name="threads" class="w-4 h-4"}}
                         Threads
                     </a>
                     {{/if}}
                     {{#if bluesky}}
                     <a href="{{social_url type="bluesky"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-bluesky"></i>
+                        {{> "icon" name="bluesky" class="w-4 h-4"}}
                         Bluesky
                     </a>
                     {{/if}}
                     {{#if mastodon}}
                     <a href="{{social_url type="mastodon"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-mastodon"></i>
+                        {{> "icon" name="mastodon" class="w-4 h-4"}}
                         Mastodon
                     </a>
                     {{/if}}
                     {{#if tiktok}}
                     <a href="{{social_url type="tiktok"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-tiktok"></i>
+                        {{> "icon" name="tiktok" class="w-4 h-4"}}
                         TikTok
                     </a>
                     {{/if}}
                     {{#if youtube}}
                     <a href="{{social_url type="youtube"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-youtube"></i>
+                        {{> "icon" name="youtube" class="w-4 h-4"}}
                         YouTube
                     </a>
                     {{/if}}
                     {{#if instagram}}
                     <a href="{{social_url type="instagram"}}" target="_blank" rel="noopener"
                         class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
-                        <i class="fa-brands fa-instagram"></i>
+                        {{> "icon" name="instagram" class="w-4 h-4"}}
                         Instagram
                     </a>
                     {{/if}}
                     {{#if location}}
                     <span class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 text-sm">
-                        <i class="fa-solid fa-location-dot"></i>
+                        {{> "icon" name="location-dot" class="w-4 h-4"}}
                         {{location}}
                     </span>
                     {{/if}}

@@ -8,7 +8,8 @@
     {{!-- Standalone on purpose. An error template that depends on the theme layout, the
          asset pipeline or a helper would produce a misleading error when one of those is
          what broke, so everything here is inline and only context data is interpolated
-         (no {{asset}}, no {{t}}, no partials). error-404.hbs is the exception: a 404 may
+         (no asset helper, no translate helper, no partials). error-404.hbs is the
+         exception: a 404 may
          use the full theme, and does. --}}
     <style>
         :root { color-scheme: dark; }
