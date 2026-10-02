@@ -17,6 +17,11 @@
  *    correspond to a code-split chunk named X in the manifest, so a registry typo
  *    or a missing import fails here instead of silently doing nothing in a browser.
  *
+ * 4. **Island chunks load.** Each of those chunks is imported and must expose
+ *    exactly one of `mount()`/`enhance()`. Nothing else evaluates them — the entry
+ *    never imports them statically — so a broken import path or a renamed export
+ *    would otherwise only appear in a browser.
+ *
  * Not a DOM test suite — Phase 3 adds Playwright for behaviour.
  */
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
@@ -155,7 +160,33 @@ if (unwired.length) {
   );
 }
 
+// --- 4. island chunks load and honour the contract --------------------------------
+const contractErrors = [];
+let loadedChunks = 0;
+
+for (const name of islandNames) {
+  const chunk = Object.values(manifest).find((item) => item.isDynamicEntry && item.name === name);
+  if (!chunk) continue; // section 3 already reported it
+
+  try {
+    const mod = await import(resolve(ROOT, "assets/built", chunk.file));
+    const hasMount = typeof mod.mount === "function";
+    const hasEnhance = typeof mod.enhance === "function";
+    if (!hasMount && !hasEnhance) contractErrors.push(`${name} (${chunk.file}) exports neither mount() nor enhance()`);
+    else if (hasMount && hasEnhance) {
+      contractErrors.push(`${name} (${chunk.file}) exports both mount() and enhance() — pick one`);
+    } else loadedChunks++;
+  } catch (err) {
+    contractErrors.push(`${name} (${chunk.file}) failed to load: ${err.message}`);
+  }
+}
+
+if (contractErrors.length) {
+  fail(`island chunks are broken:\n${contractErrors.map((line) => `  - ${line}`).join("\n")}`);
+}
+
 console.log(
   `smoke-bundle: OK — entry ${entry.file} (${entrySize} B) loads, registers ${registered.join(", ")}, ` +
-    `inlines no framework, and ${islandNames.size} island(s) resolve to ${chunkNames.size} split chunk(s).`,
+    `inlines no framework; ${islandNames.size} island(s) resolve to ${chunkNames.size} split chunk(s) ` +
+    `and ${loadedChunks} of them load with a valid contract.`,
 );

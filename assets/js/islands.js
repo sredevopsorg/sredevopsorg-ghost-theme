@@ -42,6 +42,7 @@
 const registry = {
   MobileMenu: () => import("./islands/MobileMenu.js"),
   ReadingProgress: () => import("./islands/ReadingProgress.jsx"),
+  TableOfContents: () => import("./islands/TableOfContents.jsx"),
 };
 
 const SELECTOR = "[data-island]";

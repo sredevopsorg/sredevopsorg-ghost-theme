@@ -187,42 +187,18 @@
   }
 }
 
-/* --- Tocbot dark theme overrides ---
-   Written as plain CSS because Tailwind v4 dropped v3's `@apply x !important`
-   syntax. Phase 3 replaces tocbot with a TableOfContents island and this block
-   goes away with assets/vendor/tocbot.{css,js}. */
-.toc-list {
-  list-style: none !important;
+/* --- Anchor targets for the table of contents ---
+   The TOC links to heading ids; keep the heading clear of the sticky header and
+   scroll smoothly unless the reader asked for reduced motion. The island in
+   assets/js/islands/TableOfContents.jsx owns the list styling itself. */
+.gh-content :is(h2, h3, h4) {
+  scroll-margin-top: 5rem;
 }
 
-.toc-list-item {
-  color: #9ca3af;
-  font-size: 0.875rem;
-  line-height: 1.625;
-  transition: color 150ms;
-}
-
-.toc-list-item:hover {
-  color: #ffffff;
-}
-
-.is-active-link {
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  border-left: 2px solid #3b82f6;
-  padding-left: 0.5rem;
-}
-
-.is-active-link::before {
-  background-color: #3b82f6 !important;
-}
-
-.toc-link::before {
-  background-color: transparent !important;
-}
-
-.toc-list-item + .toc-list-item {
-  @apply mt-1;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 .pagination {

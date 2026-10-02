@@ -1,33 +1,11 @@
 {{#is "post"}}
-<div class="border border-gray-700 rounded-lg p-5 bg-dark-card sticky-top">
-  <h4 class="text-white font-bold text-sm tracking-wider uppercase border-b border-gray-700 pb-2 mb-3">{{t "Table of Contents"}}
-  </h4>
-  <div id="toc-container" class="js-toc"></div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Allow a brief moment for Ghost content to fully render in DOM
-    setTimeout(function () {
-      if (window.tocbot) {
-        tocbot.init({
-          // Where to render the table of contents
-          tocSelector: '.js-toc',
-          // Where to grab the headings from (your main post body)
-          contentSelector: '.gh-content',
-          // Which headings to grab (h2 and h3 are usually best for reading flow)
-          headingSelector: 'h2, h3',
-          // Optional: Enable smooth scrolling, collapse nested lists, etc.
-          orderedList: false,
-          collapseDepth: 6,
-          scrollSmooth: true,
-          scrollSmoothDuration: 400,
-          headingsOffset: 80 // Adjust this based on your sticky header height
-        });
-      }
-    }, 500);
-  });
-</script>
+{{!-- Table of contents. It is derived from the rendered headings, which Handlebars
+     cannot enumerate, so the island owns the whole card (heading included). Without
+     JavaScript the card is simply absent — previously it was an empty labelled card
+     plus a tocbot CDN request and an inline setTimeout race.
+     data-island-lazy: on mobile the sidebar sits far below the article, so the chunk
+     is only fetched when it comes near the viewport. --}}
+<div data-island="TableOfContents" data-island-lazy data-target=".gh-content" data-headings="h2, h3"></div>
 {{/is}}
 
 <div>

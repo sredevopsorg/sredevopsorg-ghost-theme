@@ -52,15 +52,12 @@ import { pathToFileURL } from "node:url";
 
 /** Exact class names that must never be reported as missing. */
 export const ALLOWLIST_EXACT = [
-  // JS-only hooks — the theme's scripts query them, they carry no styling.
-  "js-toc",
-  "js-toc-content",
+  // JS-only hook — the theme's scripts query it, it carries no styling.
   "js-reframe",
 
-  // Tech debt, NOT correct: dead classes with no rule in the v3 build either.
-  // They are kept here only so the migration is not blocked by them; delete
-  // them from the templates and then delete these two lines.
-  "sticky-top", // dead — partials/sidebar.hbs
+  // Tech debt, NOT correct: a wrapper with no rule of its own (the <img> inside it
+  // is styled). Kept so the guard does not fail on it; delete it from the template
+  // and then delete this line.
   "feature-image-wrapper", // dead — partials/feature-image.hbs
 
   // Unstyled semantic wrapper on author.hbs. Also matched by /^author-/ below
@@ -74,7 +71,6 @@ export const ALLOWLIST_PATTERNS = [
   /^js-/, // JS-only hooks: scripts select them, nothing styles them.
   /^kg-/, // Ghost-injected: Koenig editor output (kg-card, kg-image, ...) is rendered at request time.
   /^gh-/, // Ghost-injected: core markup such as gh-content / gh-comments.
-  /^is-/, // Ghost-injected: state classes added to <html>/<body> at render time.
   /^post-template$/, // Ghost-injected: context class on <body>.
   /^page-template$/, // Ghost-injected: context class on <body>.
   /^home-template$/, // Ghost-injected: context class on <body>.

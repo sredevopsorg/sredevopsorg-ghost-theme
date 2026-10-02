@@ -227,6 +227,8 @@ so it is code-split and only fetched where such an island exists).
 | Every `data-island` in a template resolves to a code-split chunk | `yarn test:bundle` |
 | Island Tailwind classes have real CSS | `yarn test:classes` |
 | `enhance` island behaviour (Escape, outside click, breakpoints) | `yarn test:unit` |
+| Island chunks load and expose exactly one of `mount`/`enhance` | `yarn test:bundle` |
+| Below-the-fold islands (`data-island-lazy`) are not fetched early | mount points `[data-island-lazy]`, observed with `IntersectionObserver` |
 | Adding an island cannot break the page or the other islands | guarded, isolated mounting in `assets/js/islands.js` |
 
 Strings come from `partials/island-config.hbs` (`{{json}}` + `{{t}}`), read in an island with
