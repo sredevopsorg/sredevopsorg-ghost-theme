@@ -7,14 +7,14 @@
             <div class="flex items-start gap-4 mb-4">
                 {{#if profile_image}}
                 <img src="{{img_url profile_image size="xs" format="webp" }}" alt="{{name}}"
-                    class="h-16 w-16 rounded-full object-cover border border-gray-700">
+                    class="h-16 w-16 rounded-full object-cover border border-border-strong">
                 {{/if}}
                 <div class="flex-1">
-                    <p class="text-white font-semibold">{{name}}</p>
+                    <p class="text-strong font-semibold">{{name}}</p>
                     <p class="text-xs text-brand-blue hover:underline transition-colors"><a href="{{url}}">View more content
                             by {{name}}</a></p>
                     {{#if bio}}
-                    <p class="text-gray-400 text-sm mt-1">{{bio}}</p>
+                    <p class="text-muted text-sm mt-1">{{bio}}</p>
                     {{/if}}
                 </div>
             </div>
@@ -23,76 +23,76 @@
                 <div class="flex flex-wrap gap-2 text-sm">
                     {{#if website}}
                     <a href="{{website}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="link" class="w-4 h-4"}}
                         Website
                     </a>
                     {{/if}}
                     {{#if twitter}}
                     <a href="{{social_url type="twitter"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="twitter" class="w-4 h-4"}}
                         Twitter
                     </a>
                     {{/if}}
                     {{#if facebook}}
                     <a href="{{social_url type="facebook"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="facebook" class="w-4 h-4"}}
                         Facebook
                     </a>
                     {{/if}}
                     {{#if linkedin}}
                     <a href="{{social_url type="linkedin"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="linkedin" class="w-4 h-4"}}
                         LinkedIn
                     </a>
                     {{/if}}
                     {{#if threads}}
                     <a href="{{social_url type="threads"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="threads" class="w-4 h-4"}}
                         Threads
                     </a>
                     {{/if}}
                     {{#if bluesky}}
                     <a href="{{social_url type="bluesky"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="bluesky" class="w-4 h-4"}}
                         Bluesky
                     </a>
                     {{/if}}
                     {{#if mastodon}}
                     <a href="{{social_url type="mastodon"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="mastodon" class="w-4 h-4"}}
                         Mastodon
                     </a>
                     {{/if}}
                     {{#if tiktok}}
                     <a href="{{social_url type="tiktok"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="tiktok" class="w-4 h-4"}}
                         TikTok
                     </a>
                     {{/if}}
                     {{#if youtube}}
                     <a href="{{social_url type="youtube"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="youtube" class="w-4 h-4"}}
                         YouTube
                     </a>
                     {{/if}}
                     {{#if instagram}}
                     <a href="{{social_url type="instagram"}}" target="_blank" rel="noopener"
-                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 text-sm transition-colors">
+                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
                         {{> "icon" name="instagram" class="w-4 h-4"}}
                         Instagram
                     </a>
                     {{/if}}
                     {{#if location}}
-                    <span class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 text-sm">
+                    <span class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted text-sm">
                         {{> "icon" name="location-dot" class="w-4 h-4"}}
                         {{location}}
                     </span>
