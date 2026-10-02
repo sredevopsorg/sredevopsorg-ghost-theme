@@ -2,21 +2,21 @@
 
 <article class="max-w-2xl mx-auto py-16 text-center">
     <section class="mb-8">
-        <h1 class="text-6xl md:text-7xl font-bold text-white tracking-tight mb-4">404</h1>
-        <p class="text-xl text-gray-400 mb-2">Page not found</p>
-        <p class="text-gray-600">
+        <h1 class="text-6xl md:text-7xl font-bold text-strong tracking-tight mb-4">404</h1>
+        <p class="text-xl text-muted mb-2">Page not found</p>
+        <p class="text-subtle-text">
             Go to the front page of <a href="{{@site.url}}" class="text-brand-blue hover:underline" rel="home">{{@site.title}}</a> or try searching below.
         </p>
     </section>
 
     <section class="max-w-md mx-auto">
         <button
-            class="flex items-center w-full gap-2 px-4 py-2 rounded-md border border-gray-700 bg-dark-card text-gray-400 hover:text-white transition-colors duration-200"
+            class="flex items-center w-full gap-2 px-4 py-2 rounded-md border border-border-strong bg-raised text-muted hover:text-strong transition-colors duration-200"
             data-ghost-search
             aria-label="{{t "Search"}}"
             title="Press / to search">
             <span class="flex-grow text-left">{{t "Search"}}</span>
-            <kbd class="hidden px-2 py-1 text-xs rounded border border-gray-700 text-gray-500 md:inline-block">/</kbd>
+            <kbd class="hidden px-2 py-1 text-xs rounded border border-border-strong text-subtle-text md:inline-block">/</kbd>
         </button>
     </section>
 </article>

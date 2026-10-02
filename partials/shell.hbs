@@ -11,13 +11,13 @@
      6.67). The remedy is the documented one: a locale template on the post — which is
      what custom-es.hbs is. See docs/v3-roadmap.md, Phase 4 notes. --}}
 <!DOCTYPE html>
-<html lang="{{#if documentLang}}{{documentLang}}{{else}}{{@site.locale}}{{/if}}" class="dark">
+<html lang="{{#if documentLang}}{{documentLang}}{{else}}{{@site.locale}}{{/if}}">
 
 <head>
     {{> "head"}}
 </head>
 
-<body class="{{body_class}} bg-dark-bg text-dark-text antialiased font-sans">
+<body class="{{body_class}} bg-surface text-strong antialiased font-sans">
 
     {{> "header"}}
 

@@ -8,7 +8,37 @@
 
 /* Custom tweaks for Ghost */
 .social-icon-box {
-  @apply w-[38px] h-[38px] flex items-center justify-center bg-white text-black rounded transition-colors hover:bg-gray-200 cursor-pointer;
+  @apply w-[38px] h-[38px] flex items-center justify-center bg-inverse text-on-inverse rounded transition-colors hover:bg-subtle cursor-pointer;
+}
+
+/* Theme toggle. Both icons are rendered server-side and CSS shows the one for the
+   current theme, so the control is correct before any script runs: a sun while the
+   page is dark (click to go light), a moon while it is light. The `:not()` guard keeps
+   an explicit light choice from being overridden by a dark operating system. */
+.theme-toggle .theme-icon-sun {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle .theme-icon-sun {
+    display: inline-block;
+  }
+
+  :root:not([data-theme="light"]) .theme-toggle .theme-icon-moon {
+    display: none;
+  }
+}
+
+:root[data-theme="dark"] .theme-toggle .theme-icon-sun {
+  display: inline-block;
+}
+
+:root[data-theme="dark"] .theme-toggle .theme-icon-moon {
+  display: none;
+}
+
+.theme-toggle {
+  cursor: pointer;
 }
 
 /* Ghost Navigation Override */
@@ -27,7 +57,7 @@
 }
 
 .nav li a {
-  @apply block w-full text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 transition-colors hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple rounded-sm;
+  @apply block w-full text-[11px] font-semibold uppercase tracking-[0.2em] text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple rounded-sm;
 }
 
 @media (min-width: 768px) {
@@ -44,37 +74,37 @@
 
 /* --- Header icon pill (search / account / mode toggles) --- */
 .icon-pill {
-  @apply inline-flex items-center gap-0.5 rounded-full border border-white/10 bg-white/5 p-1;
+  @apply inline-flex items-center gap-0.5 rounded-full border border-inverse/10 bg-inverse/5 p-1;
 }
 
 .icon-pill > * {
-  @apply flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple;
+  @apply flex h-8 w-8 items-center justify-center rounded-full text-subtle-text transition-colors hover:text-strong hover:bg-inverse/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple;
 }
 
 .icon-pill > .is-active {
-  @apply text-white bg-white/10;
+  @apply text-strong bg-inverse/10;
 }
 
 /* --- Comfortable Reading Experience (Replaces default `prose`) --- */
 .gh-content {
-  @apply text-base leading-7 text-gray-300;
+  @apply text-base leading-7 text-body;
 }
 
 /* Heading Hierarchy */
 .gh-content h1 {
-  @apply text-3xl md:text-4xl font-bold text-white mb-8 mt-12 tracking-tight;
+  @apply text-3xl md:text-4xl font-bold text-strong mb-8 mt-12 tracking-tight;
 }
 
 .gh-content h2 {
-  @apply text-2xl md:text-3xl font-bold text-white mb-6 mt-10 tracking-tight;
+  @apply text-2xl md:text-3xl font-bold text-strong mb-6 mt-10 tracking-tight;
 }
 
 .gh-content h3 {
-  @apply text-xl md:text-2xl font-bold text-white mb-4 mt-8;
+  @apply text-xl md:text-2xl font-bold text-strong mb-4 mt-8;
 }
 
 .gh-content h4 {
-  @apply text-lg md:text-xl font-semibold text-gray-200 mb-3 mt-6;
+  @apply text-lg md:text-xl font-semibold text-strong mb-3 mt-6;
 }
 
 /* Paragraphs & Lists */
@@ -84,7 +114,7 @@
 
 .gh-content strong,
 .gh-content b {
-  @apply font-semibold text-white;
+  @apply font-semibold text-strong;
 }
 
 .gh-content a {
@@ -109,7 +139,7 @@
 }
 
 .gh-content .table-responsive {
-  @apply overflow-x-auto rounded-xl border border-white/10 bg-dark-card/30 my-6;
+  @apply overflow-x-auto rounded-xl border border-inverse/10 bg-raised/30 my-6;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -129,7 +159,7 @@
 }
 
 .gh-content table thead th {
-  @apply bg-white/5 text-white font-semibold;
+  @apply bg-inverse/5 text-strong font-semibold;
 }
 
 .gh-content table tr:nth-child(odd) {
@@ -142,7 +172,7 @@
 
 /* Blockquotes */
 .gh-content blockquote {
-  @apply border-l-4 border-brand-blue bg-dark-card/60 p-5 my-8 rounded-r-xl italic text-gray-300 text-base;
+  @apply border-l-4 border-brand-blue bg-raised/60 p-5 my-8 rounded-r-xl italic text-body text-base;
 }
 
 .gh-content blockquote p {
@@ -206,11 +236,11 @@
 }
 
 .pagination-link {
-  @apply inline-flex items-center justify-center rounded-full border border-white/20 bg-brand-purple px-4 py-2 text-[10px] font-bold uppercase tracking-[0.25em] text-white transition-colors duration-200 hover:bg-white/10;
+  @apply inline-flex items-center justify-center rounded-full border border-white/20 bg-brand-purple px-4 py-2 text-[10px] font-bold uppercase tracking-[0.25em] text-strong transition-colors duration-200 hover:bg-inverse/10;
 }
 
 .pagination-page {
-  @apply text-[10px] font-bold uppercase tracking-[0.25em] text-gray-300;
+  @apply text-[10px] font-bold uppercase tracking-[0.25em] text-body;
 }
 
 /* --- Mobile menu (<details> disclosure) ---

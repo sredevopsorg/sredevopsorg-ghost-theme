@@ -262,6 +262,39 @@ no font-size, and `class` defaults to `w-4 h-4`.
 `tests/no-third-party.test.mjs` fails the build if a third-party host or a Font Awesome
 class comes back.
 
+## 🎨 Theming
+
+The palette is dark by default, light when the reader's system asks for it, and either
+when they choose. Nothing has to be configured.
+
+**Tokens are named by role, never by colour** — `bg-surface`, `text-muted`,
+`border-border-strong` — so a palette is a list of values rather than a rewrite of every
+template. Each token is one `light-dark(light, dark)` pair, and `color-scheme` decides
+which half applies: `data-theme` on `<html>` when the reader has chosen, `light dark`
+otherwise, so the operating system is in charge until someone says otherwise.
+
+```css
+:root { color-scheme: light dark; }               /* follow the system */
+:root[data-theme="dark"] { color-scheme: dark; }  /* explicit choice */
+:root[data-theme="light"] { color-scheme: light; }
+
+@theme {
+  --color-surface: light-dark(#ffffff, #0d0e11);
+  --color-strong:  light-dark(#111827, #f3f4f6);
+}
+```
+
+`{{> "icon" name="sun"}}` / `{{> "icon" name="moon"}}` inside `.theme-toggle` are both
+rendered and CSS shows the one matching the current theme, so the control is correct
+before any script runs. The `ThemeToggle` island only labels the button and writes the
+choice; a small inline script in `partials/head.hbs` applies a stored choice before the
+first paint, which is the one thing a deferred module cannot do.
+
+`light-dark()` requires Chrome 111+, Safari 16.4+ or Firefox 120-era browsers — no more
+than Tailwind v4 already asks for. Adding a locale or a palette means editing the token
+block in `assets/css/index.css`, not the templates. See
+[docs/adr/0002](docs/adr/0002-theming-semantic-tokens.md).
+
 ## ✍️ Locale Content Authoring
 
 ### Tagging Posts for Language Filtering

@@ -1,5 +1,5 @@
 <article
-  class="bg-dark-card border border-gray-700 rounded-xl overflow-hidden hover:border-gray-500 transition-colors group flex flex-col h-full">
+  class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
   {{#if feature_image}}
   <a href="{{url}}" class="block aspect-[16/9] overflow-hidden">
     <img src="{{img_url feature_image size="m" format="webp"}}"
@@ -12,10 +12,10 @@
     <a href="{{primary_tag.url}}"
       class="text-xs font-bold text-brand-purple uppercase tracking-wider mb-2 hover:underline font-mono">{{primary_tag.name}}</a>
     {{/if}}
-    <h3 class="text-lg font-semibold text-white group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
+    <h3 class="text-lg font-semibold text-strong group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
         href="{{url}}">{{title}}</a></h3>
-    <p class="text-sm text-gray-400 flex-grow line-clamp-2">{{excerpt words="20"}}</p>
-    <div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
+    <p class="text-sm text-muted flex-grow line-clamp-2">{{excerpt words="20"}}</p>
+    <div class="flex items-center justify-between text-xs text-subtle-text mt-4 pt-3 border-t border-border-subtle">
       {{#match locale "=" "es"}}
       <span>{{date published_at format="DD/MM/YYYY"}}</span>
       <span>{{reading_time minute="Menos de un minuto" minutes="% minutos aprox."}}</span>

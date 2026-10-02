@@ -41,6 +41,7 @@
  */
 const registry = {
   CodeBlocks: () => import("./islands/CodeBlocks.js"),
+  ThemeToggle: () => import("./islands/ThemeToggle.js"),
   MobileMenu: () => import("./islands/MobileMenu.js"),
   ReadingProgress: () => import("./islands/ReadingProgress.jsx"),
   ShareButtons: () => import("./islands/ShareButtons.jsx"),

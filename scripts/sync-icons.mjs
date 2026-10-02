@@ -52,6 +52,8 @@ const ICONS = {
   close: `${BOOTSTRAP_ICONS}/x-lg.svg`,
   envelope: `${BOOTSTRAP_ICONS}/envelope.svg`,
   menu: `${BOOTSTRAP_ICONS}/list.svg`,
+  sun: `${BOOTSTRAP_ICONS}/sun.svg`,
+  moon: `${BOOTSTRAP_ICONS}/moon-stars.svg`,
 };
 
 /** Reduce an SVG file to the parts an inline icon needs: the viewBox and the shapes. */

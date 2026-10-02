@@ -33,8 +33,8 @@ function TocLink({ item, activeId, depth }) {
           "block border-l-2 py-1 text-sm leading-relaxed transition-colors",
           depth > 0 ? "pl-6" : "pl-3",
           isActive
-            ? "border-brand-blue font-bold text-white"
-            : "border-transparent text-gray-400 hover:text-white",
+            ? "border-brand-blue font-bold text-strong"
+            : "border-transparent text-muted hover:text-strong",
         ].join(" ")}
       >
         {item.text}
@@ -120,12 +120,12 @@ function TableOfContents({ target = ".gh-content", headings: headingSelector = "
   return (
     <nav
       aria-labelledby="toc-title"
-      className="rounded-lg border border-gray-700 bg-dark-card p-5"
+      className="rounded-lg border border-border-strong bg-raised p-5"
       data-island-state="mounted"
     >
       <h4
         id="toc-title"
-        className="mb-3 border-b border-gray-700 pb-2 text-sm font-bold tracking-wider text-white uppercase"
+        className="mb-3 border-b border-border-strong pb-2 text-sm font-bold tracking-wider text-strong uppercase"
       >
         {t("toc")}
       </h4>

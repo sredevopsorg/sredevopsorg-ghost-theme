@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-50 w-full bg-[#0d0e11]/80 backdrop-blur-md border-b border-white/10 py-3 min-h-[60px]">
+<header class="sticky top-0 z-50 w-full bg-surface/80 backdrop-blur-md border-b border-inverse/10 py-3 min-h-[60px]">
   {{!-- Inner container to keep spacing consistent with the rest of the theme --}}
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
 
@@ -9,10 +9,10 @@
         </a>
         {{else}}
         <a href="{{@site.url}}"
-          class="text-2xl font-bold tracking-tight text-white transition-colors hover:text-brand-purple">{{@site.title}}<span class="text-brand-orange">.</span></a>
+          class="text-2xl font-bold tracking-tight text-strong transition-colors hover:text-brand-purple">{{@site.title}}<span class="text-brand-orange">.</span></a>
         {{/if}}
         {{#if @site.icon}}
-        <span class="mx-3 hidden h-6 w-px bg-white/15 sm:inline-block" aria-hidden="true"></span>
+        <span class="mx-3 hidden h-6 w-px bg-inverse/15 sm:inline-block" aria-hidden="true"></span>
         <a href="{{@site.url}}" rel="me" aria-hidden="true" tabindex="-1"
           class="hidden rounded-md sm:inline-flex">
           <img src="{{@site.icon}}" alt="" class="h-7 w-7 rounded-md" />
@@ -26,7 +26,7 @@
       {{navigation type="primary"}}
       {{/if}}
       {{!-- <a href="/subscribe/"
-        class="bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 px-5 rounded-lg text-sm transition-colors">Subscribe</a> --}}
+        class="bg-brand-purple hover:bg-blue-500 text-strong font-semibold py-2 px-5 rounded-lg text-sm transition-colors">Subscribe</a> --}}
     </div>
 
     {{!-- Search & Account (opt-in via theme settings) --}}
@@ -37,6 +37,15 @@
         {{> "icon" name="search" class="w-3 h-3"}}
       </button>
       {{/if}}
+      <button type="button"
+        class="theme-toggle "
+        data-island="ThemeToggle"
+        data-switch-to-light="{{t "Switch to light theme"}}"
+        data-switch-to-dark="{{t "Switch to dark theme"}}"
+        aria-label="{{t "Toggle theme"}}" title="{{t "Toggle theme"}}">
+        {{> "icon" name="sun" class="w-3 h-3 theme-icon-sun"}}
+        {{> "icon" name="moon" class="w-3 h-3 theme-icon-moon"}}
+      </button>
       {{#if @custom.show_login}}
       <a href="#/portal/signin" data-portal="signin"
         aria-label="{{t "Sign in"}}" title="{{t "Sign in"}}">
@@ -57,28 +66,38 @@
          element it is declared on and renders nothing into it. --}}
     <details id="mobile-menu" data-island="MobileMenu" data-desktop-min-width="768" class="group md:hidden">
       <summary
-        class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:text-white"
+        class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-muted transition-colors hover:text-strong"
         aria-label="{{t "Open menu"}}">
         {{> "icon" name="menu" class="w-5 h-5 group-open:hidden"}}
         {{> "icon" name="close" class="w-5 h-5 hidden group-open:inline"}}
       </summary>
 
       <nav
-        class="absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex flex-col gap-4 text-sm font-medium z-50">
+        class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b border-inverse/10 p-6 flex flex-col gap-4 text-sm font-medium z-50">
         {{#if @site.navigation}}
         {{navigation type="primary"}}
         {{/if}}
+        <button type="button"
+          class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
+          data-island="ThemeToggle"
+          data-switch-to-light="{{t "Switch to light theme"}}"
+          data-switch-to-dark="{{t "Switch to dark theme"}}"
+          aria-label="{{t "Toggle theme"}}" title="{{t "Toggle theme"}}">
+          {{> "icon" name="sun" class="w-3 h-3 theme-icon-sun"}}
+          {{> "icon" name="moon" class="w-3 h-3 theme-icon-moon"}}
+          <span>{{t "Toggle theme"}}</span>
+        </button>
         {{!-- <a href="/subscribe/"
-          class="bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 px-5 rounded-lg text-center transition-colors mt-2">Subscribe</a> --}}
+          class="bg-brand-purple hover:bg-blue-500 text-strong font-semibold py-2 px-5 rounded-lg text-center transition-colors mt-2">Subscribe</a> --}}
         {{#if @custom.show_search}}
         <button type="button" data-ghost-search
-          class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
+          class="flex items-center gap-2 text-muted transition-colors hover:text-strong">
           {{> "icon" name="search" class="w-4 h-4"}} {{t "Search"}}
         </button>
         {{/if}}
         {{#if @custom.show_login}}
         <a href="#/portal/signin" data-portal="signin"
-          class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
+          class="flex items-center gap-2 text-muted transition-colors hover:text-strong">
           {{> "icon" name="user" class="w-4 h-4"}} {{t "Sign in"}}
         </a>
         {{/if}}

@@ -149,6 +149,40 @@ and was verified to exit 1 when `{{lang}}` is reintroduced. Note also that gscan
 *programmatic* API returned zero errors for the same theme with every `checkVersion` —
 only the CLI reproduced Ghost's own validation, so the CLI is what the gate uses.
 
+### Phase 5b: a second palette, and what it took
+
+The theme was dark-only by accident rather than choice: `<html class="dark">` was
+hardcoded and the markup named colours after their appearance — `text-white`,
+`text-gray-400`, `bg-gray-800`, `border-gray-700` — next to a few `dark-*` tokens from
+v2. A second palette was a naming problem, not a CSS one.
+
+What changed:
+
+- **18 distinct colour utility names became 9 semantic tokens** (`surface`, `raised`,
+  `subtle`, `border-subtle`, `border-strong`, `strong`, `body`, `muted`, `subtle-text`,
+  plus `inverse`/`on-inverse` for the social buttons), across ~200 replacements in 24
+  files. Hardcoded hexes (`bg-[#0d0e11]/80`) went the same way.
+- **One definition per token**, `light-dark(<light>, <dark>)`, with `color-scheme` from
+  `data-theme` or the OS. No duplicated light block, no media query, and the OS
+  preference cannot drift from the explicit choice.
+- **The only inline script in the theme** (~300 bytes, in `<head>`) applies a stored
+  choice before the first paint. It is inline because a deferred module runs after the
+  paint this exists to prevent.
+- **A vanilla toggle island** with both icons server-rendered and swapped in CSS, so the
+  control is correct and labelled with JavaScript disabled.
+
+Two things came out of testing rather than review:
+
+- the island originally *re-derived* the theme on every read, so with storage blocked
+  (private mode) it fell back to the system preference after each click — the toggle
+  moved one way and could never come back. It now tracks the applied theme, and
+  `tests/theme-toggle.test.mjs` pins the round trip;
+- a `dark` class the island also set was dead code that the CSS-coverage guard flagged;
+  removed, since `data-theme` and `color-scheme` are what the palette reads.
+
+**Unverified:** the light palette's contrast. There is no browser in this repository, so
+the values need a human look — recorded here rather than assumed.
+
 ## Island contract (applies to every Phase 3 branch)
 
 Implemented in Phase 2 by `assets/js/islands.js` (runtime) and
