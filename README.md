@@ -1,18 +1,12 @@
-# SREDevOps.org Ghost Theme (v3 in development)
+# SREDevOps.org Ghost Theme (v3)
 
-> **Ghost v6 Theme** for [SREDevOps.org](https://www.sredevops.org) — Multi-locale, Tailwind CSS v4 (Vite), responsive, dark-mode first and tag-based language filtering.
+> **Ghost 6 theme** for [SREDevOps.org](https://www.sredevops.org) — multi-locale, Tailwind CSS v4 built with Vite, React islands where interactivity is needed, light and dark palettes, and tag-based language filtering. Makes no third-party requests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ghost Compatibility](https://img.shields.io/badge/Ghost-%3E%3D6.0.0-lightgrey)](https://ghost.org)
 [![Node Engine](https://img.shields.io/badge/Node-%3E%3D24-green)](https://nodejs.org)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sredevopsorg/sredevopsorg-ghost-theme)
 ---
-
-## v2 To Do
-
-- [x] Fix primary menu navigation, mobile views and small screens doesn't render correctly
-- [x] Improve responsive design for secondary navigation menu
-- [x] Create login and search forms for the main navigation menu, as optional features (Ghost Docs: <https://docs.ghost.org/themes/custom-settings>)
 
 ## 🌐 Multi-Locale Architecture
 
@@ -324,7 +318,6 @@ template falls back to `post.hbs` → `default.hbs` and renders with the site lo
 Ghost layout cannot see the post context, so the theme cannot infer the language from the
 post's tags (see `docs/v3-roadmap.md`, Phase 4 notes).
 
-
 ### Template Resolution Flow
 
 ```mermaid
@@ -443,6 +436,17 @@ curl -I http://localhost:2368/es/ | grep "lang"
 # Expected: <html lang="es">
 
 ```
+
+### Packaging a release
+
+```bash
+yarn package    # dist/<name>-<version>.zip, read back and validated by GScan
+```
+
+The archive contains exactly the files `scripts/ship-manifest.mjs` allows — the built
+assets, not the sources — and `gscan --zip` validates it the way Ghost does on upload.
+The full sequence, including what to smoke-test afterwards and how to roll back, is in
+[docs/release-checklist.md](docs/release-checklist.md).
 
 ### Lighthouse Audits
 
