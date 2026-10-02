@@ -99,9 +99,17 @@ try {
   fail(`the bundle threw while loading:\n  ${err.message}\n  ${entry.file}`);
 }
 
-const missingHooks = ["DOMContentLoaded", "keydown"].filter((type) => !registered.includes(type));
+// The entry is a deferred module, so the DOM is already parsed when it runs and its
+// own work happens immediately. `keydown` is the one behaviour it genuinely owns
+// (the `/` search hotkey); everything event-driven and heavier lives in islands, so
+// asserting DOMContentLoaded here would freeze an implementation detail.
+const missingHooks = ["keydown"].filter((type) => !registered.includes(type));
 if (missingHooks.length) {
   fail(`the bundle loaded but registered no ${missingHooks.join(", ")} listener — check the entry's imports.`);
+}
+
+if (!registered.length) {
+  fail("the bundle registered no DOM listeners at all — is the entry still wired up?");
 }
 
 // --- 2. it is split ---------------------------------------------------------------

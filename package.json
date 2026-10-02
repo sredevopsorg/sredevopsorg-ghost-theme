@@ -56,6 +56,7 @@
     "devDependencies": {
         "@tailwindcss/vite": "^4.3.3",
         "@vitejs/plugin-react": "^5.2.0",
+        "prismjs": "^1.30.0",
         "react": "^19.3.0",
         "react-dom": "^19.3.0",
         "tailwindcss": "^4.3.3",

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Qué es Platform Engineering? SRE? DevOps?</title>
+<title>Cómo desplegar Ghost (CMS/Blog) en Kubernetes</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,54 +20,45 @@
 <script id="theme-config" type="application/json">
 {"readingProgress":"Reading progress","closeMenu":"Close menu","openMenu":"Open menu","shareVia":"Share via Email","share":"Share","linkCopied":"Link copied!","copyLink":"Copy link","toc":"Table of Contents","locale":"en","siteUrl":"http://localhost:2368"}
 </script>
-<link rel="icon" href="http://localhost:2368/content/images/size/w256h256/2024/07/Icon-App-76x76@2x.png" type="image/png">
-    <link rel="canonical" href="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
-    <link rel="alternate" type="text/markdown" href="http://localhost:2368/es/que-es-platform-engineering-sre-devops.md">
+<meta name="description" content="Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes">
+    <link rel="icon" href="http://localhost:2368/content/images/size/w256h256/2024/07/Icon-App-76x76@2x.png" type="image/png">
+    <link rel="canonical" href="http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/">
+    <link rel="alternate" type="text/markdown" href="http://localhost:2368/es/como-desplegar-ghost-en-kubernetes.md">
     <meta name="referrer" content="no-referrer-when-downgrade">
 
     <meta property="og:site_name" content="Local Dev">
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Qué es Platform Engineering? SRE? DevOps?">
-    <meta property="og:description" content="(O del por qué DevOps es sólo una parte...)
-
-Actualizado: Julio 2024
-
-En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.
-
-Nota: Como todo blog, ésta es una nota basada en experiencias y">
-    <meta property="og:url" content="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;2000">
+    <meta property="og:title" content="Cómo desplegar Ghost (CMS/Blog) en Kubernetes">
+    <meta property="og:description" content="Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes">
+    <meta property="og:url" content="http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/">
+    <meta property="og:image" content="http://localhost:2368/content/images/2025/12/ghost-on-kubernetes.png">
     <meta property="article:published_time" content="TIMESTAMP">
     <meta property="article:modified_time" content="TIMESTAMP">
-    <meta property="article:tag" content="Opinion">
+    <meta property="article:tag" content="Kubernetes">
     <meta property="article:tag" content="Español">
-    <meta property="article:tag" content="Platform Engineering">
-    <meta property="article:tag" content="SRE">
-    <meta property="article:tag" content="DevOps">
-    <meta property="article:tag" content="Empresas">
-    <meta property="article:tag" content="Internal Developer Platform">
-    <meta property="article:tag" content="Observability">
+    <meta property="article:tag" content="Apps">
+    <meta property="article:tag" content="Open Source">
     <meta property="article:tag" content="SREDevOps">
+    <meta property="article:tag" content="DevOps">
+    <meta property="article:tag" content="Selected content">
+    <meta property="article:tag" content="SRE">
+    <meta property="article:tag" content="Cloud">
+    <meta property="article:tag" content="Containers">
+    <meta property="article:tag" content="Development">
+    <meta property="article:tag" content="Docker">
+    <meta property="article:tag" content="Github">
 
     <meta property="article:publisher" content="https://www.facebook.com/sredevops">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Qué es Platform Engineering? SRE? DevOps?">
-    <meta name="twitter:description" content="(O del por qué DevOps es sólo una parte...)
-
-Actualizado: Julio 2024
-
-En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.
-
-Nota: Como todo blog, ésta es una nota basada en experiencias y">
-    <meta name="twitter:url" content="http://localhost:2368/es/que-es-platform-engineering-sre-devops/">
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;jpg&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;2000">
+    <meta name="twitter:title" content="Cómo desplegar Ghost (CMS/Blog) en Kubernetes">
+    <meta name="twitter:description" content="Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes">
+    <meta name="twitter:url" content="http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/">
+    <meta name="twitter:image" content="http://localhost:2368/content/images/2025/12/ghost-on-kubernetes.png">
     <meta name="twitter:label1" content="Written by">
-    <meta name="twitter:data1" content="local">
+    <meta name="twitter:data1" content="Local Dev">
     <meta name="twitter:label2" content="Filed under">
-    <meta name="twitter:data2" content="Opinion, Español, Platform Engineering, SRE, DevOps, Empresas, Internal Developer Platform, Observability, SREDevOps">
+    <meta name="twitter:data2" content="Kubernetes, Español, Apps, Open Source, SREDevOps, DevOps, Selected content, SRE, Cloud, Containers, Development, Docker, Github">
     <meta name="twitter:site" content="@sredevopsorg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="675">
 
     <script type="application/ld+json">
 {
@@ -84,23 +75,21 @@ Nota: Como todo blog, ésta es una nota basada en experiencias y">
     },
     "author": {
         "@type": "Person",
-        "name": "local",
-        "url": "http://localhost:2368/author/local-2/",
+        "name": "Local Dev",
+        "url": "http://localhost:2368/author/local/",
         "sameAs": []
     },
-    "headline": "Qué es Platform Engineering? SRE? DevOps?",
-    "url": "http://localhost:2368/es/que-es-platform-engineering-sre-devops/",
+    "headline": "Cómo desplegar Ghost (CMS/Blog) en Kubernetes",
+    "url": "http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/",
     "datePublished": "TIMESTAMP",
     "dateModified": "TIMESTAMP",
     "image": {
         "@type": "ImageObject",
-        "url": "https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&ixlib=rb-4.0.3&q=80&w=2000",
-        "width": 1200,
-        "height": 675
+        "url": "http://localhost:2368/content/images/2025/12/ghost-on-kubernetes.png"
     },
-    "keywords": "Opinion, Español, Platform Engineering, SRE, DevOps, Empresas, Internal Developer Platform, Observability, SREDevOps",
-    "description": "(O del por qué DevOps es sólo una parte...)\n\nActualizado: Julio 2024\n\nEn esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.\n\nNota: Como todo blog, ésta es una nota basada en experiencias y opiniones personales, no es una guía oficial ni un documento técnico. Toda corrección, sugerencia o comentario es bienvenido.\n\n\nPlatform Engineering\n\nProceso de desarrollo, mantenimiento y me",
-    "mainEntityOfPage": "http://localhost:2368/es/que-es-platform-engineering-sre-devops/"
+    "keywords": "Kubernetes, Español, Apps, Open Source, SREDevOps, DevOps, Selected content, SRE, Cloud, Containers, Development, Docker, Github",
+    "description": "Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes",
+    "mainEntityOfPage": "http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/"
 }
     </script>
 
@@ -184,7 +173,7 @@ Nota: Como todo blog, ésta es una nota basada en experiencias y">
 <style>:root {--ghost-accent-color: #aa3cfd;}</style>
 </head>
 
-<body class="post-template tag-opinion tag-hash-ngeorger tag-hash-es tag-es tag-hash-home tag-platform-engineering tag-sre tag-devops tag-empresas tag-internal-developer-platform tag-observability tag-sredevops tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 bg-dark-bg text-dark-text antialiased font-sans">
+<body class="post-template tag-kubernetes tag-hash-ngeorger tag-hash-home tag-es tag-hash-es tag-apps tag-opensource tag-sredevops tag-devops tag-selected tag-sre tag-cloud tag-containers tag-development tag-docker tag-github tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 bg-dark-bg text-dark-text antialiased font-sans">
 
     <header class="sticky top-0 z-50 w-full bg-[#0d0e11]/80 backdrop-blur-md border-b border-white/10 py-3 min-h-[60px]">
   <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -296,184 +285,336 @@ Nota: Como todo blog, ésta es una nota basada en experiencias y">
 
   <div data-island="ReadingProgress" data-target=".gh-content">
 </div> <div
-  class="post tag-opinion tag-hash-ngeorger tag-hash-es tag-es tag-hash-home tag-platform-engineering tag-sre tag-devops tag-empresas tag-internal-developer-platform tag-observability tag-sredevops tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 featured grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-gray-800 pb-8">
+  class="post tag-kubernetes tag-hash-ngeorger tag-hash-home tag-es tag-hash-es tag-apps tag-opensource tag-sredevops tag-devops tag-selected tag-sre tag-cloud tag-containers tag-development tag-docker tag-github tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 featured grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-gray-800 pb-8">
 
   <div class="lg:col-span-8 flex flex-col justify-center">
     <div class="flex items-center gap-3 mb-3">
       <span
-        class="bg-brand-purple text-white text-[10px] font-bold px-3 py-1  tracking-wide uppercase font-mono">Opinion</span>
+        class="bg-brand-purple text-white text-[10px] font-bold px-3 py-1  tracking-wide uppercase font-mono">Kubernetes</span>
       <span class="text-gray-500 text-xs">
 <i class="far fa-clock mr-1">
-</i> Alrededor de 4 minutos para leer</span>
+</i> Alrededor de 6 minutos para leer</span>
     </div>
 
-    <h1 class="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-white mb-3">Qué es Platform Engineering? SRE? DevOps?</h1>
+    <h1 class="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-white mb-3">Cómo desplegar Ghost (CMS/Blog) en Kubernetes</h1>
 
-    <p class="text-lg text-gray-400 leading-relaxed max-w-3xl mb-4">(O del por qué DevOps es sólo una parte...)
-
-Actualizado: Julio 2024
-
-En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.
-
-Nota: Como todo blog, ésta es una nota basada en experiencias y</p>
+    <p class="text-lg text-gray-400 leading-relaxed max-w-3xl mb-4">Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes</p>
 
     <div class="flex items-center text-sm text-gray-400">
       <span
-        class="h-6 w-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-300 font-bold mr-2">local</span>
+        class="h-6 w-6 bg-gray-800 rounded-full flex items-center justify-center text-[10px] text-gray-300 font-bold mr-2">Local Dev</span>
       <span class="mr-2 text-gray-300 font-medium">
-<a href="/author/local-2/">local</a>
+<a href="/author/local/">Local Dev</a>
 </span>
       <span class="mr-2 text-gray-600">|</span>
-      <span>01/07/2024</span>
+      <span>11/06/2023</span>
     </div>
   </div>
 
   <div class="lg:col-span-4 mt-4 lg:mt-0">
     <figure class="feature-image-wrapper">
-    <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;900"
-        alt="Qué es Platform Engineering? SRE? DevOps?"
+    <img src="/content/images/size/w900/format/webp/2025/12/ghost-on-kubernetes.png"
+        alt="Cómo desplegar Ghost (CMS/Blog) en Kubernetes"
         class="w-full h-auto object-cover rounded-xl border border-gray-800 shadow-2xl">
 </figure>
-    <p class="mt-2 text-center text-xs text-gray-600">
-<span style="white-space:pre-wrap">Photo by </span>
-<a href="https://unsplash.com/@growtika?utm_source=ghost&amp;utm_medium=referral&amp;utm_campaign=api-credit">
-<span style="white-space:pre-wrap">Growtika</span>
-</a>
-<span style="white-space:pre-wrap"> / </span>
-<a href="https://unsplash.com/?utm_source=ghost&amp;utm_medium=referral&amp;utm_campaign=api-credit">
-<span style="white-space:pre-wrap">Unsplash</span>
-</a>
-</p>
   </div>
   </div>
 
   <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8 relative">
     <div class="lg:col-span-8 gh-content" data-island="CodeBlocks" data-prismjs-copy="Copy" data-prismjs-copy-success="Copied!">
-      <p>
-<em>(O del por qué DevOps es sólo una parte...)</em>
-</p>
-<blockquote>
-<em>Actualizado: Julio 2024</em>
-</blockquote>
-<p>En esta columna intentaré definir y explicar los conceptos de Platform Engineering, SRE y DevOps, y por qué es importante entenderlos, diferenciarlos y saber cuándo usarlos.</p>
-<p>Nota: Como todo blog, ésta es una nota basada en experiencias y opiniones personales, no es una guía oficial ni un documento técnico. Toda corrección, sugerencia o comentario es bienvenido.</p>
-<h3 id="platform-engineering">Platform Engineering</h3>
-<p>Proceso de desarrollo, mantenimiento y mejora de una plataforma o ecosistema donde vivirá tu proyecto, que puede incluir desde la creación de una infraestructura hasta APIs para la provisión interna de los servicios e infraestructura, en conjunto con sistemas tipo <a href="http://localhost:2368/tag/internal-developer-platform/" rel="noreferrer">"Internal Developer Portals" (IdP) y similares.</a>
+      <h2 id="ghost-en-kubernetes-v6x-por-sredevopsorg">Ghost en Kubernetes (v6.x) por SREDevOps.Org</h2>
+<p>Despliega la principal plataforma de publicación de código abierto, <strong>Ghost</strong>, en Kubernetes con la máxima <strong>seguridad</strong> y <strong>eficiencia</strong> utilizando una imagen de contenedor endurecida y multi-arquitectura.</p>
+<p>Mantenido por <a href="http://localhost:2368/">
+<strong>
+<em>SREDevOps.org</em>
+</strong>
+</a>
+<em>: SRE, DevOps, Linux, Hacking Ético, IA, ML, Código Abierto, Cloud Native, Platform Engineering en Inglés, Español y Portugués (Brasil).</em>
 </p>
 <figure class="kg-card kg-bookmark-card">
-<a class="kg-bookmark-container" href="http://localhost:2368/tag/internal-developer-platform/">
+<a class="kg-bookmark-container" href="https://github.com/sredevopsorg/ghost-on-kubernetes">
 <div class="kg-bookmark-content">
-<div class="kg-bookmark-title">Internal Developer Platform - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div>
-<div class="kg-bookmark-description">
-</div>
+<div class="kg-bookmark-title">GitHub - sredevopsorg/ghost-on-kubernetes: Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image.</div>
+<div class="kg-bookmark-description">Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image. - sredevopsorg/ghost-on-kubernetes</div>
 <div class="kg-bookmark-metadata">
-<img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt="">
-<span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span>
+<img class="kg-bookmark-icon" src="http://localhost:2368/content/images/icon/pinned-octocat-093da3e6fa40-22.svg" alt="">
+<span class="kg-bookmark-author">GitHub</span>
+<span class="kg-bookmark-publisher">sredevopsorg</span>
 </div>
 </div>
 <div class="kg-bookmark-thumbnail">
-<img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'">
+<img src="http://localhost:2368/content/images/thumbnail/395b82c9-df81-4aee-95a5-4269616a550f" alt="" onerror="this.style.display = 'none'">
 </div>
 </a>
 </figure>
-<h3 id="site-reliability-engineering-sre">Site Reliability Engineering (SRE)</h3>
-<p>enfoque para garantizar la disponibilidad y el rendimiento de un sistema o aplicación. Se centra en automatizar y optimizar procesos para garantizar que el sistema esté disponible y funcione correctamente en todo momento.</p>
-<figure class="kg-card kg-bookmark-card">
-<a class="kg-bookmark-container" href="http://localhost:2368/tag/sre/">
-<div class="kg-bookmark-content">
-<div class="kg-bookmark-title">SRE - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div>
-<div class="kg-bookmark-description">
-</div>
-<div class="kg-bookmark-metadata">
-<img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt="">
-<span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span>
-</div>
-</div>
-<div class="kg-bookmark-thumbnail">
-<img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'">
-</div>
-</a>
-</figure>
-<h3 id="devops">DevOps</h3>
-<p>DevOps es una cultura y conjunto de prácticas que busca unir el desarrollo de software y la operación de sistemas para mejorar la velocidad y la eficiencia del desarrollo de aplicaciones.</p>
-<figure class="kg-card kg-bookmark-card">
-<a class="kg-bookmark-container" href="http://localhost:2368/tag/devops/">
-<div class="kg-bookmark-content">
-<div class="kg-bookmark-title">DevOps - SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</div>
-<div class="kg-bookmark-description">
-</div>
-<div class="kg-bookmark-metadata">
-<img class="kg-bookmark-icon" src="https://sredevops.org/content/images/2024/05/favicon.ico" alt="">
-<span class="kg-bookmark-author">SREDevOps.org - SRE, DevOps, Cloud Native, Linux, AI/ML, Platform Engineering, OpenSource</span>
-</div>
-</div>
-<div class="kg-bookmark-thumbnail">
-<img src="https://sredevops.org/content/images/2023/11/bg-logo.png" alt="" onerror="this.style.display = 'none'">
-</div>
-</a>
-</figure>
-<p>En resumen, Platform Engineering se enfoca en desarrollar y mantener una plataforma tecnológica, SRE en garantizar la disponibilidad y rendimiento de un sistema y DevOps en unir el desarrollo de software y operación de sistemas para mejorar la velocidad y eficiencia del desarrollo de aplicaciones.</p>
+<h3 id="aspectos-destacados-seguridad-y-eficiencia">
+<strong>Aspectos Destacados: Seguridad y Eficiencia</strong>
+</h3>
+<p>Este repositorio implementa Ghost CMS v6.xx.x de <a href="https://github.com/TryGhost/Ghost">@TryGhost (Oficial)</a> en Kubernetes con una imagen personalizada, que ofrece mejoras significativas para el uso en producción y características de seguridad en Kubernetes.</p>
+<h3 id="seguridad-mejorada">
+<strong>Seguridad Mejorada</strong>
+</h3>
+<ul>
+<li>
+<strong>Ejecución Sin Root:</strong> Tanto los componentes de Ghost como los de MySQL se ejecutan exclusivamente como un <strong>usuario sin privilegios (non-root)</strong> (UID/GID 65532) en Kubernetes, previniendo posibles ataques de escalada de privilegios.</li>
+<li>
+<strong>Tiempo de Ejecución Distroless:</strong> Utilizamos <strong>Google Container Tools Distroless Debian 13 - NodeJS 22</strong> como el entorno de tiempo de ejecución final. Las imágenes <strong>Distroless</strong> contienen solo las dependencias de la aplicación y el lenguaje requeridas, <strong>excluyendo shells y gestores de paquetes</strong>, lo que las hace sustancialmente más seguras y reduce la superficie de ataque.</li>
+<li>
+<strong>Reducción de Vulnerabilidades:</strong> Al reemplazar <code>gosu</code> con un flujo de ejecución de contenedor nativo y adoptar Distroless, eliminamos varias vulnerabilidades críticas reportadas en la imagen original de Ghost:<ul>
+<li>
+<strong>Resultado:</strong> Solo este cambio redujo <strong>6 vulnerabilidades críticas</strong> y <strong>34 vulnerabilidades altas</strong> reportadas por Docker Scout en la imagen oficial.</li>
+</ul>
+</li>
+</ul>
+<p>
+<strong>Ejemplo de Reportes de Seguridad:</strong>
+</p>
+<!--kg-card-begin: html-->
 <table>
 <thead>
 <tr>
-<th>Nombre</th>
-<th>Ideas clave -&gt;</th>
-<th>
-</th>
-<th>
-</th>
-<th>
-</th>
-<th>
-</th>
+<th style="text-align:left">Imagen Oficial de Ghost</th>
+<th style="text-align:left">Imagen de Ghost en Kubernetes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>
-<strong>Platform Eng.</strong> -&gt;</td>
-<td>cultura org.</td>
-<td>proyectos</td>
-<td>automatización</td>
-<td>integraciones</td>
-<td>self service</td>
-</tr>
-<tr>
-<td>
-<strong>SRE</strong>         -&gt;</td>
-<td>arquitectura</td>
-<td>observabilidad</td>
-<td>infraestructura</td>
-<td>estabilidad</td>
-<td>escalabilidad</td>
-</tr>
-<tr>
-<td>
-<strong>DevOps</strong>       -&gt;</td>
-<td>colaboración</td>
-<td>desarrollo</td>
-<td>entrega continua</td>
-<td>integración</td>
-<td>cultura ágil</td>
+<td style="text-align:left">Escaneo de ejemplo para la <a href="https://hub.docker.com/_/ghost/tags">Imagen Oficial de Ghost</a>: <img src="https://raw.githubusercontent.com/sredevopsorg/ghost-on-kubernetes/main/docs/images/dockerhub-ghost.png" alt="Reporte de Docker Scout - Imagen Oficial de Ghost">
+</td>
+<td style="text-align:left">Ejemplo de nuestra <a href="https://hub.docker.com/r/ngeorger/ghost-on-kubernetes/tags">Imagen de Ghost en Kubernetes en Docker Hub</a>: <img src="https://raw.githubusercontent.com/sredevopsorg/ghost-on-kubernetes/main/docs/images/dockerhub-ngeorger.png" alt="Reporte de Docker Scout - Imagen de Ghost en Kubernetes">
+</td>
 </tr>
 </tbody>
 </table>
-<h3 id="pero-qu%C3%A9-realmente-necesito-y-para-qu%C3%A9-lo-har%C3%ADa">Pero, qué realmente necesito y para qué lo haría?</h3>
-<p>El tiempo y esfuerzo requerido para una adopción exitosa de SRE, DevOps o Ingeniería de Plataformas puede variar dependiendo de la organización específica y del estado actual de su infraestructura y procesos de TI. Por lo general, se tarda varios meses a varios años para que una organización adopte completamente y vea los beneficios de estas prácticas.</p>
-<p>Un ejemplo de estudio de caso de una adopción exitosa de SRE es Google. Desarrollaron el concepto de SRE y lo han estado utilizando durante muchos años. Google ha reportado un aumento significativo en la eficiencia, disponibilidad y confiabilidad de sus sistemas desde la adopción de SRE. En su caso, se tardaron varios años en integrar completamente las prácticas de SRE en su cultura y procesos de ingeniería, pero los resultados valieron la pena el esfuerzo.</p>
-<p>Otro ejemplo de adopción exitosa de DevOps es Spotify, comenzaron su viaje en 2010 y lograron un aumento significativo en la eficiencia y velocidad de entrega al implementar prácticas de integración continua y entrega continua, así como otras metodologías de DevOps.</p>
-<h3 id="seg%C3%BAn-la-literatura-y-los-expertos-en-la-industria-hay-varios-errores-comunes-que-las-organizaciones-cometen-al-implementar-devops">Según la literatura y los expertos en la industria, hay varios errores comunes que las organizaciones cometen al implementar DevOps</h3>
-<p>Existen varios errores comunes que cometen las organizaciones al intentar adoptar DevOps, Platform Engineering, etc, entre ellas están:</p>
+<!--kg-card-end: html-->
+<h3 id="rendimiento-y-arquitectura">
+<strong>Rendimiento y Arquitectura</strong>
+</h3>
 <ul>
-<li>Falta de objetivos y metas claros: Sin una comprensión clara de los resultados deseados y beneficios de la ingeniería de plataformas, puede ser difícil medir el progreso y determinar si la implementación es exitosa.</li>
-<li>Recursos insuficientes: Adoptar la ingeniería de plataformas requiere una inversión significativa de tiempo y recursos. Sin recursos adecuados, puede ser difícil implementar y mantener la infraestructura y procesos necesarios.</li>
-<li>Falta de comunicación y colaboración: La ingeniería de plataformas requiere un alto nivel de colaboración y comunicación entre equipos. Sin una comunicación efectiva, puede ser difícil coordinar esfuerzos y asegurar que todos trabajen hacia los mismos objetivos.</li>
-<li>Enfoque excesivo en la tecnología: Las organizaciones también deben enfocarse en construir una cultura y procesos que respalden la ingeniería de plataformas.</li>
-<li>Negligencia de la seguridad y cumplimiento: La ingeniería de plataformas requiere un enfoque en la seguridad y cumplimiento para garantizar que los sistemas sean seguros y cumplan con las regulaciones de la industria.</li>
-<li>Negligencia de la monitorización y observabilidad: La ingeniería de plataformas requiere un enfoque en la monitorización y observabilidad para garantizar que los sistemas funcionen correctamente y que los problemas puedan ser identificados y resueltos rápidamente.</li>
-<li>No involucrar a los miembros del equipo adecuados: La ingeniería de plataformas requiere un equipo diverso con diferentes experticias y antecedentes. No involucrar a las personas adecuadas puede llevar a malentendidos y soluciones inefectivas.</li>
+<li>
+<strong>Artefactos de Build Personalizados:</strong> Mantenemos dos Dockerfiles distintos para producción y desarrollo:<ul>
+<li>
+<strong>Imagen de Producción:</strong> La imagen principal construida utilizando nuestro proceso de construcción endurecido y multi-etapa. Ver el <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/Dockerfile">Dockerfile</a>.</li>
+<li>
+<strong>Imagen de Desarrollo:</strong> Una variante adaptada para pruebas, que incluye soporte para SQLite. Ver el <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/Dockerfile-dev">Dockerfile-dev</a>.</li>
 </ul>
-<p>Para tener éxito con una cultura de ingeniería de plataformas, las organizaciones deben enfocarse en objetivos y metas claros, proporcionar recursos suficientes, comunicarse y colaborar efectivamente, enfocarse en construir una cultura y procesos que respalden, priorizar la seguridad y cumplimiento, invertir en monitorización y observabilidad, e involucrar a los miembros del equipo adecuados</p>
+</li>
+<li>
+<strong>Soporte Multi-Arquitectura:</strong> Las imágenes están construidas para las arquitecturas <strong>amd64</strong> y <strong>arm64</strong>.</li>
+<li>
+<strong>Build Multi-Etapa:</strong> Utilizamos la imagen oficial de Node 22 Jod LTS para la construcción, lo que reduce significativamente el tamaño final de la imagen y mejora la seguridad al eliminar componentes de construcción innecesarios.</li>
+<li>
+<strong>Ghost v6 y NodeJS 22 LTS Actualizados:</strong> Utilizando las últimas versiones estables para seguridad y rendimiento.</li>
+<li>
+<strong>Punto de Entrada Robusto (entrypoint.js):</strong> Un script de punto de entrada <strong>Node.js</strong> personalizado, ejecutado por el usuario sin privilegios, maneja las operaciones de tiempo de ejecución necesarias, como la actualización de temas predeterminados, antes de iniciar la aplicación Ghost. El script se puede revisar aquí: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/entrypoint.js">entrypoint.js</a>.</li>
+<li>
+<strong>Contenedor Init Dedicado:</strong> El despliegue incluye un <strong>initContainer</strong> para manejar la creación de directorios, la propiedad correcta (UID/GID 65532) y la configuración de permisos antes del lanzamiento del contenedor principal de Ghost, asegurando una operación fluida dentro del contenedor Distroless.</li>
+</ul>
+<h2 id="resumen-de-la-arquitectura-de-despliegue">
+<strong>Resumen de la Arquitectura de Despliegue</strong>
+</h2>
+<p>Este proyecto proporciona archivos manifest completos de Kubernetes (<code>deploy/</code>) para ejecutar una instancia de Ghost lista para producción, respaldada por una base de datos <strong>MySQL</strong>.</p>
+<!--kg-card-begin: html-->
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Recurso</th>
+<th style="text-align:left">Componentes</th>
+<th style="text-align:left">Detalles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">
+<strong>Namespace</strong>
+</td>
+<td style="text-align:left">ghost-on-kubernetes</td>
+<td style="text-align:left">Proporciona aislamiento lógico para todos los componentes. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/00-namespace.yaml">00-namespace.yaml</a>)</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<strong>StatefulSet</strong>
+</td>
+<td style="text-align:left">ghost-on-kubernetes-mysql</td>
+<td style="text-align:left">Gestiona la base de datos MySQL 8, asegurando red estable y almacenamiento persistente. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/05-mysql.yaml">05-mysql.yaml</a>)</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<strong>Deployment</strong>
+</td>
+<td style="text-align:left">ghost-on-kubernetes</td>
+<td style="text-align:left">Gestiona los pods de la aplicación Ghost v6. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/06-ghost-deployment.yaml">06-ghost-deployment.yaml</a>)</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<strong>Services</strong>
+</td>
+<td style="text-align:left">ghost-on-kubernetes-service, ghost-on-kubernetes-mysql-service</td>
+<td style="text-align:left">Expone Ghost (2368) y MySQL (3306) internamente dentro del clúster. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/03-service.yaml">03-service.yaml</a>)</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<strong>PersistentVolumeClaims (PVC)</strong>
+</td>
+<td style="text-align:left">k8s-ghost-content, ghost-on-kubernetes-mysql-pvc</td>
+<td style="text-align:left">Solicita almacenamiento persistente para el contenido de Ghost (temas, imágenes) y los datos de MySQL. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/02-pvc.yaml">02-pvc.yaml</a>)</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<strong>Secrets</strong>
+</td>
+<td style="text-align:left">ghost-config-prod, ghost-on-kubernetes-mysql-env, tls-secret</td>
+<td style="text-align:left">Almacena de forma segura la configuración de Ghost, las credenciales de la base de datos y los certificados TLS (opcional). (Archivos: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/01-mysql-config.yaml">01-mysql-config.yaml</a>, <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/04-ghost-config.yaml">04-ghost-config.yaml</a>, <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/01-tls.yaml">01-tls.yaml</a>)</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<strong>Ingress</strong>
+</td>
+<td style="text-align:left">ghost-on-kubernetes-ingress</td>
+<td style="text-align:left">Expone la aplicación Ghost al mundo exterior a través de HTTP/HTTPS (requiere un TLD). (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/07-ingress.yaml">07-ingress.yaml</a>)</td>
+</tr>
+</tbody>
+</table>
+<!--kg-card-end: html-->
+<p>
+<em>Nota</em>: Puedes alojar múltiples instancias de Ghost reemplazando la especificación de Namespace en cada archivo manifest.</p>
+<h2 id="instrucciones-de-instalaci%C3%B3n-producci%C3%B3n">
+<strong>Instrucciones de Instalación (Producción)</strong>
+</h2>
+<p>Sigue estos pasos para desplegar Ghost en tu clúster de Kubernetes.</p>
+<h3 id="prerrequisitos">
+<strong>Prerrequisitos</strong>
+</h3>
+<ol>
+<li>Un clúster de Kubernetes en funcionamiento (<code>kubectl</code> configurado).</li>
+<li>Un StorageClass provisionado (requerido para los PVCs).</li>
+</ol>
+<h3 id="0-clonar-o-hacer-fork-del-repositorio">
+<strong>0. Clonar (o hacer fork) del Repositorio</strong>
+</h3>
+<pre>
+<code class="language-bash">## Clonar el repositorio
+git clone https://github.com/sredevopsorg/ghost-on-kubernetes.git --depth 1 --branch main --single-branch --no-tags
+## Cambiar de directorio
+cd ghost-on-kubernetes
+</code>
+</pre>
+<h3 id="1-revisar-y-configurar">
+<strong>1. Revisar y Configurar</strong>
+</h3>
+<p>Revisa los archivos de configuración de ejemplo y modifica los manifests en la carpeta <code>deploy/</code> para adaptarlos a tu entorno (ej. clase de almacenamiento, nombre de dominio, valores de secretos).</p>
+<ul>
+<li>
+<strong>Configuraciones:</strong> Revisa los archivos de configuración de ejemplo en el directorio <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/examples/">examples/</a>:<ul>
+<li>
+<code>config.production.sample.yaml</code>: Configuración recomendada usando MySQL 8. Requiere un <strong>dominio de nivel superior (TLD)</strong> válido para el campo <code>url</code> y la configuración de Ingress.</li>
+<li>
+<code>config.development.sample.yaml</code>: Utiliza SQLite para entornos de prueba.</li>
+</ul>
+</li>
+<li>
+<strong>Documentación Oficial de Ghost:</strong> Consulta la <a href="https://ghost.org/docs/config/#custom-configuration-files">documentación oficial de Ghost</a> para opciones de configuración detalladas.</li>
+</ul>
+<h3 id="2-secuencia-de-despliegue">
+<strong>2. Secuencia de Despliegue</strong>
+</h3>
+<p>Es <strong>crucial</strong> aplicar los manifests en el orden correcto para asegurar la resolución de dependencias (especialmente los componentes de la base de datos).</p>
+<ol>
+<li>
+<strong>Crear el Namespace:</strong>
+<code>kubectl apply -f deploy/00-namespace.yaml</code>
+</li>
+</ol>
+<p>
+<strong>Exponer Ghost con Ingress (Opcional/Recomendado):</strong>
+</p>
+<pre>
+<code class="language-bash"># Enruta el tráfico externo al Service de Ghost
+kubectl apply -f deploy/07-ingress.yaml
+</code>
+</pre>
+<p>
+<strong>Desplegar la Aplicación Ghost (Deployment):</strong>
+</p>
+<pre>
+<code class="language-bash"># Espera a que MySQL esté listo antes de comenzar
+kubectl apply -f deploy/06-ghost-deployment.yaml
+</code>
+</pre>
+<p>
+<strong>Desplegar la Base de Datos MySQL (StatefulSet):</strong>
+</p>
+<pre>
+<code class="language-bash"># Espera a que el PVC de MySQL esté enlazado
+kubectl apply -f deploy/05-mysql.yaml
+</code>
+</pre>
+<p>
+<strong>Crear Almacenamiento Persistente y Services:</strong>
+</p>
+<pre>
+<code class="language-bash">kubectl apply -f deploy/02-pvc.yaml
+kubectl apply -f deploy/03-service.yaml
+</code>
+</pre>
+<p>
+<strong>Crear Secrets (Credenciales y Configuración):</strong>
+</p>
+<pre>
+<code class="language-bash"># IMPORTANTE: Personaliza estos secretos antes de aplicarlos
+kubectl apply -f deploy/01-mysql-config.yaml
+kubectl apply -f deploy/04-ghost-config.yaml
+kubectl apply -f deploy/01-tls.yaml
+</code>
+</pre>
+<h2 id="%C2%A1tu-blog-ghost-est%C3%A1-desplegado">
+<strong>¡Tu Blog Ghost está Desplegado!</strong>
+</h2>
+<p>¡Felicidades! Has desplegado una instancia de Ghost v6 altamente segura y escalable en Kubernetes.</p>
+<h3 id="acceso-sin-nombre-de-dominio-pruebas">
+<strong>Acceso Sin Nombre de Dominio (Pruebas)</strong>
+</h3>
+<p>Para previsualizar el sitio web sin configurar Ingress o un TLD, puedes usar el <em>port forwarding</em>:</p>
+<ol>
+<li>Configura temporalmente las URL <code>url</code> y <code>admin</code> en tu Secret <code>config.production.json</code> para usar <code>http://localhost:2368/</code>.</li>
+<li>Reinicia el/los pod(s) de Ghost después de actualizar el Secret.</li>
+<li>Ejecuta el comando de <em>port-forwarding</em>:</li>
+</ol>
+<pre>
+<code class="language-bash">kubectl port-forward -n ghost-on-kubernetes services ghost-on-kubernetes-service 2368:2368
+</code>
+</pre>
+<h2 id="contribuciones">Contribuciones</h2>
+<p>¡Damos la bienvenida a las contribuciones de la comunidad! Por favor, revisa el archivo <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> para obtener más información sobre cómo contribuir a este proyecto.</p>
+<h2 id="licencia-y-cr%C3%A9ditos">Licencia y Créditos</h2>
+<ul>
+<li>Este proyecto está licenciado bajo la <strong>Licencia MIT</strong>. Por favor, revisa el archivo <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/LICENSE">LICENSE</a> para obtener más información.</li>
+<li>Ghost CMS está licenciado bajo la <a href="https://github.com/TryGhost/Ghost/blob/main/LICENSE">Licencia MIT</a>.</li>
+<li>La imagen de node y la imagen Distroless están licenciadas por sus respectivos propietarios.</li>
+</ul>
+<h2 id="historial-de-estrellas">Historial de Estrellas</h2>
+<figure class="kg-card kg-image-card">
+<img src="https://api.star-history.com/svg?repos=sredevopsorg/ghost-on-kubernetes&amp;type=Date&amp;theme=dark" class="kg-image" alt="Star History Chart" loading="lazy" width="800" height="533">
+</figure>
+<p>
+</p>
+<h3 id="enlaces">Enlaces</h3>
+<figure class="kg-card kg-bookmark-card">
+<a class="kg-bookmark-container" href="https://github.com/sredevopsorg/ghost-on-kubernetes">
+<div class="kg-bookmark-content">
+<div class="kg-bookmark-title">GitHub - sredevopsorg/ghost-on-kubernetes: Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image.</div>
+<div class="kg-bookmark-description">Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image. - sredevopsorg/ghost-on-kubernetes</div>
+<div class="kg-bookmark-metadata">
+<img class="kg-bookmark-icon" src="http://localhost:2368/content/images/icon/pinned-octocat-093da3e6fa40-23.svg" alt="">
+<span class="kg-bookmark-author">GitHub</span>
+<span class="kg-bookmark-publisher">sredevopsorg</span>
+</div>
+</div>
+<div class="kg-bookmark-thumbnail">
+<img src="http://localhost:2368/content/images/thumbnail/395b82c9-df81-4aee-95a5-4269616a550f-1" alt="" onerror="this.style.display = 'none'">
+</div>
+</a>
+</figure>
     </div>
     <aside class="lg:col-span-4 relative">
       <div class="sticky top-8 space-y-10">
@@ -486,43 +627,43 @@ Nota: Como todo blog, ésta es una nota basada en experiencias y</p>
     </h4>
   <div class="flex gap-2">
 
-<a href="mailto:?subject=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F&body=http://localhost:2368/es/que-es-platform-engineering-sre-devops/" target="_blank" rel="noopener noreferrer"
+<a href="mailto:?subject=C%C3%B3mo%20desplegar%20Ghost%20(CMS%2FBlog)%20en%20Kubernetes&body=http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/" target="_blank" rel="noopener noreferrer"
   class="social-icon-box" aria-label="Share via Email" title="Share via Email">
   <i class="fa-regular fa-envelope text-sm" aria-hidden="true">
 </i>
 </a>
 
-<a href="https://x.com/intent/tweet?url=http://localhost:2368/es/que-es-platform-engineering-sre-devops/&text=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F" target="_blank"
+<a href="https://x.com/intent/tweet?url=http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/&text=C%C3%B3mo%20desplegar%20Ghost%20(CMS%2FBlog)%20en%20Kubernetes" target="_blank"
   rel="noopener noreferrer" class="social-icon-box" aria-label="X" title="X">
   <i class="fa-brands fa-x text-sm" aria-hidden="true">
 </i>
 </a>
 
-<a href="https://facebook.com/sharer/sharer.php?u=http://localhost:2368/es/que-es-platform-engineering-sre-devops/" target="_blank" rel="noopener noreferrer"
+<a href="https://facebook.com/sharer/sharer.php?u=http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/" target="_blank" rel="noopener noreferrer"
   class="social-icon-box" aria-label="Facebook" title="Facebook">
   <i class="fa-brands fa-facebook text-sm" aria-hidden="true">
 </i>
 </a>
 
-<a href="https://linkedin.com/shareArticle?mini=true&url=http://localhost:2368/es/que-es-platform-engineering-sre-devops/&title=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F"
+<a href="https://linkedin.com/shareArticle?mini=true&url=http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/&title=C%C3%B3mo%20desplegar%20Ghost%20(CMS%2FBlog)%20en%20Kubernetes"
   target="_blank" rel="noopener noreferrer" class="social-icon-box" aria-label="LinkedIn" title="LinkedIn">
   <i class="fa-brands fa-linkedin-in text-sm" aria-hidden="true">
 </i>
 </a>
 
-<a href="https://api.whatsapp.com/send?text=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F%20http://localhost:2368/es/que-es-platform-engineering-sre-devops/" target="_blank"
+<a href="https://api.whatsapp.com/send?text=C%C3%B3mo%20desplegar%20Ghost%20(CMS%2FBlog)%20en%20Kubernetes%20http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/" target="_blank"
   rel="noopener noreferrer" class="social-icon-box" aria-label="WhatsApp" title="WhatsApp">
   <i class="fa-brands fa-whatsapp text-sm" aria-hidden="true">
 </i>
 </a>
 
-<a href="https://reddit.com/submit?url=http://localhost:2368/es/que-es-platform-engineering-sre-devops/&title=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F" target="_blank"
+<a href="https://reddit.com/submit?url=http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/&title=C%C3%B3mo%20desplegar%20Ghost%20(CMS%2FBlog)%20en%20Kubernetes" target="_blank"
   rel="noopener noreferrer" class="social-icon-box" aria-label="Reddit" title="Reddit">
   <i class="fa-brands fa-reddit text-sm" aria-hidden="true">
 </i>
 </a>
 
-<a href="https://mastodon.social/share?text=Qu%C3%A9%20es%20Platform%20Engineering%3F%20SRE%3F%20DevOps%3F%20http://localhost:2368/es/que-es-platform-engineering-sre-devops/" target="_blank"
+<a href="https://mastodon.social/share?text=C%C3%B3mo%20desplegar%20Ghost%20(CMS%2FBlog)%20en%20Kubernetes%20http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/" target="_blank"
   rel="noopener noreferrer" class="social-icon-box" aria-label="Mastodon" title="Mastodon">
   <i class="fa-brands fa-mastodon text-sm" aria-hidden="true">
 </i>
@@ -582,20 +723,24 @@ En esta columna intentaré definir y explicar los</p>
 </article>
 <article
   class="bg-dark-card border border-gray-700 rounded-xl overflow-hidden hover:border-gray-500 transition-colors group flex flex-col h-full">
-  <a href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instancia-sin-ip-publica/" class="block aspect-[16/9] overflow-hidden">
-    <img src="/content/images/size/w300/format/webp/2024/08/ec2-instance-connect-endpoint.png"
-      alt="No más bastiones en AWS: Con EC2 Instance Connect llegas a tu instancia sin IP pública"
+  <a href="/es/que-es-platform-engineering-sre-devops/" class="block aspect-[16/9] overflow-hidden">
+    <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
+      alt="Qué es Platform Engineering? SRE? DevOps?"
       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
   </a>
   <div class="p-5 flex flex-col flex-grow">
     <h3 class="text-lg font-semibold text-white group-hover:text-brand-purple transition-colors leading-tight mb-2">
 <a
-        href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instancia-sin-ip-publica/">No más bastiones en AWS: Con EC2 Instance Connect llegas a tu instancia sin IP pública</a>
+        href="/es/que-es-platform-engineering-sre-devops/">Qué es Platform Engineering? SRE? DevOps?</a>
 </h3>
-    <p class="text-sm text-gray-400 flex-grow line-clamp-2">Desde hoy puedes conectarte a un servidor EC2 en Amazon Web Services (AWS) utilizando &quot;EC2 Instance Connect&quot;, sin necesidad de una IP pública ni un host bastión . Este artículo te ayudará a entender cómo configurar correctamente tu endpoint y obtener una conexión segura a tu servidor EC2 en AWS.</p>
+    <p class="text-sm text-gray-400 flex-grow line-clamp-2">(O del por qué DevOps es sólo una parte...)
+
+Actualizado: Julio 2024
+
+En esta columna intentaré definir y explicar los</p>
     <div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
-      <span>10/07/2023</span>
-      <span>2 minutos aprox.</span>
+      <span>01/07/2024</span>
+      <span>4 minutos aprox.</span>
     </div>
   </div>
 </article>
@@ -605,7 +750,7 @@ En esta columna intentaré definir y explicar los</p>
   <section id="comments" class="mt-8 border-t border-gray-800 pt-8">
     <div class="gh-comments">
 
-        <script defer src="https://cdn.jsdelivr.net/ghost/comments-ui@~1.6/umd/comments-ui.min.js" data-locale="en" data-ghost-comments="http://localhost:2368/" data-api="http://localhost:2368/ghost/api/content/" data-admin="http://localhost:2368/ghost/" data-key="7d4e0c71149feae71b36b6efca" data-title=" " data-count="false" data-post-id="6abf50e348156c00014afbe2" data-color-scheme="auto" data-avatar-saturation="60" data-accent-color="#aa3cfd" data-comments-enabled="all" data-publication="Local Dev" crossorigin="anonymous">
+        <script defer src="https://cdn.jsdelivr.net/ghost/comments-ui@~1.6/umd/comments-ui.min.js" data-locale="en" data-ghost-comments="http://localhost:2368/" data-api="http://localhost:2368/ghost/api/content/" data-admin="http://localhost:2368/ghost/" data-key="7d4e0c71149feae71b36b6efca" data-title=" " data-count="false" data-post-id="6abf510248156c00014afcc0" data-color-scheme="auto" data-avatar-saturation="60" data-accent-color="#aa3cfd" data-comments-enabled="all" data-publication="Local Dev" crossorigin="anonymous">
 </script>
 
     </div>
@@ -616,9 +761,9 @@ En esta columna intentaré definir y explicar los</p>
         <div class="flex flex-col w-full p-4">
             <div class="flex items-start gap-4 mb-4">
                 <div class="flex-1">
-                    <p class="text-white font-semibold">local</p>
+                    <p class="text-white font-semibold">Local Dev</p>
                     <p class="text-xs text-brand-blue hover:underline transition-colors">
-<a href="/author/local-2/">Ver más contenido por local</a>
+<a href="/author/local/">Ver más contenido por Local Dev</a>
 </p>
                 </div>
             </div>

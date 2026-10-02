@@ -40,6 +40,7 @@
  * `data-island` values used in templates (scripts/smoke-bundle.mjs enforces it).
  */
 const registry = {
+  CodeBlocks: () => import("./islands/CodeBlocks.js"),
   MobileMenu: () => import("./islands/MobileMenu.js"),
   ReadingProgress: () => import("./islands/ReadingProgress.jsx"),
   ShareButtons: () => import("./islands/ShareButtons.jsx"),

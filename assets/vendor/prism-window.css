@@ -43,8 +43,55 @@ pre[class*="language-"]::before {
     z-index: 10 !important;
 }
 
-/* Hide the default toolbar to keep the window clean */
-.toolbar { display: none !important; }
+/* Language label + copy button, sitting in the right of the window header.
+   Previously hidden with `display: none !important`, which made the toolbar, the
+   language label and the copy button unreachable. */
+.code-toolbar { position: relative !important; }
+
+.code-toolbar > .toolbar {
+    position: absolute !important;
+    top: 0 !important;
+    right: 10px !important;
+    height: 40px !important; /* matches the window header */
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    opacity: .75;
+    transition: opacity .15s ease;
+    z-index: 6 !important;
+}
+
+.code-toolbar:hover > .toolbar { opacity: 1; }
+
+.toolbar-item {
+    font-family: "Roboto Mono", ui-monospace, monospace !important;
+    font-size: 11px !important;
+    letter-spacing: .04em;
+    color: #9ca3af !important;
+}
+
+.copy-to-clipboard-button {
+    background: rgba(255, 255, 255, .06) !important;
+    border: 1px solid rgba(255, 255, 255, .15) !important;
+    border-radius: 5px !important;
+    color: #9ca3af !important;
+    cursor: pointer;
+    font: inherit !important;
+    padding: 3px 9px !important;
+    transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+
+.copy-to-clipboard-button:hover {
+    background: rgba(255, 255, 255, .12) !important;
+    border-color: rgba(255, 255, 255, .3) !important;
+    color: #fff !important;
+}
+
+/* Prism's copy plugin sets data-copy-state on the button. */
+.copy-to-clipboard-button[data-copy-state="copy-success"] {
+    border-color: #34d399 !important;
+    color: #34d399 !important;
+}
 
 /* --- Fix Line Numbers (Offset for the header) --- */
 pre.line-numbers {

@@ -83,9 +83,11 @@ export const ALLOWLIST_PATTERNS = [
   // by design. No Tailwind utility starts with `fa-`, so this cannot mask one.
   /^fa-/,
   /^(?:fas|far|fab|fal|fat|fad)$/, // External stylesheet: legacy Font Awesome style shorthands.
-  // Vendor: generated at runtime by the bundled Prism.js (assets/js/prism.js).
-  // The Prism plugins own their own styling, and `toolbar{display:none}` in
-  // prism-window.css intentionally leaves the toolbar markup unstyled.
+  // Prism markup generated at runtime by the highlighter (assets/js/islands/
+  // prism-setup.js): the toolbar wrapper, its items (language label, copy button)
+  // and the line-number sizer. prism-window.css styles the toolbar, the button and
+  // the gutter — these names never appear in template or island source, so the guard
+  // would otherwise have nothing to match them against.
   /^(?:code-toolbar|toolbar-item|line-numbers-sizer|copy-to-clipboard-button)$/,
 ];
 
