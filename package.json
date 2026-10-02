@@ -12,7 +12,16 @@
         "dev": "rm -fv ./assets/built/* && gulp",
         "build": "rm -fv ./assets/built/* && gulp build",
         "test:dev": "npx gscan --verbose .",
-        "test:ci": "gscan --fatal --verbose ."
+        "test:ci": "gscan --fatal --verbose .",
+        "test:ship": "node scripts/ship-manifest.mjs --check",
+        "verify": "yarn build && npx --yes gscan@6.6.1 --fatal . && node scripts/ship-manifest.mjs --check",
+        "ghost:up": "docker compose -f docker-compose.dev.yml up -d",
+        "ghost:down": "docker compose -f docker-compose.dev.yml down",
+        "ghost:restart": "docker compose -f docker-compose.dev.yml restart ghost",
+        "fixtures:capture": "node scripts/fixtures.mjs capture",
+        "fixtures:normalize": "node scripts/fixtures.mjs normalize",
+        "fixtures:diff": "node scripts/fixtures.mjs diff",
+        "fixtures:promote": "node scripts/fixtures.mjs promote"
     },
     "author": {
         "name": "Nicolas Georger",

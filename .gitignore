@@ -34,3 +34,7 @@ old/
 .env
 docker-compose.yml
 demo.html
+
+# v3: fixture captures (tests/fixtures/golden is the committed baseline)
+tests/fixtures/raw/
+tests/fixtures/current/

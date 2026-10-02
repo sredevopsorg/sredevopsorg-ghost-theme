@@ -1,0 +1,61 @@
+# Theme CI — runs on every v3 phase branch and on the integration branch.
+#
+# Gates, in order of how early they fail:
+#   1. the build must produce the assets the templates reference
+#   2. GScan (the same validator Ghost runs on upload) must find no fatal issues
+#   3. the package must be self-contained: no dev/test files, no missing assets
+#
+# Golden-HTML fixtures and Playwright are local-only for now (they need a seeded
+# Ghost); Phase 3 moves them into this workflow against docker-compose.dev.yml.
+name: theme-ci
+
+on:
+  pull_request:
+    branches:
+      - v3-dev
+      - main
+  push:
+    branches:
+      - v3-dev
+      - "v3/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: theme-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-validate:
+    name: build + gscan + package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Syntax-check tooling scripts
+        run: |
+          for f in scripts/*.mjs; do node --check "$f"; done
+
+      - name: Build theme assets
+        run: yarn build
+
+      - name: Validate with GScan
+        run: npx --yes gscan@6.6.1 --fatal --verbose .
+
+      - name: Assert package contents and asset references
+        run: node scripts/ship-manifest.mjs --check
+
+      - name: Show what would ship
+        run: node scripts/ship-manifest.mjs --list

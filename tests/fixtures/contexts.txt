@@ -1,0 +1,20 @@
+# Contexts captured as golden HTML fixtures.
+#
+# Format: <fixture-name>  <path>  [# note]
+# Paths marked "adjust" must point at content that exists in your local Ghost
+# instance, otherwise capture fails loudly (by design).
+#
+# Cover every template Ghost can select, in every locale the theme serves.
+
+home            /                               # home.hbs (channel template from routes.yaml)
+home-paged      /page/2/                         # requires at least two pages of posts
+post            /en/a-post-slug/                # adjust: an existing post in the /en/ collection
+page            /about/                         # adjust: an existing page
+tag             /tag/en/                        # tag.hbs (taxonomy route from routes.yaml)
+author          /author/ngeorger/               # adjust: an existing author slug
+es-home         /es/                            # home-es.hbs -> default-es.hbs
+es-post         /es/un-post-slug/               # adjust: an existing post in the /es/ collection
+br-home         /br/                            # home-br.hbs -> default-br.hbs
+not-found       /this-page-does-not-exist/      # error-404.hbs
+# Enable once members pages exist in the theme (members/signin.hbs etc.):
+# members-signin  /signin/
