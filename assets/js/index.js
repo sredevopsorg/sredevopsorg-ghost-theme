@@ -7,3 +7,4 @@
  */
 import "../css/index.css";
 import "./main.js";
+import "./islands.js";

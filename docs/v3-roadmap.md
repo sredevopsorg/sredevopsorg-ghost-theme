@@ -39,6 +39,21 @@ any order once Phase 2 lands.
 
 ## Island contract (applies to every Phase 3 branch)
 
+Implemented in Phase 2 by `assets/js/islands.js` (runtime) and
+`assets/js/lib/theme-config.js` (config). How it works:
+
+| Piece | Rule |
+| --- | --- |
+| Mount point | `<div data-island="Name" data-…>` inside `{{{body}}}`; never `document.body` |
+| Island module | `assets/js/islands/<Name>.jsx`, exporting `mount(element, props)`; key in the registry must equal `data-island` |
+| Framework | Owned by the island module, never by the runtime. A vanilla or Preact island needs no runtime change |
+| Code splitting | The registry holds `() => import(...)` thunks, so the island chunk (and the framework it pulls in) is fetched only where a mount point exists. React is **never** in the entry chunk — `yarn test:bundle` fails if it is |
+| Lazy islands | Add `data-island-lazy` to defer even the import until the element nears the viewport |
+| Props | The mount element's `dataset`; read rendered markup from the DOM (`data-target`) rather than passing content through attributes |
+| Strings | `{{json}}` block from `partials/island-config.hbs`, read via `t(key)`; flat keys, English fallbacks in `theme-config.js` |
+| Styles | Tailwind classes written in the component (`assets/js/**` is an `@source` glob), guarded by `yarn test:classes` |
+| Failure | Unknown name, missing `mount` export or a throwing import logs and marks the element `data-island-state="unknown|failed"`; the page and other islands are unaffected |
+
 - Mount point: `<div data-island="Name" data-…>` inside `{{{body}}}`; never `document.body`.
 - The registry logs and skips unknown island names — a template typo must not break every page.
 - Mount below-the-fold islands lazily (`IntersectionObserver` + `await import()`), reserve space
