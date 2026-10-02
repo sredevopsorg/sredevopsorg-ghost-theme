@@ -1,10 +1,10 @@
-# SREDevOps.org Ghost Theme (v2 WiP)
+# SREDevOps.org Ghost Theme (v3 in development)
 
-> **Ghost v6 Theme** for [SREDevOps.org](https://www.sredevops.org) — Multi-locale, Tailwind CSS v3, responsive, dark-mode first and tag-based language filtering.
+> **Ghost v6 Theme** for [SREDevOps.org](https://www.sredevops.org) — Multi-locale, Tailwind CSS v4 (Vite), responsive, dark-mode first and tag-based language filtering.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ghost Compatibility](https://img.shields.io/badge/Ghost-%3E%3D6.0.0-lightgrey)](https://ghost.org)
-[![Node Engine](https://img.shields.io/badge/Node-%3E%3D22-green)](https://nodejs.org)
+[![Node Engine](https://img.shields.io/badge/Node-%3E%3D24-green)](https://nodejs.org)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sredevopsorg/sredevopsorg-ghost-theme)
 ---
 
@@ -116,7 +116,7 @@ taxonomies:
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **Node.js** | `>=22` | Runtime for build tooling |
+| **Node.js** | `>=24` | Runtime for build tooling (Vite 7, Tailwind v4) |
 | **Yarn** | `>=1.22` | Package management (preferred over npm) |
 | **Ghost** | `>=6.0` | Local development server |
 | **Docker** *(optional)* | Latest | Run Ghost via official container |
@@ -168,16 +168,23 @@ yarn install
 ### 3. Start Development Server
 
 ```bash
-yarn dev
+yarn dev        # vite build --watch: rebuilds assets/built/** on save
 ```
 
-This triggers:
+This rebuilds, on every change:
 
-- Tailwind CSS compilation with `@tailwindcss/forms` and `@tailwindcss/typography`
-- Asset bundling via Gulp
-- LiveReload for template/CSS changes
+- `assets/css/index.css` (Tailwind CSS v4 + `assets/css/theme.css`) → `assets/built/index-<hash>.css`
+- `assets/js/index.js` → `assets/built/index-<hash>.js`
+- `partials/vite_assets/{head,foot}.hbs`, regenerated from `assets/built/manifest.json`
 
-> 🔁 **Hot reload** is enabled for `.hbs`, `.css`, and `.js` files. Browser refreshes automatically on save.
+Because filenames are hashed, the generated partials are the only place asset URLs live —
+never hardcode them, and rebuild after pulling.
+
+> 🔁 **Dev loop:** `yarn build` (or `--watch`) for assets, but **Ghost caches compiled
+> Handlebars templates** — after editing any `.hbs` file run `yarn ghost:restart`
+> (or `ghost restart`) before trusting what the browser shows.
+> `yarn ghost:up` starts a local Ghost 6 at <http://localhost:2368> with this repo mounted
+> as the active theme; see [tests/fixtures/README.md](tests/fixtures/README.md).
 
 ---
 
@@ -334,18 +341,25 @@ Run via Chrome DevTools
 
 ### Option 1: Ghost Admin Upload
 
-1. Build assets:
+1. Build assets (the zip must already contain them — Ghost never runs a build):
 
    ```bash
    yarn build
+   yarn verify      # build + GScan + package-contents + bundle smoke test
    ```
 
-2. Zip the theme:
+2. Zip the theme. Check what ships first, then exclude everything else:
 
    ```bash
+   yarn test:ship --list
    zip -r sredevopsorg-ghost-theme.zip . \
-     -x "*.git*" "node_modules/*" ".github/*"
+     -x "*.git*" "node_modules/*" ".github/*" "lib/*" "scripts/*" "tests/*" "docs/*" \
+        "vite.config.js" "docker-compose.dev.yml" "yarn.lock" "*.md"
    ```
+
+   `assets/built/**` is generated and untracked, so a zip from a fresh clone without
+   `yarn build` would ship the placeholder partials and render unstyled — `yarn test:ship`
+   fails in exactly that case.
 
 3. Upload via **Ghost Admin → Design → Upload theme**
 
@@ -427,7 +441,7 @@ We welcome contributions aligned with our project conventions.
   - [RuntimeWire Website](https://runtimewire.com/)
   - [@TryGhost "Source" Theme](https://github.com/TryGhost/Source)
 - **Community**: Ghost Forum contributors for multi-locale pattern validation
-- **Tooling**: Tailwind CSS, Gulp, PostCSS, GScan
+- **Tooling**: Tailwind CSS v4, Vite, GScan
 
 ---
 

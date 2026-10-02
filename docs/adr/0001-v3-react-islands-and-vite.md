@@ -88,7 +88,7 @@ assigned posts before removal; unused ones are deleted, used ones become thin wr
 ### D7 — Build output is not committed
 
 `assets/built/**` becomes git-ignored; `partials/vite_assets/*.hbs` placeholders stay
-committed. `npm run zip` builds before packaging, and CI builds before deploying. This removes
+committed. `yarn zip` builds before packaging, and CI builds before deploying. This removes
 the stale-hash class of bug and the review noise of committed bundles.
 
 ### D8 — Theme toggle is a token-layer feature, flagged and dropable

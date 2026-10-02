@@ -36,12 +36,13 @@
   "Description": "Descrição",
   "Posts": "Postagens",
   "No tags found": "Nenhuma tag encontrada",
-  "Get the latest posts delivered right to your inbox": "Receba as últimas postagens diretamente na sua caixa de entrada",
   "Register with Email": "Cadastre-se com seu e-mail",
   "Related content": "Conteúdo relacionado",
   "Share this post:": "Compartilhe esta postagem:",
   "Stay in the loop": "Fique por dentro",
   "Table of Contents": "Sumário",
   "Just a minute or less": "Menos de um minuto",
-  "Takes about % minutes to read": "Leva cerca de % minutos para ler"
+  "Takes about % minutes to read": "Leva cerca de % minutos para ler",
+  "Almost finished! Please check your inbox to confirm your subscription.": "Quase pronto! Verifique sua caixa de entrada para confirmar a inscrição.",
+  "Sorry, something went wrong. Please try again.": "Desculpe, algo deu errado. Tente novamente."
 }

@@ -57,5 +57,11 @@ jobs:
       - name: Assert package contents and asset references
         run: node scripts/ship-manifest.mjs --check
 
+      - name: Smoke-test the built bundle
+        run: node scripts/smoke-bundle.mjs
+
+      - name: Check every template class has CSS
+        run: node scripts/class-coverage.mjs --css assets/built --css assets/vendor
+
       - name: Show what would ship
         run: node scripts/ship-manifest.mjs --list

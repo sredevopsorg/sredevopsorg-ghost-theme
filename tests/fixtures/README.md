@@ -15,7 +15,7 @@ tests/fixtures/
 ## One-time setup
 
 ```bash
-npm run ghost:up                       # Ghost 6 on http://localhost:2368
+yarn ghost:up                       # Ghost 6 on http://localhost:2368
 ```
 
 Then, in Ghost Admin (`http://localhost:2368/ghost/`):
@@ -34,16 +34,47 @@ producing an empty fixture.
 ## Capture and compare
 
 ```bash
-npm run fixtures:capture     # curl-free capture into raw/ (needs Ghost running)
-npm run fixtures:normalize   # -> current/
-npm run fixtures:diff        # compare current/ with golden/; exits 1 on any difference
+yarn fixtures:capture     # curl-free capture into raw/ (needs Ghost running)
+yarn fixtures:normalize   # -> current/
+yarn fixtures:diff        # compare current/ with golden/; exits 1 on any difference
 ```
 
 When a difference is intended (a real template change), review it and re-baseline:
 
 ```bash
-npm run fixtures:promote     # current/ -> golden/    then: git diff tests/fixtures/golden
+yarn fixtures:promote     # current/ -> golden/    then: git diff tests/fixtures/golden
 ```
+
+## Baselines for a migration (Phase 1 procedure)
+
+A baseline captured on the branch you are testing proves nothing. For a migration the
+goldens must come from the **pre-migration** theme, then the branch is captured against them.
+The docker-compose file mounts the repository itself as the active theme, so switching branch
+switches the theme:
+
+```bash
+# 1. baseline from the pre-migration theme
+git checkout main
+yarn install && yarn build && yarn ghost:restart
+node scripts/fixtures.mjs capture && node scripts/fixtures.mjs normalize
+node scripts/fixtures.mjs promote                       # -> tests/fixtures/golden/
+git add tests/fixtures/golden && git commit -m "test: golden fixtures for the v2 (gulp) build"
+
+# 2. capture the branch and compare
+git checkout v3/phase-1-vite-pipeline
+yarn install && yarn build && yarn ghost:restart
+node scripts/fixtures.mjs capture && node scripts/fixtures.mjs normalize
+node scripts/fixtures.mjs diff                          # exits 1 and prints the first differing character
+```
+
+Expected for the Vite/Tailwind-v4 migration: differences limited to
+
+- `<link>`/`<script>` asset URLs and their `?v=` hash (normalised, so usually invisible),
+- the new `{{body_class}}` classes on `<body>` (three layout shells),
+- `{{post_class}}` on the post container (post, custom-es, custom-notocbot),
+- the members signup form's new messages in the sidebar.
+
+Anything else is a real rendering change and must be explained before merging.
 
 ## What is normalised
 

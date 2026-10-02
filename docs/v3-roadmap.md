@@ -14,7 +14,7 @@ branches, deliverables, gates.
 Naming note: `v3-dev/<slug>` is impossible — git cannot keep `refs/heads/v3-dev` and
 `refs/heads/v3-dev/<slug>` at the same time. Phase branches use the `v3/` prefix instead.
 
-Flow per phase: branch from `v3-dev` → implement → `npm run verify` locally → PR into `v3-dev`
+Flow per phase: branch from `v3-dev` → implement → `yarn verify` locally → PR into `v3-dev`
 → CI green → squash merge → delete branch. `v3-dev` is never force-pushed.
 
 ## Phases
@@ -60,6 +60,16 @@ any order once Phase 2 lands.
 ## Verification stack
 
 1. **GScan** — `npx gscan --fatal --verbose .` (baseline is clean; keep it clean).
+1b. **Class coverage** — `yarn test:classes`: every class used in a template or in `assets/js`
+   must have a rule in `assets/built/**` + `assets/vendor/**`. This is the guard against
+   Tailwind's silent failure mode, where a renamed utility simply emits no CSS.
+1c. **Bundle smoke test** — `yarn test:bundle`: the built entry is evaluated in a stubbed DOM;
+   it must load without throwing and register its hooks. Catches bundle-semantics regressions
+   that no HTML diff can see.
+   Two documented limits of the class guard: `--css` directory scans are **not** recursive, so
+   pass every output directory explicitly (`--css assets/built --css assets/vendor`); and a
+   class whose name starts with a digit (`2xl:grid-cols-2`) is not decoded from Tailwind's
+   hex-escape form, so it fails loudly rather than silently. Neither exists in the theme today.
 2. **Golden HTML fixtures** — one file per context (home, `/page/2/`, post, page, tag, author,
    `/es/…`, `/br/…`, 404, members) captured from the local Ghost container; Phase 1+ diffs must
    show asset-URL changes only.

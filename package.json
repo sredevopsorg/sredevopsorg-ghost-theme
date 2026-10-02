@@ -1,6 +1,6 @@
 {
     "name": "sredevopsorg-ghost-theme",
-    "description": "Ghost v6 Theme for SREDevOps.org (https://www.sredevops.org) — Multi-locale, Tailwind CSS v3, responsive, dark-mode first and tag-based language filtering.",
+    "description": "Ghost v6 Theme for SREDevOps.org (https://www.sredevops.org) — Multi-locale, Tailwind CSS v4 via Vite, responsive, dark-mode first and tag-based language filtering.",
     "demo": "https://www.sredevops.org",
     "version": "2.1.5",
     "engines": {
@@ -9,19 +9,21 @@
     },
     "license": "MIT",
     "scripts": {
-        "dev": "rm -fv ./assets/built/* && gulp",
-        "build": "rm -fv ./assets/built/* && gulp build",
+        "dev": "vite build --watch",
+        "build": "vite build",
         "test:dev": "npx gscan --verbose .",
         "test:ci": "gscan --fatal --verbose .",
         "test:ship": "node scripts/ship-manifest.mjs --check",
-        "verify": "yarn build && npx --yes gscan@6.6.1 --fatal . && node scripts/ship-manifest.mjs --check",
+        "verify": "yarn build && npx --yes gscan@6.6.1 --fatal . && node scripts/ship-manifest.mjs --check && yarn test:bundle && yarn test:classes",
         "ghost:up": "docker compose -f docker-compose.dev.yml up -d",
         "ghost:down": "docker compose -f docker-compose.dev.yml down",
         "ghost:restart": "docker compose -f docker-compose.dev.yml restart ghost",
         "fixtures:capture": "node scripts/fixtures.mjs capture",
         "fixtures:normalize": "node scripts/fixtures.mjs normalize",
         "fixtures:diff": "node scripts/fixtures.mjs diff",
-        "fixtures:promote": "node scripts/fixtures.mjs promote"
+        "fixtures:promote": "node scripts/fixtures.mjs promote",
+        "test:bundle": "node scripts/smoke-bundle.mjs",
+        "test:classes": "node scripts/class-coverage.mjs --css assets/built --css assets/vendor"
     },
     "author": {
         "name": "Nicolas Georger",
@@ -50,26 +52,10 @@
         "https://github.com/sredevopsorg/sredevopsorg-ghost-theme/graphs/contributors"
     ],
     "devDependencies": {
-        "@tailwindcss/forms": "^0.5.11",
-        "@tailwindcss/typography": "^0.5.20",
-        "autoprefixer": "^10.6.1",
-        "cssnano": "9.1.1",
-        "gulp": "^5.0.1",
-        "gulp-concat": "2.6.1",
-        "gulp-livereload": "4.0.2",
-        "gulp-postcss": "10.0.0",
-        "gulp-uglify": "3.0.2",
-        "postcss": "^8.5.28",
-        "postcss-import": "^17.0.0",
-        "pump": "3.0.4",
-        "tailwindcss": "^3.4.19"
+        "@tailwindcss/vite": "^4.3.3",
+        "tailwindcss": "^4.3.3",
+        "vite": "^7.3.6"
     },
-    "browserslist": [
-        ">0.2%",
-        "not dead",
-        "not op_mini all",
-        "not IE 11"
-    ],
     "config": {
         "posts_per_page": 12,
         "card_assets": true,

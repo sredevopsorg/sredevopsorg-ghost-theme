@@ -38,3 +38,6 @@ demo.html
 # v3: fixture captures (tests/fixtures/golden is the committed baseline)
 tests/fixtures/raw/
 tests/fixtures/current/
+
+# v3: build output is generated, never committed (npm run build)
+assets/built/
