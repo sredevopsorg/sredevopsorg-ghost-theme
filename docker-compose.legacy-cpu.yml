@@ -1,0 +1,45 @@
+# Opt-in override for hosts whose CPU predates SSE4.2/AVX.
+#
+#   docker compose -f docker-compose.dev.yml -f docker-compose.legacy-cpu.yml up -d
+#
+# Why this exists: Ghost loads its bundled sharp/libvips while booting, and that
+# binary executes instructions older CPUs do not have. On an Intel Pentium P6100
+# (2010, no SSE4.2, no AVX) the container boots, logs normally, then dies with
+# SIGILL — `docker inspect` shows exit code 132 and the restart count climbs.
+#
+#   docker run --rm --entrypoint node ghost:6-alpine \
+#     -e 'require("/var/lib/ghost/current/node_modules/sharp")'   # -> exit 132
+#
+# is the whole diagnosis: node itself is fine, requiring sharp is what kills it.
+# It reproduces with the project's own Ghost image too, so this is hardware, not
+# the image.
+#
+# Effect: sharp is moved aside, so Ghost boots and renders HTML normally but cannot
+# process images (uploads and {{img_url}} size generation need it). That is enough
+# for golden-HTML fixtures and template work. Do NOT use this override to test
+# anything image-related, and do not use it on hardware from this decade.
+#
+# The image entrypoint normally seeds content/ and drops to the `node` user; this
+# wrapper does both, then runs Ghost in the foreground. Note: no shell variables
+# here on purpose — Compose interpolates `$name` in the command, and `${src%/}`
+# makes the whole config invalid.
+services:
+  ghost:
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        mkdir -p /var/lib/ghost/content/data /var/lib/ghost/content/files \
+                 /var/lib/ghost/content/images /var/lib/ghost/content/media \
+                 /var/lib/ghost/content/public /var/lib/ghost/content/settings \
+                 /var/lib/ghost/content/logs /var/lib/ghost/content/apps
+        tar -cC /var/lib/ghost/content.orig/themes casper 2>/dev/null | tar -xC /var/lib/ghost/content/themes || true
+        tar -cC /var/lib/ghost/content.orig/themes source 2>/dev/null | tar -xC /var/lib/ghost/content/themes || true
+        chown -R node:node /var/lib/ghost/content 2>/dev/null || true
+        mv /var/lib/ghost/current/node_modules/sharp /var/lib/ghost/current/node_modules/sharp.hidden 2>/dev/null || true
+        echo "[legacy-cpu] sharp hidden; Ghost runs without image processing"
+        # --no-opt: V8's optimising compiler emits instructions this CPU lacks once a
+        # function gets hot, which kills the process silently (exit 0, no log) partway
+        # through CPU-heavy work such as a large content import. Interpreter-only is
+        # slower and, on this hardware, that is the point.
+        exec node --no-opt current/index.js
