@@ -19,7 +19,7 @@
  * Zero dependencies (Node >= 20 for global fetch).
  */
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
-import { join, dirname, basename } from "node:path";
+import { join, dirname, basename, resolve } from "node:path";
 
 const ROOT = process.cwd();
 const DIRS = {
@@ -39,15 +39,24 @@ function arg(name, fallback) {
   return fallback;
 }
 
-/** `name  /path  # comment` lines; first token is the fixture name. */
+/**
+ * `name  /path  # comment` lines; first token is the fixture name.
+ *
+ * A note may carry `expect=NNN` for contexts whose correct response is not 200 —
+ * the 404 template, for example, must keep returning 404 while still being
+ * captured and diffed.
+ */
 function contexts() {
   return readFileSync(CONTEXTS, "utf8")
     .split("\n")
-    .map((line) => line.replace(/#.*$/, "").trim())
-    .filter(Boolean)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"))
     .map((line) => {
-      const [name, path] = line.split(/\s+/);
-      return { name, path: path ?? "/" };
+      const [body, ...noteParts] = line.split("#");
+      const [name, path] = body.trim().split(/\s+/);
+      const note = noteParts.join("#");
+      const expect = Number((note.match(/expect=(\d{3})/) ?? [])[1]) || 200;
+      return { name, path: path ?? "/", expect };
     });
 }
 
@@ -56,6 +65,11 @@ function contexts() {
  * something a human must then verify by reading the diff.
  */
 const NORMALISERS = [
+  // Ghost emits minified HTML on very few lines, so any insertion shifts the rest of
+  // the file and a line diff reports hundreds of false changes. One tag per line makes
+  // the diff show what was actually added or removed. Applied to both sides, so it
+  // stays meaningful (including inside <pre>/<code>, where it is equally deterministic).
+  [/></g, ">\n<"],
   [/[?&]v=[0-9a-zA-Z._-]+/g, "?v=HASH"], // {{asset}} cache-busting query
   [/nonce="[^"]*"/g, 'nonce="NONCE"'], // CSP nonces (Ghost code injection)
   [/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})/g, "TIMESTAMP"],
@@ -79,18 +93,18 @@ async function capture() {
   mkdirSync(out, { recursive: true });
 
   let failures = 0;
-  for (const { name, path } of contexts()) {
+  for (const { name, path, expect } of contexts()) {
     const url = `${base}${path}`;
     try {
       const res = await fetch(url, { redirect: "follow", headers: { "user-agent": "theme-fixtures/1.0" } });
       const body = await res.text();
-      if (!res.ok) {
-        console.error(`  ✗ ${name.padEnd(12)} ${res.status} ${url}`);
+      if (res.status !== expect) {
+        console.error(`  ✗ ${name.padEnd(12)} ${res.status} ${url} (expected ${expect})`);
         failures++;
         continue;
       }
       writeFileSync(join(out, `${name}.html`), body);
-      console.log(`  ✓ ${name.padEnd(12)} ${url} (${body.length} bytes)`);
+      console.log(`  ✓ ${name.padEnd(12)} ${res.status} ${url} (${body.length} bytes)`);
     } catch (err) {
       console.error(`  ✗ ${name.padEnd(12)} ${url} — ${err.message}`);
       failures++;
@@ -106,6 +120,11 @@ async function capture() {
 function normalize() {
   const from = arg("in", DIRS.raw);
   const to = arg("out", DIRS.current);
+  // Normalising in place deletes the input before reading it; refuse instead.
+  if (resolve(from) === resolve(to)) {
+    console.error(`--in and --out are the same directory (${rel(from)}/) — normalise into a different one.`);
+    process.exit(2);
+  }
   if (!existsSync(from)) {
     console.error(`No captured fixtures in ${rel(from)}/ — run \`yarn fixtures:capture\` first.`);
     process.exit(1);
@@ -123,26 +142,36 @@ function normalize() {
   console.log(`Normalised ${files.length} fixture(s) into ${rel(to)}/.`);
 }
 
-/** Ghost output is often one very long line, so report the first differing character too. */
-function firstDifference(a, b) {
+/**
+ * Every differing line, not just the first: a migration gate is only meaningful if
+ * you can see that the *whole* file changed in the ways you expect. Ghost output is
+ * often one very long line, so each side is trimmed around the differing column and
+ * identical (golden, current) pairs are collapsed.
+ */
+function lineDifferences(a, b, { context = 40, width = 80, max = 12 } = {}) {
   const left = a.split("\n");
   const right = b.split("\n");
-  const max = Math.max(left.length, right.length);
-  for (let i = 0; i < max; i++) {
+  const maxLines = Math.max(left.length, right.length);
+  const diffs = [];
+  const seen = new Set();
+
+  for (let i = 0; i < maxLines; i++) {
     const l = left[i] ?? "";
     const r = right[i] ?? "";
     if (l === r) continue;
+
     let col = 0;
     while (col < l.length && col < r.length && l[col] === r[col]) col++;
-    const from = Math.max(0, col - 40);
-    return {
-      line: i + 1,
-      col: col + 1,
-      golden: l.slice(from, col + 80) || "<end of line>",
-      current: r.slice(from, col + 80) || "<end of line>",
-    };
+    const from = Math.max(0, col - context);
+    const golden = l.slice(from, col + width) || "<end of line>";
+    const current = r.slice(from, col + width) || "<end of line>";
+
+    const key = `${golden}\u0000${current}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    diffs.push({ line: i + 1, golden, current });
   }
-  return null;
+  return { total: diffs.length, shown: diffs.slice(0, max), truncated: Math.max(0, diffs.length - max) };
 }
 
 function diff() {
@@ -176,10 +205,13 @@ function diff() {
       console.log(`  = ${file}`);
       continue;
     }
-    const delta = firstDifference(a, b);
-    console.error(`  ✗ ${file} — first difference at line ${delta.line}, column ${delta.col}`);
-    console.error(`      golden:  …${delta.golden.trim()}`);
-    console.error(`      current: …${delta.current.trim()}`);
+    const delta = lineDifferences(a, b);
+    console.error(`  ✗ ${file} — ${delta.total} differing line(s)`);
+    for (const diff of delta.shown) {
+      console.error(`      L${diff.line} golden:  …${diff.golden.trim()}`);
+      console.error(`      L${diff.line} current: …${diff.current.trim()}`);
+    }
+    if (delta.truncated) console.error(`      … ${delta.truncated} more differing line(s)`);
     changed++;
   }
   for (const file of currentFiles.filter((f) => !goldenFiles.includes(f))) {

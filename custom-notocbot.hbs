@@ -1,4 +1,6 @@
-{{!< default}} {{#post}} {{#is "post" }} {{!-- Header Grid: 2/3 Text, 1/3 Image --}} <div
+{{!< default}} {{#post}} {{#is "post" }} 
+  {{!-- Island: fixed 2px reading-progress bar; renders into this empty div. --}}
+  <div data-island="ReadingProgress" data-target=".gh-content"></div>{{!-- Header Grid: 2/3 Text, 1/3 Image --}} <div
   class="{{post_class}} grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-gray-800 pb-8">
 
   {{!-- Left Column: Text Info (min 2/3 width) --}}
