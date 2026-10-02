@@ -15,8 +15,31 @@ tests/fixtures/
 ## One-time setup
 
 ```bash
-yarn ghost:up                       # Ghost 6 on http://localhost:2368
+yarn ghost:up                       # Ghost 6 on http://localhost:2368 + Mailpit on :8025
 ```
+
+On a **fresh volume** the database has to be initialised once before Ghost will
+start — otherwise it logs `Database state requires initialisation` and exits:
+
+```bash
+docker compose -f docker-compose.dev.yml run --rm --entrypoint sh ghost \
+  -c 'cd /var/lib/ghost/current && ./node_modules/.bin/knex-migrator init'
+```
+
+Two things verified on real hardware while setting this up:
+
+- **Ghost sends mail** (staff sign-in device verification, import-completion
+  notices). With no mailer those steps fail with `Failed to send email`, and an
+  import can fail with it. The compose file therefore runs Mailpit and points
+  Ghost at it; read what Ghost sends at <http://localhost:8025>.
+- **CPUs without SSE4.2/AVX cannot run Ghost as-is**: its bundled `sharp` dies with
+  SIGILL (exit 132) before Ghost finishes booting. On such a machine also load
+  `docker-compose.legacy-cpu.yml`, which hides sharp (so image resizing is
+  unavailable — fine for HTML fixtures) and runs node with `--no-opt`:
+
+  ```bash
+  docker compose -f docker-compose.dev.yml -f docker-compose.legacy-cpu.yml up -d
+  ```
 
 Then, in Ghost Admin (`http://localhost:2368/ghost/`):
 
@@ -30,6 +53,22 @@ Then, in Ghost Admin (`http://localhost:2368/ghost/`):
 Edit `contexts.txt` so the `adjust:` paths point at that content. Anything still
 pointing at a non-existent slug fails during capture rather than silently
 producing an empty fixture.
+
+### Restoring a Ghost export
+
+Ghost's importer needs `meta` **inside** `db[0]`:
+
+```json
+{ "db": [ { "meta": { "exported_on": 0, "version": "6.67.0" }, "data": { "posts": [] } } ] }
+```
+
+A file shaped `{"db":[{"data":…}]}` is unwrapped to `{data}` and rejected with
+`Wrong importer structure. `meta` is missing.` Admin's own export always includes
+it. On slow hardware, import in batches of about ten posts: larger payloads can
+kill the Ghost process (SIGILL on old CPUs, see the override above) partway
+through, and the API returns `200` immediately because the import runs as a
+background job — watch the container log for `site-content-import completed`
+rather than trusting the response.
 
 ## Capture and compare
 
