@@ -10,12 +10,19 @@
  *
  *   1. Templates own the document. An island renders *inside* its mount element
  *      and never replaces server-rendered content.
- *   2. An island module exports `mount(element, props)` and owns its framework
- *      import. This file therefore never imports React: a page with no islands
- *      downloads zero framework bytes, and an island could be written in vanilla
- *      JS or Preact without touching this runtime.
+ *   2. An island module exports ONE of:
+ *        - `mount(element, props)` — the island owns dynamic UI; the framework it
+ *          imports renders into the element, which must be empty;
+ *        - `enhance(element, props)` — behaviour only; the element keeps its
+ *          server-rendered children and no framework is loaded at all.
+ *      Either way the island owns its framework import; this file never imports
+ *      one, so a page with no islands downloads zero framework bytes and an
+ *      island could be vanilla (see MobileMenu), Preact or Svelte.
+ *      Return a cleanup function when the island adds listeners.
  *   3. Props come from the mount element's `dataset`. Anything already rendered
- *      should be read from the DOM instead (see `data-target`).
+ *      should be read from the DOM instead (see `data-target`, which for an
+ *      `enhance` island selects the element to augment when it is not the mount
+ *      element itself).
  *   4. Nothing may break without JavaScript: mount points are empty containers.
  *   5. One island failing must not affect the others or the page.
  *
@@ -28,8 +35,12 @@
  * Tailwind `@source` glob), so `yarn test:classes` keeps them honest.
  */
 
-/** name -> () => import("./islands/<Name>.jsx"). Keys must match data-island values. */
+/**
+ * name -> () => import("./islands/<Name>.{js,jsx}"). Keys must equal the
+ * `data-island` values used in templates (scripts/smoke-bundle.mjs enforces it).
+ */
 const registry = {
+  MobileMenu: () => import("./islands/MobileMenu.js"),
   ReadingProgress: () => import("./islands/ReadingProgress.jsx"),
 };
 
@@ -37,6 +48,9 @@ const SELECTOR = "[data-island]";
 
 /** Elements already handled, so a second scan cannot double-mount. */
 const handled = new WeakSet();
+
+/** Cleanup functions returned by `enhance` islands, keyed by element. */
+const cleanups = new Map();
 
 function markHandled(el, state) {
   handled.add(el);
@@ -56,11 +70,26 @@ async function mountElement(el) {
 
   try {
     const mod = await loader();
-    if (typeof mod.mount !== "function") {
-      throw new TypeError(`island "${name}" must export a mount(element, props) function`);
+    const props = { ...el.dataset };
+
+    // `mount` renders into an empty element; `enhance` augments existing markup.
+    if (typeof mod.mount === "function") {
+      mod.mount(el, props);
+      markHandled(el, "mounted");
+      return;
     }
-    mod.mount(el, { ...el.dataset });
-    markHandled(el, "mounted");
+    if (typeof mod.enhance === "function") {
+      // Enhance augments existing markup, so it needs an element with children:
+      // data-target selects one, otherwise the mount element itself is used and
+      // nothing is rendered into it.
+      const target = props.target ? document.querySelector(props.target) : el;
+      if (!target) throw new Error(`enhance island "${name}" target not found: ${props.target}`);
+      const cleanup = mod.enhance(target, props);
+      if (typeof cleanup === "function") cleanups.set(el, cleanup);
+      markHandled(el, "enhanced");
+      return;
+    }
+    throw new TypeError(`island "${name}" must export mount(element, props) or enhance(element, props)`);
   } catch (err) {
     console.error(`[islands] "${name}" failed to mount:`, err);
     markHandled(el, "failed");
@@ -100,7 +129,7 @@ export function mountIslands(scope = document) {
 }
 
 /** Exposed for tests and for debugging in the browser console. */
-window.__themeIslands = { mountIslands, registry: Object.keys(registry) };
+window.__themeIslands = { mountIslands, cleanups, registry: Object.keys(registry) };
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => mountIslands());

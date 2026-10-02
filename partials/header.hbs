@@ -45,29 +45,43 @@
       {{/if}}
     </div>
 
-    {{!-- Mobile Menu Toggle --}}
-    <button id="mobile-toggle" type="button" class="rounded-lg p-2 text-gray-400 transition-colors hover:text-white md:hidden" aria-label="Toggle navigation menu" aria-controls="mobile-menu" aria-expanded="false"><i class="fas fa-bars text-xl"></i></button>
+    {{!-- Mobile menu: a native <details> disclosure, so it opens without JavaScript.
+         <summary> is focusable and Enter/Space toggles it, which is why no
+         aria-expanded is set — the element already exposes its state.
+         The MobileMenu island only adds Escape/outside-click/resize closing and
+         keeps the accessible name in sync with the state.
+         Note: the primary navigation is rendered twice on purpose. `<details>`
+         content is hidden while closed, so the panel cannot double as the desktop
+         row without JavaScript. --}}
+    {{!-- data-island on the <details> itself: an `enhance` island augments the
+         element it is declared on and renders nothing into it. --}}
+    <details id="mobile-menu" data-island="MobileMenu" data-desktop-min-width="768" class="group md:hidden">
+      <summary
+        class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:text-white"
+        aria-label="{{t "Open menu"}}">
+        <i class="fas fa-bars text-xl group-open:hidden"></i>
+        <i class="fas fa-xmark hidden text-xl group-open:inline"></i>
+      </summary>
 
-    {{!-- Mobile Menu Overlay (Vertical items) --}}
-    <nav id="mobile-menu"
-      class="hidden absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex-col gap-4 text-sm font-medium z-50">
-      {{#if @site.navigation}}
-      {{navigation type="primary"}}
-      {{/if}}
-      {{!-- <a href="/subscribe/"
-        class="bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 px-5 rounded-lg text-center transition-colors mt-2">Subscribe</a> --}}
-      {{#if @custom.show_search}}
-      <button type="button" data-ghost-search
-        class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
-        <i class="fas fa-magnifying-glass"></i> {{t "Search"}}
-      </button>
-      {{/if}}
-      {{#if @custom.show_login}}
-      <a href="#/portal/signin" data-portal="signin"
-        class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
-        <i class="fas fa-user"></i> {{t "Sign in"}}
-      </a>
-      {{/if}}
+      <nav
+        class="absolute top-full left-0 right-0 bg-[#0d0e11]/95 backdrop-blur-md border-b border-white/10 p-6 flex flex-col gap-4 text-sm font-medium z-50">
+        {{#if @site.navigation}}
+        {{navigation type="primary"}}
+        {{/if}}
+        {{!-- <a href="/subscribe/"
+          class="bg-brand-purple hover:bg-blue-500 text-white font-semibold py-2 px-5 rounded-lg text-center transition-colors mt-2">Subscribe</a> --}}
+        {{#if @custom.show_search}}
+        <button type="button" data-ghost-search
+          class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
+          <i class="fas fa-magnifying-glass"></i> {{t "Search"}}
+        </button>
+        {{/if}}
+        {{#if @custom.show_login}}
+        <a href="#/portal/signin" data-portal="signin"
+          class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
+          <i class="fas fa-user"></i> {{t "Sign in"}}
+        </a>
+        {{/if}}
     </nav>
 
   </div>

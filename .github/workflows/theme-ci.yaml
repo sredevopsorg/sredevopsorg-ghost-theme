@@ -57,6 +57,9 @@ jobs:
       - name: Assert package contents and asset references
         run: node scripts/ship-manifest.mjs --check
 
+      - name: Unit-test island behaviour
+        run: yarn test:unit
+
       - name: Smoke-test the built bundle
         run: node scripts/smoke-bundle.mjs
 
