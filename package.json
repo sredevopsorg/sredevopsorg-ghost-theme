@@ -1,8 +1,8 @@
 {
     "name": "sredevopsorg-ghost-theme",
-    "description": "Ghost v6 Theme for SREDevOps.org (https://www.sredevops.org) — Multi-locale, Tailwind CSS v4 via Vite, responsive, dark-mode first and tag-based language filtering.",
+    "description": "Ghost 6 theme for SREDevOps.org (https://www.sredevops.org) \u2014 multi-locale, Tailwind CSS v4 via Vite, React islands, light and dark palettes, and tag-based language filtering.",
     "demo": "https://www.sredevops.org",
-    "version": "2.1.5",
+    "version": "3.0.0",
     "type": "module",
     "engines": {
         "ghost": ">=6.0.0",
@@ -25,7 +25,8 @@
         "fixtures:promote": "node scripts/fixtures.mjs promote",
         "test:bundle": "node scripts/smoke-bundle.mjs",
         "test:classes": "node scripts/class-coverage.mjs --css assets/built --css assets/vendor",
-        "test:unit": "node --test \"tests/*.test.mjs\""
+        "test:unit": "node --test \"tests/*.test.mjs\"",
+        "package": "node scripts/package-theme.mjs"
     },
     "author": {
         "name": "Nicolas Georger",
@@ -36,6 +37,7 @@
         "type": "theme",
         "categories": [
             "Dark",
+            "Light",
             "Magazine",
             "Sidebar navigation"
         ]
