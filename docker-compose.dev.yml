@@ -1,0 +1,45 @@
+# Local Ghost 6 for theme development and golden-HTML fixtures.
+#
+#   docker compose -f docker-compose.dev.yml up -d   # or: npm run ghost:up
+#   open http://localhost:2368/ghost/                # create the owner account
+#   docker compose -f docker-compose.dev.yml down    # or: npm run ghost:down
+#
+# The repository is mounted as the active theme, so `vite build --watch`
+# (Phase 1+) and template edits land immediately. Ghost caches compiled
+# Handlebars templates in production mode; restart after changing *.hbs:
+#
+#   docker compose -f docker-compose.dev.yml restart ghost
+#
+# One-time setup after the container starts (see tests/fixtures/README.md):
+#   1. Create the owner account at /ghost/.
+#   2. Settings -> Design -> activate "sredevopsorg-ghost-theme".
+#   3. Settings -> Advanced -> Routing -> upload routes.yaml (routing lives in the
+#      database, not in the theme, which is why CI never deploys it).
+#   4. Create posts/pages tagged en/es/br so the locale collections match.
+
+services:
+  ghost:
+    image: ghost:6-alpine
+    container_name: sredevopsorg-ghost-dev
+    restart: unless-stopped
+    ports:
+      - "2368:2368"
+    environment:
+      url: http://localhost:2368
+      NODE_ENV: development
+      database__client: sqlite3
+      database__connection__filename: /var/lib/ghost/content/data/ghost-dev.db
+      mail__transport: Direct
+      logging__level: warn
+    volumes:
+      - ghost-dev-data:/var/lib/ghost/content
+      - ./:/var/lib/ghost/content/themes/sredevopsorg-ghost-theme
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:2368/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+volumes:
+  ghost-dev-data:
