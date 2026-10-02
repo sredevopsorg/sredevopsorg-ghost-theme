@@ -37,6 +37,12 @@ const DENY_FILES = [
   "postcss.config.js",
   "README.md",
   "demo.html",
+  // Font sources are build inputs: the CSS that ships references the hashed copies in
+  // assets/built/, so shipping both would duplicate 262 kB. The licence texts stay.
+  "assets/fonts/inter-latin.woff2",
+  "assets/fonts/inter-latin-ext.woff2",
+  "assets/fonts/roboto-mono-latin.woff2",
+  "assets/fonts/roboto-mono-latin-ext.woff2",
 ];
 
 /** Dev/build config denied by pattern. */

@@ -89,6 +89,40 @@ Result for Phase 4b: **793 lines across 18 templates → 533 across 16, of which
 one- to two-line wrappers.** The goldens' tag sequences are byte-identical before and
 after, which is the evidence that the refactor changed no markup.
 
+## Phase 5 notes
+
+### The last two third-party dependencies, and what replacing them cost
+
+Fonts (Inter, Roboto Mono) and icons (Font Awesome) were the only off-site requests the
+theme made. Both are local now.
+
+| | Before | After |
+| --- | --- | --- |
+| Fonts | 2 stylesheets + 2 preconnects to `fonts.googleapis.com` / `fonts.gstatic.com` | 262 kB of woff2 in the theme, latin + latin-ext, 4 `@font-face` rules |
+| Icons | Font Awesome's full stylesheet from cdnjs (~100 kB) plus its webfonts | ~16 kB of inline SVG covering exactly the twenty glyphs used |
+| Requests to other origins | 3 stylesheets, 2 preconnects, N webfont files | 0 |
+
+Neither is fetched at build time: `scripts/sync-fonts.mjs` and `scripts/sync-icons.mjs`
+download once and write committed files, so builds stay offline and reproducible. Licence
+texts are fetched alongside and committed.
+
+Three things this phase caught that are worth remembering:
+
+- **Tailwind's preflight makes `<svg>` a block element** (`display: block`), so an inline
+  icon sitting in a line of text breaks the line. Every icon carries `inline-block` plus
+  `align-[-0.125em]`, which is Font Awesome's own vertical alignment.
+- **Replacing an element class-by-class loses classes.** The first pass rewrote 47 call
+  sites and silently dropped `hidden` and `group-open:inline` from the mobile menu's close
+  button, which would have left it visible next to the open/close toggle.
+- **The CSS coverage guard cannot see a class inside a JSX ternary.** Two Font Awesome
+  classes survived in `ShareButtons.jsx` for exactly that reason, which is why
+  `tests/no-third-party.test.mjs` now greps templates *and* island source for them.
+
+Not done, deliberately: preloading the fonts. They are referenced from the theme's own
+hashed CSS with `font-display: swap`, which is one request behind the stylesheet that
+already blocks first paint; a `<link rel="preload">` would need the hashed filename
+exposed through the manifest bridge, and is worth doing only with a real measurement.
+
 ## Island contract (applies to every Phase 3 branch)
 
 Implemented in Phase 2 by `assets/js/islands.js` (runtime) and

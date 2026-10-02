@@ -34,13 +34,13 @@
       {{#if @custom.show_search}}
       <button type="button" data-ghost-search
         aria-label="{{t "Search"}}" title="{{t "Search"}}">
-        <i class="fas fa-magnifying-glass text-xs"></i>
+        {{> "icon" name="search" class="w-3 h-3"}}
       </button>
       {{/if}}
       {{#if @custom.show_login}}
       <a href="#/portal/signin" data-portal="signin"
         aria-label="{{t "Sign in"}}" title="{{t "Sign in"}}">
-        <i class="fas fa-user text-xs"></i>
+        {{> "icon" name="user" class="w-3 h-3"}}
       </a>
       {{/if}}
     </div>
@@ -59,8 +59,8 @@
       <summary
         class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-gray-400 transition-colors hover:text-white"
         aria-label="{{t "Open menu"}}">
-        <i class="fas fa-bars text-xl group-open:hidden"></i>
-        <i class="fas fa-xmark hidden text-xl group-open:inline"></i>
+        {{> "icon" name="menu" class="w-5 h-5 group-open:hidden"}}
+        {{> "icon" name="close" class="w-5 h-5 hidden group-open:inline"}}
       </summary>
 
       <nav
@@ -73,13 +73,13 @@
         {{#if @custom.show_search}}
         <button type="button" data-ghost-search
           class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
-          <i class="fas fa-magnifying-glass"></i> {{t "Search"}}
+          {{> "icon" name="search" class="w-4 h-4"}} {{t "Search"}}
         </button>
         {{/if}}
         {{#if @custom.show_login}}
         <a href="#/portal/signin" data-portal="signin"
           class="flex items-center gap-2 text-gray-400 transition-colors hover:text-white">
-          <i class="fas fa-user"></i> {{t "Sign in"}}
+          {{> "icon" name="user" class="w-4 h-4"}} {{t "Sign in"}}
         </a>
         {{/if}}
     </nav>

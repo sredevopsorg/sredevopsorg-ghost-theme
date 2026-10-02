@@ -15,7 +15,7 @@
       <span
         class="bg-brand-purple text-white text-[10px] font-bold px-3 py-1  tracking-wide uppercase font-mono">{{primary_tag.name}}</span>
       {{/if}}
-      <span class="text-gray-500 text-xs"><i class="far fa-clock mr-1"></i> {{#match locale "=" "es"}}{{reading_time minute="Menos de un minuto" minutes="Alrededor de % minutos para leer"}}{{else match locale "=" "br"}}{{reading_time minute="Menos de um minuto" minutes="Cerca de % minutos de leitura"}}{{else}}{{reading_time minute=(t "Just a minute or less") minutes=(t "Takes about % minutes to read")}}{{/match}}</span>
+      <span class="text-gray-500 text-xs">{{> "icon" name="clock" class="w-4 h-4 mr-1"}} {{#match locale "=" "es"}}{{reading_time minute="Menos de un minuto" minutes="Alrededor de % minutos para leer"}}{{else match locale "=" "br"}}{{reading_time minute="Menos de um minuto" minutes="Cerca de % minutos de leitura"}}{{else}}{{reading_time minute=(t "Just a minute or less") minutes=(t "Takes about % minutes to read")}}{{/match}}</span>
     </div>
 
     <h1 class="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-white mb-3">{{title}}</h1>
