@@ -1,6 +1,5 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+/* Custom theme styles. Utility classes are Tailwind v4, available here through
+   @apply because this file is imported by assets/css/index.css. */
 
 :root {
   --gh-font-heading: '';
@@ -120,13 +119,13 @@
 
 .gh-content table {
   @apply w-full border-collapse text-sm mb-6;
-  border-color: rgba(255,255,255,0.12);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .gh-content table th,
 .gh-content table td {
   @apply px-4 py-3 align-top text-left;
-  border: 1px solid rgba(255,255,255,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .gh-content table thead th {
@@ -134,11 +133,11 @@
 }
 
 .gh-content table tr:nth-child(odd) {
-  background-color: rgba(255,255,255,0.03);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .gh-content table tr:hover {
-  background-color: rgba(255,255,255,0.08);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Blockquotes */
@@ -147,11 +146,11 @@
 }
 
 .gh-content blockquote p {
-  @apply mb-0;
   /* Prevents double margins inside blockquotes */
+  @apply mb-0;
 }
 
-/* Koenig Image Overrides (Fixing previous errors) */
+/* Koenig Image Overrides */
 .kg-image-card,
 .kg-gallery-card {
   width: 100%;
@@ -188,29 +187,41 @@
   }
 }
 
-/* --- Tocbot Dark Theme Overrides --- */
+/* --- Tocbot dark theme overrides ---
+   Written as plain CSS because Tailwind v4 dropped v3's `@apply x !important`
+   syntax. Phase 3 replaces tocbot with a TableOfContents island and this block
+   goes away with assets/vendor/tocbot.{css,js}. */
 .toc-list {
-  @apply list-none !important;
+  list-style: none !important;
 }
 
 .toc-list-item {
-  @apply text-gray-400 hover:text-white transition-colors text-sm leading-relaxed !important;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  line-height: 1.625;
+  transition: color 150ms;
+}
+
+.toc-list-item:hover {
+  color: #ffffff;
 }
 
 .is-active-link {
-  @apply text-white font-bold border-l-2 border-brand-blue pl-2 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-left: 2px solid #3b82f6;
+  padding-left: 0.5rem;
 }
 
 .is-active-link::before {
   background-color: #3b82f6 !important;
-  /* brand-blue */
 }
 
 .toc-link::before {
   background-color: transparent !important;
 }
 
-.toc-list-item+.toc-list-item {
+.toc-list-item + .toc-list-item {
   @apply mt-1;
 }
 
@@ -224,4 +235,17 @@
 
 .pagination-page {
   @apply text-[10px] font-bold uppercase tracking-[0.25em] text-gray-300;
+}
+
+/* --- Members form feedback ---
+   Ghost's members script adds .success/.error to the form element when the
+   subscribe request settles; without these rules both messages would show. */
+[data-members-form] .message-success,
+[data-members-form] .message-error {
+  display: none;
+}
+
+[data-members-form].success .message-success,
+[data-members-form].error .message-error {
+  display: block;
 }

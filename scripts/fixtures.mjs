@@ -9,11 +9,11 @@
  *
  * Workflow:
  *   1. docker compose -f docker-compose.dev.yml up -d   (see tests/fixtures/README.md)
- *   2. npm run fixtures:capture                          -> tests/fixtures/raw/
- *   3. npm run fixtures:normalize                        -> tests/fixtures/current/
- *   4. npm run fixtures:promote                          (only when the new output is intended)
+ *   2. yarn fixtures:capture                          -> tests/fixtures/raw/
+ *   3. yarn fixtures:normalize                        -> tests/fixtures/current/
+ *   4. yarn fixtures:promote                          (only when the new output is intended)
  *
- *   After a change: capture + normalize + `npm run fixtures:diff`.
+ *   After a change: capture + normalize + `yarn fixtures:diff`.
  *   The diff must show asset URLs only for a build-pipeline change (Phase 1).
  *
  * Zero dependencies (Node >= 20 for global fetch).
@@ -107,7 +107,7 @@ function normalize() {
   const from = arg("in", DIRS.raw);
   const to = arg("out", DIRS.current);
   if (!existsSync(from)) {
-    console.error(`No captured fixtures in ${rel(from)}/ — run \`npm run fixtures:capture\` first.`);
+    console.error(`No captured fixtures in ${rel(from)}/ — run \`yarn fixtures:capture\` first.`);
     process.exit(1);
   }
   rmSync(to, { recursive: true, force: true });
@@ -149,7 +149,7 @@ function diff() {
   const golden = arg("golden", DIRS.golden);
   const current = arg("current", DIRS.current);
   if (!existsSync(current)) {
-    console.error(`No normalised fixtures in ${rel(current)}/ — run \`npm run fixtures:normalize\`.`);
+    console.error(`No normalised fixtures in ${rel(current)}/ — run \`yarn fixtures:normalize\`.`);
     process.exit(1);
   }
   const goldenFiles = existsSync(golden) ? readdirSync(golden).filter((f) => f.endsWith(".html")).sort() : [];
@@ -158,7 +158,7 @@ function diff() {
   if (!goldenFiles.length) {
     console.warn(
       `No golden fixtures in ${rel(golden)}/ yet.\n` +
-        `Review ${rel(current)}/ then commit it as the baseline: \`npm run fixtures:promote\`.`,
+        `Review ${rel(current)}/ then commit it as the baseline: \`yarn fixtures:promote\`.`,
     );
     process.exit(0);
   }
@@ -189,7 +189,7 @@ function diff() {
 
   if (changed) {
     console.error(`\n${changed} fixture(s) differ. Inspect ${rel(current)}/ and either fix the change or` +
-      " promote it deliberately with `npm run fixtures:promote`.");
+      " promote it deliberately with `yarn fixtures:promote`.");
     process.exit(1);
   }
   console.log(`\nAll ${goldenFiles.length} fixtures match.`);
