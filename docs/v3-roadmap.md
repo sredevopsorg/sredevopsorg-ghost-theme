@@ -45,8 +45,9 @@ Implemented in Phase 2 by `assets/js/islands.js` (runtime) and
 | Piece | Rule |
 | --- | --- |
 | Mount point | `<div data-island="Name" data-…>` inside `{{{body}}}`; never `document.body` |
-| Island module | `assets/js/islands/<Name>.jsx`, exporting `mount(element, props)`; key in the registry must equal `data-island` |
-| Framework | Owned by the island module, never by the runtime. A vanilla or Preact island needs no runtime change |
+| Island module | `assets/js/islands/<Name>.{js,jsx}`; key in the registry must equal `data-island` |
+| Mode | `mount(element, props)` when the island owns dynamic UI (framework renders into an empty element) · `enhance(element, props)` when it only augments server markup (no framework loaded at all; the element keeps its children). Return a cleanup function when listeners are added |
+| Framework | Owned by the island module, never by the runtime. Choose per island: React when it owns stateful UI, vanilla when it is DOM augmentation — `MobileMenu` is 0.47 kB gzip vanilla, the React runtime alone is ~69 kB gzip |
 | Code splitting | The registry holds `() => import(...)` thunks, so the island chunk (and the framework it pulls in) is fetched only where a mount point exists. React is **never** in the entry chunk — `yarn test:bundle` fails if it is |
 | Lazy islands | Add `data-island-lazy` to defer even the import until the element nears the viewport |
 | Props | The mount element's `dataset`; read rendered markup from the DOM (`data-target`) rather than passing content through attributes |
@@ -81,6 +82,8 @@ Implemented in Phase 2 by `assets/js/islands.js` (runtime) and
 1c. **Bundle smoke test** — `yarn test:bundle`: the built entry is evaluated in a stubbed DOM;
    it must load without throwing and register its hooks. Catches bundle-semantics regressions
    that no HTML diff can see.
+1d. **Island behaviour** — `yarn test:unit` (node:test, no dependencies): DOM-level behaviour
+   of `enhance` islands, e.g. Escape/outside-click/breakpoint handling in `MobileMenu`.
    Two documented limits of the class guard: `--css` directory scans are **not** recursive, so
    pass every output directory explicitly (`--css assets/built --css assets/vendor`); and a
    class whose name starts with a digit (`2xl:grid-cols-2`) is not decoded from Tailwind's

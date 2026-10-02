@@ -1,31 +1,5 @@
 import reframe from "./lib/reframe.js";
 
-// Mobile menu
-document.addEventListener("DOMContentLoaded", function () {
-  const toggle = document.getElementById("mobile-toggle");
-  const menu = document.getElementById("mobile-menu");
-
-  if (toggle && menu) {
-    toggle.addEventListener("click", function (e) {
-      e.stopPropagation();
-      menu.classList.toggle("hidden");
-      menu.classList.toggle("flex");
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener("click", function (e) {
-      if (
-        !menu.classList.contains("hidden") &&
-        !menu.contains(e.target) &&
-        e.target !== toggle
-      ) {
-        menu.classList.add("hidden");
-        menu.classList.remove("flex");
-      }
-    });
-  }
-});
-
 // Auto-Inject Line Numbers & Highlight Syntax on all Code Blocks
   document.addEventListener('DOMContentLoaded', function () {
       // Add line-numbers to all pre code blocks automatically

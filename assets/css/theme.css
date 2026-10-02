@@ -237,6 +237,13 @@
   @apply text-[10px] font-bold uppercase tracking-[0.25em] text-gray-300;
 }
 
+/* --- Mobile menu (<details> disclosure) ---
+   Tailwind's `list-none` covers modern browsers; Safari needs the marker element
+   hidden explicitly. See partials/header.hbs and assets/js/islands/MobileMenu.js. */
+.js-mobile-summary::-webkit-details-marker {
+  display: none;
+}
+
 /* --- Members form feedback ---
    Ghost's members script adds .success/.error to the form element when the
    subscribe request settles; without these rules both messages would show. */

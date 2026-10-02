@@ -199,11 +199,23 @@ point. Nothing may break with JavaScript disabled.
 ```
 
 ```jsx
-// assets/js/islands/ReadingProgress.jsx
+// assets/js/islands/ReadingProgress.jsx — owns dynamic UI, renders into the element
 export function mount(element, props) {
   createRoot(element).render(<ReadingProgress {...props} />);
 }
 ```
+
+```js
+// assets/js/islands/MobileMenu.js — augments server markup, loads no framework
+export function enhance(element, props) {
+  // element is the <details> from the template; it keeps its children
+  return () => {}; // optional cleanup
+}
+```
+
+Pick the cheapest mode that does the job: `enhance` for DOM augmentation (the mobile menu
+costs 0.47 kB gzip), `mount` when the island really owns stateful UI (React is ~69 kB gzip,
+so it is code-split and only fetched where such an island exists).
 
 1. Register the module in `assets/js/islands.js` — the key must equal `data-island`.
 2. `yarn build`, then `yarn ghost:restart` (Ghost caches compiled templates).
@@ -214,6 +226,7 @@ export function mount(element, props) {
 | No page eager-loads React; the framework arrives with the island that needs it | `yarn test:bundle` (entry has no framework, partials reference only the entry) |
 | Every `data-island` in a template resolves to a code-split chunk | `yarn test:bundle` |
 | Island Tailwind classes have real CSS | `yarn test:classes` |
+| `enhance` island behaviour (Escape, outside click, breakpoints) | `yarn test:unit` |
 | Adding an island cannot break the page or the other islands | guarded, isolated mounting in `assets/js/islands.js` |
 
 Strings come from `partials/island-config.hbs` (`{{json}}` + `{{t}}`), read in an island with

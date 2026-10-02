@@ -15,7 +15,7 @@
         "test:dev": "npx gscan --verbose .",
         "test:ci": "gscan --fatal --verbose .",
         "test:ship": "node scripts/ship-manifest.mjs --check",
-        "verify": "yarn build && npx --yes gscan@6.6.1 --fatal . && node scripts/ship-manifest.mjs --check && yarn test:bundle && yarn test:classes",
+        "verify": "yarn build && npx --yes gscan@6.6.1 --fatal . && node scripts/ship-manifest.mjs --check && yarn test:unit && yarn test:bundle && yarn test:classes",
         "ghost:up": "docker compose -f docker-compose.dev.yml up -d",
         "ghost:down": "docker compose -f docker-compose.dev.yml down",
         "ghost:restart": "docker compose -f docker-compose.dev.yml restart ghost",
@@ -24,7 +24,8 @@
         "fixtures:diff": "node scripts/fixtures.mjs diff",
         "fixtures:promote": "node scripts/fixtures.mjs promote",
         "test:bundle": "node scripts/smoke-bundle.mjs",
-        "test:classes": "node scripts/class-coverage.mjs --css assets/built --css assets/vendor"
+        "test:classes": "node scripts/class-coverage.mjs --css assets/built --css assets/vendor",
+        "test:unit": "node --test \"tests/*.test.mjs\""
     },
     "author": {
         "name": "Nicolas Georger",
