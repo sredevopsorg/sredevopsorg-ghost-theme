@@ -1,4 +1,5 @@
-{{!< default}} {{#post}} {{#is "post" }}
+{{!< default}}
+{{#post}} {{#is "post" }}
   {{!-- Island: fixed 2px reading-progress bar; renders into this empty div. --}}
   <div data-island="ReadingProgress" data-target=".gh-content"></div>
 
@@ -57,15 +58,7 @@
 
   {{/is}}
 
-  {{#is "page"}}
-  {{#if @page.show_title_and_feature_image}}
-  <h1 class="text-4xl text-center text-white font-bold">{{title}}</h1>
-  {{> "feature-image"}}
-  {{/if}}
-  <section class="mt-8 gh-content" data-island="CodeBlocks" data-prismjs-copy="{{t "Copy"}}" data-prismjs-copy-success="{{t "Copied!"}}">
-    {{{content}}}
-  </section>
-  {{/is}}
+  
 
   {{#is "post"}}
   <div class="mt-16 border-t border-gray-800 pt-8">

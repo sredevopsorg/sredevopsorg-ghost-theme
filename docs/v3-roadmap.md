@@ -38,6 +38,30 @@ Flow per phase: branch from `v3-dev` → implement → `yarn verify` locally →
 ≈ 7–9 focused days. Phases 3a–3d, 4a–4b and 5a–5b are independent branches and can be worked in
 any order once Phase 2 lands.
 
+## Phase 4 notes
+
+### Per-locale `lang` — investigated, not solvable at the layout level
+
+A post that carries a locale tag but no locale template renders through `post.hbs` →
+`default.hbs`, which can only emit the one site locale. Three approaches were tested
+against a real Ghost 6.67 instance and all fail, for the same underlying reason: **a
+layout cannot see the post context.**
+
+| Approach | Result |
+| --- | --- |
+| `{{#has tag="es"}}` directly in the layout | always false |
+| `{{#has}}` wrapped in `{{#post}}` in the layout | always false — `#post` yields nothing in a layout |
+| `{{#contentFor "lang"}}` in `post.hbs` + `{{{block "lang"}}}` in the layout | the content **does** reach the layout, but it is evaluated **in the layout's context**, so the tag test inside it is false again |
+
+One useful thing came out of it: `{{#block "lang"}}default{{/block}}` **does** render its
+body when no `contentFor` is supplied, so a layout can define a fallback for a block.
+
+The remedy is the documented one and what the site already does: locale shells for
+collections (`default-es.hbs`, `default-br.hbs`) and a locale custom template for
+individual posts (23 of 26 posts use `custom-es`). `README.md` now states that a post in
+a locale collection must be assigned the locale template, otherwise it renders with the
+site locale.
+
 ## Island contract (applies to every Phase 3 branch)
 
 Implemented in Phase 2 by `assets/js/islands.js` (runtime) and

@@ -19,6 +19,7 @@
  * Zero dependencies (Node >= 20 for global fetch).
  */
 import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { join, dirname, basename, resolve } from "node:path";
 
 const ROOT = process.cwd();
@@ -147,35 +148,63 @@ function normalize() {
 }
 
 /**
- * Every differing line, not just the first: a migration gate is only meaningful if
- * you can see that the *whole* file changed in the ways you expect. Ghost output is
- * often one very long line, so each side is trimmed around the differing column and
- * identical (golden, current) pairs are collapsed.
+ * Line differences between two captures.
+ *
+ * Uses `diff -u` when available: an insertion shifts every following line, and a
+ * naive line-by-line comparison then reports the whole file as changed (a single
+ * inserted blank line produced "136 differing lines" for two real changes). A real
+ * diff reports the hunks instead. Falls back to an order-insensitive set comparison
+ * when `diff` is not installed.
  */
-function lineDifferences(a, b, { context = 40, width = 80, max = 12 } = {}) {
-  const left = a.split("\n");
-  const right = b.split("\n");
-  const maxLines = Math.max(left.length, right.length);
-  const diffs = [];
-  const seen = new Set();
+function lineDifferences(goldenPath, currentPath, { max = 16 } = {}) {
+  const result = spawnSync("diff", ["-u", goldenPath, currentPath], { encoding: "utf8" });
 
-  for (let i = 0; i < maxLines; i++) {
-    const l = left[i] ?? "";
-    const r = right[i] ?? "";
-    if (l === r) continue;
-
-    let col = 0;
-    while (col < l.length && col < r.length && l[col] === r[col]) col++;
-    const from = Math.max(0, col - context);
-    const golden = l.slice(from, col + width) || "<end of line>";
-    const current = r.slice(from, col + width) || "<end of line>";
-
-    const key = `${golden}\u0000${current}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    diffs.push({ line: i + 1, golden, current });
+  if (!result.error) {
+    const added = [];
+    const removed = [];
+    for (const line of (result.stdout ?? "").split("\n")) {
+      if (line.startsWith("+++") || line.startsWith("---") || line.startsWith("@@")) continue;
+      if (line.startsWith("+")) added.push(line.slice(1).trim());
+      else if (line.startsWith("-")) removed.push(line.slice(1).trim());
+    }
+    const show = (lines) => lines.filter(Boolean).slice(0, max);
+    return {
+      mode: "diff",
+      added: show(added),
+      removed: show(removed),
+      addedTotal: added.filter(Boolean).length,
+      removedTotal: removed.filter(Boolean).length,
+      truncated: Math.max(0, added.filter(Boolean).length - max) + Math.max(0, removed.filter(Boolean).length - max),
+    };
   }
-  return { total: diffs.length, shown: diffs.slice(0, max), truncated: Math.max(0, diffs.length - max) };
+
+  // Fallback: compare the two line multisets. Order-insensitive, so it cannot show a
+  // reordering, but it cannot invent cascade differences either.
+  const count = (text) => {
+    const map = new Map();
+    for (const line of text.split("\n")) map.set(line, (map.get(line) ?? 0) + 1);
+    return map;
+  };
+  const goldenCount = count(readFileSync(goldenPath, "utf8"));
+  const currentCount = count(readFileSync(currentPath, "utf8"));
+  const collect = (a, b) => {
+    const out = [];
+    for (const [line, n] of a) {
+      const diff = n - (b.get(line) ?? 0);
+      for (let i = 0; i < diff; i++) out.push(line.trim());
+    }
+    return out.filter(Boolean);
+  };
+  const removed = collect(goldenCount, currentCount);
+  const added = collect(currentCount, goldenCount);
+  return {
+    mode: "set",
+    added: added.slice(0, max),
+    removed: removed.slice(0, max),
+    addedTotal: added.length,
+    removedTotal: removed.length,
+    truncated: Math.max(0, added.length - max) + Math.max(0, removed.length - max),
+  };
 }
 
 function diff() {
@@ -209,13 +238,14 @@ function diff() {
       console.log(`  = ${file}`);
       continue;
     }
-    const delta = lineDifferences(a, b);
-    console.error(`  ✗ ${file} — ${delta.total} differing line(s)`);
-    for (const diff of delta.shown) {
-      console.error(`      L${diff.line} golden:  …${diff.golden.trim()}`);
-      console.error(`      L${diff.line} current: …${diff.current.trim()}`);
-    }
-    if (delta.truncated) console.error(`      … ${delta.truncated} more differing line(s)`);
+    const delta = lineDifferences(join(golden, file), join(current, file));
+    const scope = delta.mode === "diff" ? "diff" : "line set";
+    console.error(
+      `  ✗ ${file} — ${delta.removedTotal} removed, ${delta.addedTotal} added  [${scope}]`,
+    );
+    for (const line of delta.removed) console.error(`      - ${line}`);
+    for (const line of delta.added) console.error(`      + ${line}`);
+    if (delta.truncated) console.error(`      … ${delta.truncated} more line(s)`);
     changed++;
   }
   for (const file of currentFiles.filter((f) => !goldenFiles.includes(f))) {
