@@ -123,6 +123,32 @@ hashed CSS with `font-display: swap`, which is one request behind the stylesheet
 already blocks first paint; a `<link rel="preload">` would need the hashed filename
 exposed through the manifest bridge, and is worth doing only with a real measurement.
 
+### The gate was blind to error-level findings (found in production, fixed)
+
+Ghost logged this while booting the theme:
+
+```
+WARN The currently active theme "sredevopsorg-ghost-theme" has errors, but will still work.
+  GS001-DEPR-LANG   partials/shell.hbs   {{lang}}
+  GS080-NO-EMPTY-TRANSLATIONS  error.hbs  {{t}}
+```
+
+Both were mine, and both had passed `yarn verify` for five phases:
+
+- a partial argument named `lang` (`{{> "shell" lang="es"}}`) reads as the removed
+  `{{lang}}` helper — the argument is now `documentLang`;
+- the *comment* in error.hbs listed the helpers it avoids, and the rule scans comments,
+  so the literal `{{t}}` in prose counted as an empty translation.
+
+Cause: the gate ran `gscan --fatal`, and **`--fatal` only fails on fatal issues.** On a
+theme with these two errors, `gscan --fatal .` exits 0 while plain `gscan .` exits 1.
+The flag reads like a strictness switch and is the opposite of one.
+
+The gate now runs plain `gscan` (pinned in devDependencies, so CI and local runs agree)
+and was verified to exit 1 when `{{lang}}` is reintroduced. Note also that gscan's
+*programmatic* API returned zero errors for the same theme with every `checkVersion` —
+only the CLI reproduced Ghost's own validation, so the CLI is what the gate uses.
+
 ## Island contract (applies to every Phase 3 branch)
 
 Implemented in Phase 2 by `assets/js/islands.js` (runtime) and

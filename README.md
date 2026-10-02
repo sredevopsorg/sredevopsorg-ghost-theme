@@ -395,7 +395,11 @@ yarn build
 
 # Validate theme against Ghost spec
 yarn test:dev    # Verbose output
-yarn test:ci     # Fail on warnings (for CI)
+yarn test:ci     # Same check, used by the gate: fails on errors, not only on fatals
+
+# The gate runs the pinned gscan from devDependencies. Do not add --fatal: that flag
+# only fails on *fatal* issues, so error-level findings (a removed helper, an empty
+# translation) pass CI while Ghost logs a warning at boot.
 ```
 
 ### Locale-Specific Validation
