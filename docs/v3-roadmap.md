@@ -66,6 +66,10 @@ any order once Phase 2 lands.
 1c. **Bundle smoke test** — `yarn test:bundle`: the built entry is evaluated in a stubbed DOM;
    it must load without throwing and register its hooks. Catches bundle-semantics regressions
    that no HTML diff can see.
+   Two documented limits of the class guard: `--css` directory scans are **not** recursive, so
+   pass every output directory explicitly (`--css assets/built --css assets/vendor`); and a
+   class whose name starts with a digit (`2xl:grid-cols-2`) is not decoded from Tailwind's
+   hex-escape form, so it fails loudly rather than silently. Neither exists in the theme today.
 2. **Golden HTML fixtures** — one file per context (home, `/page/2/`, post, page, tag, author,
    `/es/…`, `/br/…`, 404, members) captured from the local Ghost container; Phase 1+ diffs must
    show asset-URL changes only.
