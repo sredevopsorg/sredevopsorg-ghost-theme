@@ -52,7 +52,10 @@ jobs:
         run: yarn build
 
       - name: Validate with GScan
-        run: npx --yes gscan@6.6.1 --fatal --verbose .
+        # Plain gscan, not `--fatal`: that flag only fails on *fatal* issues, so
+        # error-level findings (a removed helper, an empty translation) would pass CI
+        # while Ghost logs a warning at boot. The version comes from devDependencies.
+        run: yarn test:ci
 
       - name: Assert package contents and asset references
         run: node scripts/ship-manifest.mjs --check
