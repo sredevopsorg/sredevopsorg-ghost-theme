@@ -1,0 +1,20 @@
+{{!-- Configuration for client islands, read by assets/js/lib/theme-config.js.
+     Serialised with {{json}} — the documented safe way to put values into a
+     script body; never interpolate with {{{ }}} here.
+
+     Keys are flat and named exactly as the islands read them. Keep it small:
+     this is inline on every page, and anything already rendered in the DOM
+     should be read from the DOM instead. Add a key only when an island uses it. --}}
+<script id="theme-config" type="application/json">
+{{json
+    siteUrl=@site.url
+    locale=@site.locale
+    toc=(t "Table of Contents")
+    copyLink=(t "Copy link")
+    linkCopied=(t "Link copied!")
+    shareVia=(t "Share via Email")
+    openMenu=(t "Open menu")
+    closeMenu=(t "Close menu")
+    readingProgress=(t "Reading progress")
+}}
+</script>

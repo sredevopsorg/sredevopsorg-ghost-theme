@@ -402,7 +402,12 @@ export function run(argv) {
     process.stderr.write(`class-coverage: no *.hbs templates under ${root}; nothing to check\n`);
     return 2;
   }
-  const scripts = walkFiles(join(root, "assets", "js"), (file) => file.endsWith(".js"));
+  // .jsx too: islands are components, and their Tailwind classes come from the
+  // same @source globs as the templates.
+  const scripts = walkFiles(
+    join(root, "assets", "js"),
+    (file) => file.endsWith(".js") || file.endsWith(".jsx"),
+  );
 
   /** token -> { token, locations: Set<"file:line"> } */
   const usage = new Map();

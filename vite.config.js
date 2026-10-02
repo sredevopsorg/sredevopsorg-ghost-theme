@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import ghostManifestPartials from "./lib/vite/ghost-manifest-partials.js";
 
@@ -29,5 +30,8 @@ export default defineConfig({
       "partials/vite_assets/foot.hbs",
     ),
     tailwindcss(),
+    // JSX for the islands in assets/js/islands/**. Components are code-split by
+    // the registry in assets/js/islands.jsx, so this plugin adds no runtime by itself.
+    react(),
   ],
 });

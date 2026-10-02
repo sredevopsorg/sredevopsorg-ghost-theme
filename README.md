@@ -188,6 +188,40 @@ never hardcode them, and rebuild after pulling.
 
 ---
 
+## 🧩 Islands (client interactivity)
+
+Ghost renders every page server-side; React is added only where a template declares a mount
+point. Nothing may break with JavaScript disabled.
+
+```handlebars
+{{!-- post.hbs --}}
+<div data-island="ReadingProgress" data-target=".gh-content"></div>
+```
+
+```jsx
+// assets/js/islands/ReadingProgress.jsx
+export function mount(element, props) {
+  createRoot(element).render(<ReadingProgress {...props} />);
+}
+```
+
+1. Register the module in `assets/js/islands.js` — the key must equal `data-island`.
+2. `yarn build`, then `yarn ghost:restart` (Ghost caches compiled templates).
+3. `yarn verify` — the checks below fail loudly if the wiring is wrong.
+
+| Guarantee | Enforced by |
+| --- | --- |
+| No page eager-loads React; the framework arrives with the island that needs it | `yarn test:bundle` (entry has no framework, partials reference only the entry) |
+| Every `data-island` in a template resolves to a code-split chunk | `yarn test:bundle` |
+| Island Tailwind classes have real CSS | `yarn test:classes` |
+| Adding an island cannot break the page or the other islands | guarded, isolated mounting in `assets/js/islands.js` |
+
+Strings come from `partials/island-config.hbs` (`{{json}}` + `{{t}}`), read in an island with
+`t("key")` from `assets/js/lib/theme-config.js`. Keep that payload small: it is inline on every
+page.
+
+---
+
 ## ✍️ Locale Content Authoring
 
 ### Tagging Posts for Language Filtering
