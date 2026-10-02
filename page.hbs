@@ -1,7 +1,15 @@
 {{!< default}}
 
 {{#page}}
+    {{!-- @page.show_title_and_feature_image is the per-page toggle in the editor. When
+         it is off, both the title and the feature image are hidden (GScan warns if a
+         theme ignores it). This used to live in post.hbs behind an {{#is "page"}} branch
+         that could never run: page.hbs takes precedence for pages. --}}
+    {{#if @page.show_title_and_feature_image}}
     <h1 class="text-4xl text-white font-bold mb-4">{{title}}</h1>
+    {{> "feature-image"}}
+    {{/if}}
+
     <article class="gh-content" data-island="CodeBlocks" data-prismjs-copy="{{t "Copy"}}" data-prismjs-copy-success="{{t "Copied!"}}">
         {{{content}}}
     </article>

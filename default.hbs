@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+{{!-- Document language. Ghost has a single site locale; per-locale content is routed
+     by tag and served by the locale shells (default-es.hbs, default-br.hbs), which set
+     their own lang. A post in a locale collection that has no locale template renders
+     with this value.
+     Investigated for Phase 4a and not solvable at the layout level: a layout cannot see
+     the post context (neither {{#has}} nor {{#post}} resolves), and while a
+     {{#contentFor}} does reach the layout through {{{block}}}, its content is evaluated
+     in the layout's context too, so a tag test there is always false. The remedy is the
+     documented one: assign the locale's custom template to the post. --}}
 <html lang="{{@site.locale}}" class="dark">
 
 <head>

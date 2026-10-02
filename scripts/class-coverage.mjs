@@ -55,11 +55,6 @@ export const ALLOWLIST_EXACT = [
   // JS-only hook — the theme's scripts query it, it carries no styling.
   "js-reframe",
 
-  // Tech debt, NOT correct: a wrapper with no rule of its own (the <img> inside it
-  // is styled). Kept so the guard does not fail on it; delete it from the template
-  // and then delete this line.
-  "feature-image-wrapper", // dead — partials/feature-image.hbs
-
   // Unstyled semantic wrapper on author.hbs. Also matched by /^author-/ below
   // (that pattern exists for Ghost's runtime `author-<slug>` body class), so
   // it is listed explicitly to keep the intent greppable.
@@ -332,6 +327,24 @@ function loadCorpus(cssPaths) {
   return { paths: [...cssPaths], files: unique, text };
 }
 
+/**
+ * A template may carry its own `<style>` block. error.hbs does, deliberately: an
+ * error page must not depend on the asset pipeline that may be what broke. Those
+ * classes are genuinely styled, so their rules belong in the corpus — otherwise the
+ * guard reports them as missing and the fix would be an allowlist entry that hides a
+ * real deletion later.
+ */
+function templateStyleBlocks(root) {
+  const styles = [];
+  for (const file of walkFiles(root, (name) => name.endsWith(".hbs"))) {
+    const src = readFileSync(file, "utf8");
+    for (const match of src.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) {
+      styles.push(match[1]);
+    }
+  }
+  return styles;
+}
+
 // ---------------------------------------------------------------------------
 // CLI
 // ---------------------------------------------------------------------------
@@ -395,6 +408,9 @@ export function run(argv) {
     return 2;
   }
 
+  // Template <style> blocks count as CSS: error.hbs is self-contained by design.
+  const lookupText = corpus.text + "\n" + templateStyleBlocks(root).join("\n");
+
   const templates = walkFiles(root, (file) => file.endsWith(".hbs"));
   if (templates.length === 0) {
     process.stderr.write(`class-coverage: no *.hbs templates under ${root}; nothing to check\n`);
@@ -434,7 +450,7 @@ export function run(argv) {
     const rule = allowlistRuleFor(entry.token);
     // Resolved wins over allowlisted: an allowlist entry that also has a real
     // rule is stale, and we would rather see it counted than hidden.
-    if (corpus.text.includes("." + escapeSelector(entry.token))) resolved++;
+    if (lookupText.includes("." + escapeSelector(entry.token))) resolved++;
     else if (rule !== null) allowlisted.push({ ...entry, rule });
     else missing.push(entry);
   }

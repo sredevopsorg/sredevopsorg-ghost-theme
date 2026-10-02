@@ -56,15 +56,7 @@
 
   {{/is}}
 
-  {{#is "page"}}
-  {{#if @page.show_title_and_feature_image}}
-  <h1 class="text-4xl text-center text-white font-bold">{{title}}</h1>
-  {{> "feature-image"}}
-  {{/if}}
-  <section class="mt-8 gh-content">
-    {{{content}}}
-  </section>
-  {{/is}}
+  
 
   {{#is "post"}}
   <div class="mt-16 border-t border-gray-800 pt-8">
