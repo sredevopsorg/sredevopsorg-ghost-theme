@@ -96,6 +96,8 @@ taxonomies:
 - [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
 - [Development Workflow](#-development-workflow)
+- [Islands](#-islands-client-interactivity)
+- [Security feed widget](#-security-feed-widget)
 - [Locale Content Authoring](#-locale-content-authoring)
 - [Template Architecture](#-template-architecture)
 - [Theme Configuration](#-theme-configuration)
@@ -228,6 +230,98 @@ so it is code-split and only fetched where such an island exists).
 Strings come from `partials/island-config.hbs` (`{{json}}` + `{{t}}`), read in an island with
 `t("key")` from `assets/js/lib/theme-config.js`. Keep that payload small: it is inline on every
 page.
+
+---
+
+## 🛡️ Security feed widget
+
+The theme can render the newest advisories from
+[SREDevOps Sec Feed](https://github.com/sredevopsorg/sredevopsorg-sec-feed) — Ubuntu, Debian,
+Red Hat, NVD, CISA, AWS, the Kubernetes blog and OpenSSF, enriched with CISA KEV, EPSS and
+OSV.dev — as a block **inside** a page, above the post grid on every collection.
+
+It is a *minified* frontend on purpose. The service already ships a full single-page
+frontend with search, SSE and its own filters; this is the small half of it, and the
+widget's footer links to the real thing.
+
+```
+Ghost renders                    the island fetches
+─────────────                    ────────────────
+partials/sec-feed.hbs            assets/js/islands/SecFeed.js
+  <section> + heading  ──────►     status line, tag chips, rows
+  <noscript> link                 poll every 5 min while visible
+  <div data-island="SecFeed"> ──► GET {base}/api/feed?limit=10
+```
+
+### Turning it on
+
+**Admin → Settings → Design → Theme**
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `sec_feed_api_url` | Text | *(empty)* | Origin of the feed API, e.g. `https://security-feed.sredevops.org`. Empty hides the widget entirely. |
+| `sec_feed_items` | Select | `10` | How many advisories the widget shows (5 / 10 / 15 / 20). |
+
+With `sec_feed_api_url` empty the partial renders **nothing**: no markup, no island chunk,
+no request. That keeps "the theme makes no third-party requests" true for an unmodified
+site, and it is what `tests/sec-feed.test.mjs` guards — the API origin appears in no source
+file, only as this setting.
+
+### ⚠️ CORS is required — and it is not configured yet
+
+The widget calls the feed **cross-origin**, and the sec-feed fails CORS closed: with
+`CORS_ORIGINS` unset, no cross-origin caller is allowed. Add the publication's origin to
+the service:
+
+```
+CORS_ORIGINS=https://www.sredevops.org
+```
+
+Checked against the live service on 2026-10-03: `GET /api/feed` sent with an `Origin`
+header returns `200` and `Vary: Origin`, but **no `Access-Control-Allow-Origin`** — so until
+`CORS_ORIGINS` includes the publication, the browser blocks the response and the widget
+shows its error state (correctly: it degrades, it does not break the page). To avoid CORS
+entirely, reverse-proxy the feed onto the publication's own domain and set
+`sec_feed_api_url` to that path, e.g. `/feed`.
+
+### Behaviour worth knowing
+
+- **Polling, not SSE.** `/api/events` is rate-limited and caps concurrent subscribers, so a
+  widget on a public homepage should not hold one connection per open tab. It polls every 5
+  minutes while the tab is visible and refreshes when the tab returns or the browser
+  reconnects.
+- **Failures degrade.** A failed first load renders a message and a retry button; a failed
+  later poll keeps the rows and marks them stale instead of blanking the page.
+- **Sample rows are labelled.** When no upstream source is reachable the service serves
+  realistic sample items; the widget says so rather than passing it off as live data.
+- **No-JS** shows a link to the full feed (`<noscript>`, outside the mount point).
+- **Tag chips filter the rows already fetched** — no request per click, no rate limit spent.
+
+### Where it appears
+
+Included by `partials/collection-layout.hbs`, which the four **channel** templates use:
+`/` (or `/en/`), `/es/` and `/br/`. It is *not* on post or page templates, and *not* on
+`/tag/…` or `/author/…` — `tag.hbs` and `author.hbs` carry their own markup rather than
+sharing `collection-layout.hbs`.
+
+The block is one partial, so anywhere else it goes where you put it:
+
+```handlebars
+{{> "sec-feed" locale=locale}}
+```
+
+Verified against a local Ghost 6: the block renders with the expected `data-*` attributes,
+`/es/` gets the Spanish heading and no-JS link from the locale passed through, and no post,
+page, tag or author template gains any widget markup.
+
+### Weight
+
+The island is **3.87 kB gzip and loads no framework**, versus ~69 kB gzip for the React runtime
+the other islands share. That is why this one is vanilla while `ReadingProgress` and
+`TableOfContents` are React: there is no server-rendered content here to hydrate, and this is
+likely to sit on the homepage. The decisions worth testing live in
+`assets/js/lib/sec-feed-model.js` and are unit-tested there; see
+[docs/adr/0003](docs/adr/0003-security-feed-widget.md) for the reasoning.
 
 ---
 
@@ -392,6 +486,8 @@ Customize behavior via **Ghost Admin → Settings → Theme**:
 |--------|------|---------|-------------|
 | `show_search` | Boolean | `true` | Show a search icon in the main navigation |
 | `show_login` | Boolean | `true` | Show a sign-in link in the main navigation |
+| `sec_feed_api_url` | Text | *(empty)* | Origin of the security feed API. Empty hides the [security feed widget](#-security-feed-widget) |
+| `sec_feed_items` | Select | `10` | How many advisories the security feed widget shows |
 
 ### Image Size Presets
 

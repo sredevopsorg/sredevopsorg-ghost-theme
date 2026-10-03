@@ -56,5 +56,22 @@
   "Copied!": "Copied!",
   "Switch to light theme": "Switch to light theme",
   "Switch to dark theme": "Switch to dark theme",
-  "Toggle theme": "Toggle theme"
+  "Toggle theme": "Toggle theme",
+  "Security feed": "Security feed",
+  "Linux · Cloud · Kubernetes": "Linux · Cloud · Kubernetes",
+  "View the live security feed": "View the live security feed",
+  "Loading the latest advisories…": "Loading the latest advisories…",
+  "No advisories right now.": "No advisories right now.",
+  "The security feed could not be loaded.": "The security feed could not be loaded.",
+  "Try again": "Try again",
+  "Updated": "Updated",
+  "All": "All",
+  "Filter by topic": "Filter by topic",
+  "View the full live feed": "View the full live feed",
+  "Showing the last update — the feed is not responding.": "Showing the last update — the feed is not responding.",
+  "Sample data — no live source is reachable.": "Sample data — no live source is reachable.",
+  "Some sources are unreachable right now.": "Some sources are unreachable right now.",
+  "Latest security advisories": "Latest security advisories",
+  "1 advisory": "1 advisory",
+  "% advisories": "% advisories"
 }

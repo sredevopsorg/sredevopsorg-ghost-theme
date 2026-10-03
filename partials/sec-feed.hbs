@@ -1,0 +1,54 @@
+{{!-- Security feed — a minified frontend for the sec-feed service
+     (https://github.com/sredevopsorg/sredevopsorg-sec-feed), rendered as a block
+     inside an existing page rather than as its own app.
+
+     The whole block is gated on the `sec_feed_api_url` theme setting (Admin →
+     Design → Theme): with it empty the island is not rendered, no chunk is fetched
+     and no request is made, so the feature costs an unmodified site nothing. That
+     also means the API origin can only ever come from the setting — there is no
+     hardcoded host anywhere in the theme or in assets/js/islands/SecFeed.js, which
+     is what keeps "the theme makes no third-party requests" true by construction
+     rather than by review.
+
+     What is rendered *here* rather than by the island:
+       - the <section>, its heading and the frame: server-rendered, so they exist
+         before the JavaScript does and cannot shift when it arrives;
+       - a <noscript> link to the full feed, kept OUTSIDE the mount point because
+         that element must stay empty (see assets/js/islands.js).
+     The island owns only what the API decides: the status line, the tag filters,
+     the rows and the footer link.
+
+     Reuse: `{{> "sec-feed" locale="en"}}` from any template. `locale` only picks
+     the strings for the heading and the no-JS fallback; the island reads the page
+     language for relative timestamps, which is why no locale is passed through. --}}
+{{#if @custom.sec_feed_api_url}}
+<section class="mt-12 mb-12 rounded-xl border border-border-subtle bg-raised p-5 md:p-6" aria-labelledby="sec-feed-title">
+  <div class="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+    <h2 id="sec-feed-title" class="text-sm font-bold tracking-wider text-strong uppercase">
+      {{#match locale "=" "es"}}Inteligencia de seguridad{{else match locale "=" "br"}}Inteligência de segurança{{else}}{{t "Security feed"}}{{/match}}
+    </h2>
+    <p class="text-[11px] text-subtle-text font-mono uppercase tracking-wider">
+      {{#match locale "=" "es"}}Linux · Cloud · Kubernetes{{else match locale "=" "br"}}Linux · Cloud · Kubernetes{{else}}{{t "Linux · Cloud · Kubernetes"}}{{/match}}
+    </p>
+  </div>
+
+  {{!-- The island fills this. `data-poll` is minutes between refreshes; it only
+       polls while the tab is visible. --}}
+  <div data-island="SecFeed" aria-busy="true"
+       data-api-url="{{@custom.sec_feed_api_url}}"
+       data-limit="{{#if @custom.sec_feed_items}}{{@custom.sec_feed_items}}{{else}}10{{/if}}"
+       data-poll="5"></div>
+
+  <noscript>
+    <p class="mt-2 text-sm text-muted">
+      {{#match locale "=" "es"}}
+        <a class="text-brand-purple hover:text-brand-blue" href="{{@custom.sec_feed_api_url}}" rel="noopener noreferrer">Ver el feed de seguridad en vivo</a>
+      {{else match locale "=" "br"}}
+        <a class="text-brand-purple hover:text-brand-blue" href="{{@custom.sec_feed_api_url}}" rel="noopener noreferrer">Ver o feed de segurança ao vivo</a>
+      {{else}}
+        <a class="text-brand-purple hover:text-brand-blue" href="{{@custom.sec_feed_api_url}}" rel="noopener noreferrer">{{t "View the live security feed"}}</a>
+      {{/match}}
+    </p>
+  </noscript>
+</section>
+{{/if}}

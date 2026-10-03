@@ -19,6 +19,22 @@ const FALLBACKS = {
   readingProgress: "Reading progress",
   share: "Share",
   toc: "Table of Contents",
+  secFeedLoading: "Loading the latest advisories…",
+  secFeedEmpty: "No advisories right now.",
+  secFeedError: "The security feed could not be loaded.",
+  secFeedRetry: "Try again",
+  secFeedUpdated: "Updated",
+  secFeedFilterAll: "All",
+  secFeedFilterLabel: "Filter by topic",
+  secFeedViewAll: "View the full live feed",
+  secFeedStale: "Showing the last update — the feed is not responding.",
+  secFeedSample: "Sample data — no live source is reachable.",
+  secFeedSources: "Some sources are unreachable right now.",
+  secFeedList: "Latest security advisories",
+  // The `%` placeholder mirrors Ghost's own `minute`/`minutes` plural pattern and is
+  // substituted by the island, which has no plural engine of its own.
+  secFeedAdvisoryOne: "1 advisory",
+  secFeedAdvisoryMany: "% advisories",
 };
 
 let cached;
