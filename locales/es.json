@@ -60,5 +60,22 @@
   "Copied!": "¡Copiado!",
   "Switch to light theme": "Cambiar a tema claro",
   "Switch to dark theme": "Cambiar a tema oscuro",
-  "Toggle theme": "Cambiar tema"
+  "Toggle theme": "Cambiar tema",
+  "Security feed": "Inteligencia de seguridad",
+  "Linux · Cloud · Kubernetes": "Linux · Cloud · Kubernetes",
+  "View the live security feed": "Ver el feed de seguridad en vivo",
+  "Loading the latest advisories…": "Cargando los últimos avisos…",
+  "No advisories right now.": "No hay avisos por ahora.",
+  "The security feed could not be loaded.": "No se pudo cargar el feed de seguridad.",
+  "Try again": "Reintentar",
+  "Updated": "Actualizado",
+  "All": "Todos",
+  "Filter by topic": "Filtrar por tema",
+  "View the full live feed": "Ver el feed de seguridad completo",
+  "Showing the last update — the feed is not responding.": "Mostrando la última actualización: el feed no responde.",
+  "Sample data — no live source is reachable.": "Datos de ejemplo: no se puede alcanzar ninguna fuente en vivo.",
+  "Some sources are unreachable right now.": "Algunas fuentes no están disponibles ahora.",
+  "Latest security advisories": "Últimos avisos de seguridad",
+  "1 advisory": "1 aviso",
+  "% advisories": "% avisos"
 }

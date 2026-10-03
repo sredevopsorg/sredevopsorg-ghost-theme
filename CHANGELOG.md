@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **Security feed widget** — the newest advisories from
+  [SREDevOps Sec Feed](https://github.com/sredevopsorg/sredevopsorg-sec-feed) (Ubuntu, Debian,
+  Red Hat, NVD, CISA, AWS, Kubernetes and OpenSSF, enriched with CISA KEV, EPSS and OSV.dev)
+  rendered as a block above the post grid on every collection: relative timestamps, severity
+  badges, KEV and CVE markers, client-side tag filters, and a link to the full live feed.
+  **Off by default** — set `sec_feed_api_url` in Admin → Design → Theme to enable it. See
+  [README](README.md#-security-feed-widget) for the `CORS_ORIGINS` entry the service needs,
+  since it fails CORS closed, and [docs/adr/0003](docs/adr/0003-security-feed-widget.md) for
+  why it is an island and why it is vanilla.
+- **`unmountIslands()`**, and the island runtime now collects a disposer returned by `mount`
+  as well as by `enhance`, so an island owning timers or in-flight requests can be stopped.
+  Ghost navigation is still a full page load, so nothing calls it yet.
+
 ## 3.0.0
 
 A rewrite of the theme's front-end pipeline and templates. Ghost still renders every page

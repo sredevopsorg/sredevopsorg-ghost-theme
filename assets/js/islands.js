@@ -44,6 +44,7 @@ const registry = {
   ThemeToggle: () => import("./islands/ThemeToggle.js"),
   MobileMenu: () => import("./islands/MobileMenu.js"),
   ReadingProgress: () => import("./islands/ReadingProgress.jsx"),
+  SecFeed: () => import("./islands/SecFeed.js"),
   ShareButtons: () => import("./islands/ShareButtons.jsx"),
   TableOfContents: () => import("./islands/TableOfContents.jsx"),
 };
@@ -78,7 +79,12 @@ async function mountElement(el) {
 
     // `mount` renders into an empty element; `enhance` augments existing markup.
     if (typeof mod.mount === "function") {
-      mod.mount(el, props);
+      // A `mount` island may return a disposer (SecFeed does: it polls and holds an
+      // AbortController). Ghost navigations are full page loads, so nothing calls it
+      // today; storing it means the contract is symmetric and a future client-side
+      // navigation can actually stop an island's work.
+      const dispose = mod.mount(el, props);
+      if (typeof dispose === "function") cleanups.set(el, dispose);
       markHandled(el, "mounted");
       return;
     }
@@ -132,8 +138,30 @@ export function mountIslands(scope = document) {
   return elements.length;
 }
 
+/**
+ * Run every disposer collected in `scope` (default: the document) and forget them.
+ *
+ * Ghost navigation is a full page load, so the runtime has no reason to call this
+ * today; it exists so a client-side navigation, or a test, can stop an island's
+ * timers and in-flight requests instead of leaving them to the page teardown.
+ */
+export function unmountIslands(scope = document) {
+  let disposed = 0;
+  for (const [el, dispose] of cleanups) {
+    if (scope !== document && !scope.contains(el)) continue;
+    try {
+      dispose();
+    } catch (err) {
+      console.error("[islands] cleanup failed:", err);
+    }
+    cleanups.delete(el);
+    disposed++;
+  }
+  return disposed;
+}
+
 /** Exposed for tests and for debugging in the browser console. */
-window.__themeIslands = { mountIslands, cleanups, registry: Object.keys(registry) };
+window.__themeIslands = { mountIslands, unmountIslands, cleanups, registry: Object.keys(registry) };
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => mountIslands());

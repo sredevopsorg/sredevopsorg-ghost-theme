@@ -25,6 +25,10 @@
     {{/is}}
     {{/match}}
 
+    {{!-- Security feed block. Renders nothing unless `sec_feed_api_url` is set in
+         Admin → Design → Theme, so it is safe to include on every collection. --}}
+    {{> "sec-feed" locale=locale}}
+
     {{!-- Featured Post --}}
     {{#match locale "=" "es"}}{{> "featured-hero-es"}}{{else match locale "=" "br"}}{{> "featured-hero-br"}}{{else}}{{> "featured-hero"}}{{/match}}
 
