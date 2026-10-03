@@ -183,10 +183,16 @@ function createWidget(element_, config) {
     return relativeTime(iso, Date.now(), locale) || "";
   }
 
-  /** "12 advisories" without a plural engine: the theme's own `minute`/`minutes` pattern. */
+  /**
+   * "12 advisories" without a plural engine: the theme's own `minute`/`minutes` pattern.
+   *
+   * `replaceAll`, not `replace("%")`. A string pattern replaces only the first match,
+   * which is both surprising when a translator writes a second `%` into the string and
+   * the pattern CodeQL's `js/incomplete-sanitization` rule reports on — see alert #13.
+   */
   function advisoryCount(total) {
     const template = total === 1 ? t("secFeedAdvisoryOne") : t("secFeedAdvisoryMany");
-    return template.replace("%", String(total));
+    return template.replaceAll("%", String(total));
   }
 
   function renderStatus() {
