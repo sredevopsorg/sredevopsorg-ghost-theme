@@ -1,0 +1,46 @@
+{{!-- Single document shell for every locale. {{{body}}} resolves inside a partial
+     called from a layout (verified against Ghost 6.67), so default.hbs and the locale
+     shells are one-liners that differ only in the document language.
+     `documentLang` is the BCP-47 tag for the collection's language; the default shell passes
+     the site locale. It also decides the island strings and the theme toggle's labels, so
+     a locale shell is what makes a page fully Spanish/Portuguese rather than half of it.
+
+     Why the fallback is the site locale and not the post's language: a layout cannot
+     see the post context. {{#has}} in a layout is always false, {{#post}} yields nothing
+     there, and a {{#contentFor}} does reach the layout but is evaluated in the layout's
+     own context, so a tag test inside it is false too (all three verified against Ghost
+     6.67). The remedy is the documented one: a locale template on the post — which is
+     what custom-es.hbs is — or on the page, which is what custom-page-es.hbs is.
+     See docs/v3-roadmap.md, Phase 4 notes. --}}
+<!DOCTYPE html>
+<html lang="{{#if documentLang}}{{documentLang}}{{else}}{{@site.locale}}{{/if}}">
+
+<head>
+    {{!-- `locale` is threaded through unchanged: head.hbs and the islands it configures
+         need the page's language, and this is the only level that knows it. It is the
+         content-locale key (es/br/en), not the BCP-47 tag — see default-br.hbs. --}}
+    {{> "head" locale=locale}}
+</head>
+
+{{!-- Two traps in one line, both measured against Ghost 6:
+       * the helper only runs as a subexpression here. In a condition position Handlebars
+         resolves a bare name against the context, so `{{#if body_class}}` is always false
+         and silently drops every context class (post-template, tag-*, paged).
+       * it returns a SafeString, which is truthy even on the error context where its value
+         is empty — so `{{#if (body_class)}}` is true there too and leaves a stray leading
+         space. Comparing the value is what tells the two cases apart. --}}
+<body class="{{#match (body_class) "!=" ""}}{{body_class}} {{/match}}bg-surface text-strong antialiased font-sans">
+
+    {{> "header" locale=locale}}
+
+    <main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
+        {{{body}}}
+    </main>
+    {{> "footer"}}
+
+    {{ghost_foot}}
+
+    {{> "scripts"}}
+</body>
+
+</html>

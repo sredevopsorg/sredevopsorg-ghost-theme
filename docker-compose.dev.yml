@@ -1,0 +1,72 @@
+# Local Ghost 6 for theme development and golden-HTML fixtures.
+#
+#   docker compose -f docker-compose.dev.yml up -d   # or: yarn ghost:up
+#   open http://localhost:2368/ghost/                # create the owner account
+#   docker compose -f docker-compose.dev.yml down    # or: yarn ghost:down
+#
+# The repository is mounted as the active theme, so `yarn dev` (vite build
+# --watch) and template edits land immediately. Ghost caches compiled Handlebars
+# templates, so restart after changing a .hbs file:
+#
+#   docker compose -f docker-compose.dev.yml restart ghost   # or: yarn ghost:restart
+#
+# A brand-new volume needs the database initialised once, otherwise Ghost logs
+# "Database state requires initialisation" and exits:
+#
+#   docker compose -f docker-compose.dev.yml run --rm --entrypoint sh ghost \
+#     -c 'cd /var/lib/ghost/current && ./node_modules/.bin/knex-migrator init'
+#
+# On CPUs without SSE4.2/AVX, also load docker-compose.legacy-cpu.yml: Ghost's
+# bundled sharp/libvips dies with SIGILL on such hardware before Ghost can start.
+#
+# One-time setup in Ghost Admin (see tests/fixtures/README.md):
+#   1. Create the owner account at /ghost/.
+#   2. Settings -> Design -> activate "sredevopsorg-ghost-theme".
+#   3. Settings -> Advanced -> Routing -> upload routes.yaml (routing lives in the
+#      database, not in the theme, which is why CI never deploys it).
+#   4. Create posts/pages tagged en/es/br so the locale collections match.
+
+services:
+  ghost:
+    image: ghost:6-alpine
+    container_name: sredevopsorg-ghost-dev
+    restart: unless-stopped
+    ports:
+      - "2368:2368"
+    environment:
+      url: http://localhost:2368
+      # Production, matching deployment: Ghost then caches compiled Handlebars
+      # templates, which is why `restart ghost` is required after a .hbs edit.
+      # (Development mode also restart-loops in this image without a TTY.)
+      NODE_ENV: production
+      database__client: sqlite3
+      database__connection__filename: /var/lib/ghost/content/data/ghost-dev.db
+      # Local SMTP sink (below). Ghost sends mail for staff sign-in verification and
+      # for import-completion notifications; with no mailer those steps fail.
+      mail__transport: SMTP
+      mail__options__host: mailpit
+      mail__options__port: 1025
+      mail__from: "Local Dev <dev@sredevops.local>"
+      logging__level: info
+    depends_on:
+      - mailpit
+    volumes:
+      - ghost-dev-data:/var/lib/ghost/content
+      - ./:/var/lib/ghost/content/themes/sredevopsorg-ghost-theme
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:2368/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # Catches everything Ghost sends in development: read it at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: sredevopsorg-ghost-dev-mail
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+
+volumes:
+  ghost-dev-data:

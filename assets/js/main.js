@@ -1,42 +1,4 @@
-// Mobile menu
-document.addEventListener("DOMContentLoaded", function () {
-  const toggle = document.getElementById("mobile-toggle");
-  const menu = document.getElementById("mobile-menu");
-
-  if (toggle && menu) {
-    toggle.addEventListener("click", function (e) {
-      e.stopPropagation();
-      menu.classList.toggle("hidden");
-      menu.classList.toggle("flex");
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener("click", function (e) {
-      if (
-        !menu.classList.contains("hidden") &&
-        !menu.contains(e.target) &&
-        e.target !== toggle
-      ) {
-        menu.classList.add("hidden");
-        menu.classList.remove("flex");
-      }
-    });
-  }
-});
-
-// Auto-Inject Line Numbers & Highlight Syntax on all Code Blocks
-  document.addEventListener('DOMContentLoaded', function () {
-      // Add line-numbers to all pre code blocks automatically
-      document.querySelectorAll('pre[class*="language-"]').forEach(function (pre) {
-          if (!pre.classList.contains('line-numbers')) {
-              pre.classList.add('line-numbers');
-          }
-      });
-      // Re-run Prism highlighting (if needed)
-      if (typeof Prism !== 'undefined') {
-          Prism.highlightAll();
-      }
-  });
+import reframe from "./lib/reframe.js";
 
 /* Responsive HTML table */
 (function () {
@@ -83,60 +45,6 @@ document.addEventListener("keydown", function (e) {
     // Trigger Ghost search
     searchTrigger.click();
   }
-});
-
-/* Reframe */
-!(function (e, t) {
-  "object" == typeof exports && "undefined" != typeof module
-    ? (module.exports = t())
-    : "function" == typeof define && define.amd
-      ? define(t)
-      : ((e =
-          "undefined" != typeof globalThis ? globalThis : e || self).reframe =
-          t());
-})(this, function () {
-  "use strict";
-  function t() {
-    for (var e = 0, t = 0, n = arguments.length; t < n; t++)
-      e += arguments[t].length;
-    for (var i = Array(e), o = 0, t = 0; t < n; t++)
-      for (var r = arguments[t], f = 0, d = r.length; f < d; f++, o++)
-        i[o] = r[f];
-    return i;
-  }
-  return function (e, s) {
-    return (
-      void 0 === s && (s = "js-reframe"),
-      ("string" == typeof e
-        ? t(document.querySelectorAll(e))
-        : "length" in e
-          ? t(e)
-          : [e]
-      ).forEach(function (e) {
-        var t, n, i, o, r, f, d, l;
-        -1 !== e.className.split(" ").indexOf(s) ||
-          -1 < e.style.width.indexOf("%") ||
-          ((i = e.getAttribute("height") || e.offsetHeight),
-          (o = e.getAttribute("width") || e.offsetWidth),
-          (r =
-            (("string" == typeof i ? parseInt(i) : i) /
-              ("string" == typeof o ? parseInt(o) : o)) *
-            100),
-          ((f = document.createElement("div")).className = s),
-          ((d = f.style).position = "relative"),
-          (d.width = "100%"),
-          (d.paddingTop = r + "%"),
-          ((l = e.style).position = "absolute"),
-          (l.width = "100%"),
-          (l.height = "100%"),
-          (l.left = "0"),
-          (l.top = "0"),
-          null !== (t = e.parentNode) && void 0 !== t && t.insertBefore(f, e),
-          null !== (n = e.parentNode) && void 0 !== n && n.removeChild(e),
-          f.appendChild(e));
-      })
-    );
-  };
 });
 
 /* Responsive video in post content */

@@ -26,10 +26,36 @@ jobs:
       - name: Build theme assets
         run: yarn build
 
+      # A deploy is not the place to skip checks: GScan errors and island regressions
+      # should stop here rather than reach the live site.
+      - name: Check the theme
+        run: |
+          yarn test:ci
+          yarn test:unit
+
+      # The archive is built from exactly the files scripts/ship-manifest.mjs allows, so
+      # everything the v3 build consumes stays out by construction — assets/css and
+      # assets/js sources, assets/fonts sources, tailwind/vite configs, scripts, tests,
+      # docs — instead of by an `exclude` list that has to be updated whenever the build
+      # changes (which is how `gulpfile.js` was still listed after gulp was removed).
+      # Packaging also reads the archive back with `gscan --zip`: the validation Ghost
+      # itself applies on upload.
+      - name: Package the theme
+        run: |
+          node scripts/package-theme.mjs
+          echo "ARCHIVE=$(ls dist/*.zip)" >> "$GITHUB_ENV"
+
+      - name: Show what will be deployed
+        run: |
+          echo "archive: $ARCHIVE"
+          ls -l "$ARCHIVE"
+
       - name: Deploy Ghost Theme to website
         uses: sredevopsorg/action-deploy-theme@68d7b0f98e20212068a39ea90c0f84ce4ab770a8 # v1.7.3
         continue-on-error: false
         with:
           api-url: ${{ secrets.GHOST_API_URL }}
           api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
-          exclude: "node_modules gulpfile.js yarn.lock .gitignore .github .git LICENSE README.md .pre-commit-config.yaml routes.yaml tailwind.config.js"
+          # `file` supersedes `exclude` and `theme-name` in the action, so the archive
+          # built above is what gets uploaded.
+          file: ${{ env.ARCHIVE }}

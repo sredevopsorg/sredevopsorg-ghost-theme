@@ -5,8 +5,8 @@
     {{#foreach recommendations as |rec|}}
     <li class="list-none">
         <a href="{{rec.url}}" data-recommendation="{{rec.id}}" target="_blank" rel="noopener"
-            class="group block h-full bg-dark-card border border-gray-800 rounded-xl p-5 hover:border-gray-500 transition-colors">
-            <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center overflow-hidden mb-4">
+            class="group block h-full bg-raised border border-border-subtle rounded-xl p-5 hover:border-border-strong transition-colors">
+            <div class="w-10 h-10 rounded-lg bg-inverse flex items-center justify-center overflow-hidden mb-4">
                 {{#if rec.favicon}}
                 <img src="{{rec.favicon}}" alt="{{rec.title}}" loading="lazy" class="w-full h-full object-cover"
                     onerror="this.style.display='none';">
@@ -18,15 +18,15 @@
                 </svg>
                 {{/if}}
             </div>
-            <h3 class="text-sm font-semibold text-white group-hover:text-brand-purple transition-colors mb-1">
+            <h3 class="text-sm font-semibold text-strong group-hover:text-brand-purple transition-colors mb-1">
                 {{rec.title}}</h3>
             {{#if rec.description}}
-            <p class="text-xs text-gray-500 line-clamp-2">{{rec.description}}</p>
+            <p class="text-xs text-subtle-text line-clamp-2">{{rec.description}}</p>
             {{/if}}
         </a>
     </li>
     {{/foreach}}
 </ul>
 {{else}}
-<p class="text-gray-500">{{t "No posts"}}</p>
+<p class="text-subtle-text">{{t "No posts"}}</p>
 {{/if}}

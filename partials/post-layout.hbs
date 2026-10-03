@@ -1,0 +1,109 @@
+ {{#is "post" }}{{!-- Shared post layout. `locale` drives every locale-specific
+     value; an unknown or absent locale falls back to the site language. The public
+     templates (post.hbs, custom-es.hbs) are one-line wrappers that pick the locale and
+     the shell. --}}
+  {{!-- Island: fixed 2px reading-progress bar; renders into this empty div. --}}
+  <div data-island="ReadingProgress" data-target=".gh-content"></div>
+
+  {{!-- Header Grid: 2/3 Text, 1/3 Image --}} <div
+  class="{{post_class}} grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-border-subtle pb-8">
+
+  {{!-- Left Column: Text Info (min 2/3 width) --}}
+  <div class="lg:col-span-8 flex flex-col justify-center">
+    <div class="flex items-center gap-3 mb-3">
+      {{#if primary_tag}}
+      <span
+        class="bg-brand-purple text-strong text-[10px] font-bold px-3 py-1  tracking-wide uppercase font-mono">{{primary_tag.name}}</span>
+      {{/if}}
+      <span class="text-subtle-text text-xs">{{> "icon" name="clock" class="w-4 h-4 mr-1"}} {{#match locale "=" "es"}}{{reading_time minute="Menos de un minuto" minutes="Alrededor de % minutos para leer"}}{{else match locale "=" "br"}}{{reading_time minute="Menos de um minuto" minutes="Cerca de % minutos de leitura"}}{{else}}{{reading_time minute=(t "Just a minute or less") minutes=(t "Takes about % minutes to read")}}{{/match}}</span>
+    </div>
+
+    <h1 class="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-strong mb-3">{{title}}</h1>
+
+    <p class="text-lg text-muted leading-relaxed max-w-3xl mb-4">{{excerpt}}</p>
+
+    <div class="flex items-center text-sm text-muted">
+      {{#foreach authors}}
+      {{#if profile_image}}
+      <img class="h-6 w-6 rounded-full mr-2 object-cover" src="{{img_url profile_image size="xs"}}" alt="{{name}}">
+      {{else}}
+      <span
+        class="h-6 w-6 bg-subtle rounded-full flex items-center justify-center text-[10px] text-body font-bold mr-2">{{name}}</span>
+      {{/if}}
+      {{/foreach}}
+      <span class="mr-2 text-body font-medium">{{authors}}</span>
+      <span class="mr-2 text-subtle-text">|</span>
+      {{#match locale "=" "es"}}<span>{{date published_at format="DD/MM/YYYY"}}</span>{{else match locale "=" "br"}}<span>{{date published_at format="DD/MM/YYYY"}}</span>{{else}}<span>{{date published_at format="d MMMM YYYY"}}</span>{{/match}}
+    </div>
+  </div>
+
+  {{!-- Right Column: Featured Image (max 1/3 width) --}}
+  <div class="lg:col-span-4 mt-4 lg:mt-0">
+    {{> "feature-image" class="w-full h-auto object-cover rounded-xl border border-border-subtle shadow-2xl"}}
+    {{#if feature_image_caption}}
+    <p class="mt-2 text-center text-xs text-subtle-text">{{feature_image_caption}}</p>
+    {{/if}}
+  </div>
+  </div>
+
+  {{!-- Main Content Grid (Unchanged) --}}
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8 relative">
+    <div class="lg:col-span-8 gh-content" data-island="CodeBlocks"
+      data-prismjs-copy="{{#match locale "=" "es"}}Copiar{{else match locale "=" "br"}}Copiar{{else}}{{t "Copy"}}{{/match}}"
+      data-prismjs-copy-success="{{#match locale "=" "es"}}¡Copiado!{{else match locale "=" "br"}}Copiado!{{else}}{{t "Copied!"}}{{/match}}">
+      {{{content}}}
+    </div>
+    <aside class="lg:col-span-4 relative">
+      <div class="sticky top-8 space-y-10">
+        {{> "sidebar"}}
+      </div>
+    </aside>
+  </section>
+
+  {{/is}}
+
+  
+
+  {{#is "post"}}
+  <div class="mt-16 border-t border-border-subtle pt-8">
+    <h2 class="text-2xl font-bold text-strong mb-6">{{#match locale "=" "es"}}Contenido relacionado{{else match locale "=" "br"}}Conteúdo relacionado{{else}}{{t "Related content"}}{{/match}}</h2>
+    {{#match locale "=" "es"}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[es,{{primary_tag.slug}}]") limit="2" as |next|}}
+      {{#if next}}
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {{#foreach next}}{{> "post-card" locale="es"}}{{/foreach}}
+      </section>
+      {{/if}}
+      {{/get}}
+      {{else match locale "=" "br"}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[br,{{primary_tag.slug}}]") limit="2" as |next|}}
+      {{#if next}}
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {{#foreach next}}{{> "post-card" locale="br"}}{{/foreach}}
+      </section>
+      {{/if}}
+      {{/get}}
+      {{else}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[{{primary_tag.slug}}]") limit="2" as |next|}}
+      {{#if next}}
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {{#foreach next}}{{> "post-card" locale="en"}}{{/foreach}}
+      </section>
+      {{/if}}
+      {{/get}}{{/match}}
+  </div>
+
+  <section id="comments" class="mt-8 border-t border-border-subtle pt-8">
+    {{#if comments}}
+    <div class="gh-comments">
+      {{#match locale "=" "es"}}{{#if @member}}{{comments count=false mode=dark title="Opiniones?"}}
+      {{else}}{{comments count=false mode=dark title=" "}}
+      {{/if}}{{else match locale "=" "br"}}{{#if @member}}{{comments count=false mode=dark title="Opiniões?"}}
+      {{else}}{{comments count=false mode=dark title=" "}}
+      {{/if}}{{else}}{{#if @member}}{{comments count=false mode=dark title="Opinions?"}}
+      {{else}}{{comments count=false mode=dark title=" "}}
+      {{/if}}{{/match}}
+    </div>
+    {{/if}}
+  </section>
+
+  {{#match locale "=" "es"}}{{> "components/author-box-es"}}{{else}}{{> "components/author-box"}}{{/match}}
+  {{/is}}
+  

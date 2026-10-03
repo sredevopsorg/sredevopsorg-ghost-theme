@@ -1,18 +1,12 @@
-# SREDevOps.org Ghost Theme (v2 WiP)
+# SREDevOps.org Ghost Theme (v3)
 
-> **Ghost v6 Theme** for [SREDevOps.org](https://www.sredevops.org) — Multi-locale, Tailwind CSS v3, responsive, dark-mode first and tag-based language filtering.
+> **Ghost 6 theme** for [SREDevOps.org](https://www.sredevops.org) — multi-locale, Tailwind CSS v4 built with Vite, React islands where interactivity is needed, light and dark palettes, and tag-based language filtering. Makes no third-party requests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ghost Compatibility](https://img.shields.io/badge/Ghost-%3E%3D6.0.0-lightgrey)](https://ghost.org)
-[![Node Engine](https://img.shields.io/badge/Node-%3E%3D22-green)](https://nodejs.org)
+[![Node Engine](https://img.shields.io/badge/Node-%3E%3D24-green)](https://nodejs.org)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/sredevopsorg/sredevopsorg-ghost-theme)
 ---
-
-## v2 To Do
-
-- [x] Fix primary menu navigation, mobile views and small screens doesn't render correctly
-- [x] Improve responsive design for secondary navigation menu
-- [x] Create login and search forms for the main navigation menu, as optional features (Ghost Docs: <https://docs.ghost.org/themes/custom-settings>)
 
 ## 🌐 Multi-Locale Architecture
 
@@ -116,7 +110,7 @@ taxonomies:
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **Node.js** | `>=22` | Runtime for build tooling |
+| **Node.js** | `>=24` | Runtime for build tooling (Vite 7, Tailwind v4) |
 | **Yarn** | `>=1.22` | Package management (preferred over npm) |
 | **Ghost** | `>=6.0` | Local development server |
 | **Docker** *(optional)* | Latest | Run Ghost via official container |
@@ -168,18 +162,132 @@ yarn install
 ### 3. Start Development Server
 
 ```bash
-yarn dev
+yarn dev        # vite build --watch: rebuilds assets/built/** on save
 ```
 
-This triggers:
+This rebuilds, on every change:
 
-- Tailwind CSS compilation with `@tailwindcss/forms` and `@tailwindcss/typography`
-- Asset bundling via Gulp
-- LiveReload for template/CSS changes
+- `assets/css/index.css` (Tailwind CSS v4 + `assets/css/theme.css`) → `assets/built/index-<hash>.css`
+- `assets/js/index.js` → `assets/built/index-<hash>.js`
+- `partials/vite_assets/{head,foot}.hbs`, regenerated from `assets/built/manifest.json`
 
-> 🔁 **Hot reload** is enabled for `.hbs`, `.css`, and `.js` files. Browser refreshes automatically on save.
+Because filenames are hashed, the generated partials are the only place asset URLs live —
+never hardcode them, and rebuild after pulling.
+
+> 🔁 **Dev loop:** `yarn build` (or `--watch`) for assets, but **Ghost caches compiled
+> Handlebars templates** — after editing any `.hbs` file run `yarn ghost:restart`
+> (or `ghost restart`) before trusting what the browser shows.
+> `yarn ghost:up` starts a local Ghost 6 at <http://localhost:2368> with this repo mounted
+> as the active theme; see [tests/fixtures/README.md](tests/fixtures/README.md).
 
 ---
+
+## 🧩 Islands (client interactivity)
+
+Ghost renders every page server-side; React is added only where a template declares a mount
+point. Nothing may break with JavaScript disabled.
+
+```handlebars
+{{!-- post.hbs --}}
+<div data-island="ReadingProgress" data-target=".gh-content"></div>
+```
+
+```jsx
+// assets/js/islands/ReadingProgress.jsx — owns dynamic UI, renders into the element
+export function mount(element, props) {
+  createRoot(element).render(<ReadingProgress {...props} />);
+}
+```
+
+```js
+// assets/js/islands/MobileMenu.js — augments server markup, loads no framework
+export function enhance(element, props) {
+  // element is the <details> from the template; it keeps its children
+  return () => {}; // optional cleanup
+}
+```
+
+Pick the cheapest mode that does the job: `enhance` for DOM augmentation (the mobile menu
+costs 0.47 kB gzip), `mount` when the island really owns stateful UI (React is ~69 kB gzip,
+so it is code-split and only fetched where such an island exists).
+
+1. Register the module in `assets/js/islands.js` — the key must equal `data-island`.
+2. `yarn build`, then `yarn ghost:restart` (Ghost caches compiled templates).
+3. `yarn verify` — the checks below fail loudly if the wiring is wrong.
+
+| Guarantee | Enforced by |
+| --- | --- |
+| No page eager-loads React; the framework arrives with the island that needs it | `yarn test:bundle` (entry has no framework, partials reference only the entry) |
+| Every `data-island` in a template resolves to a code-split chunk | `yarn test:bundle` |
+| Island Tailwind classes have real CSS | `yarn test:classes` |
+| `enhance` island behaviour (Escape, outside click, breakpoints) | `yarn test:unit` |
+| Island chunks load and expose exactly one of `mount`/`enhance` | `yarn test:bundle` |
+| Below-the-fold islands (`data-island-lazy`) are not fetched early | mount points `[data-island-lazy]`, observed with `IntersectionObserver` |
+| Adding an island cannot break the page or the other islands | guarded, isolated mounting in `assets/js/islands.js` |
+
+Strings come from `partials/island-config.hbs` (`{{json}}` + `{{t}}`), read in an island with
+`t("key")` from `assets/js/lib/theme-config.js`. Keep that payload small: it is inline on every
+page.
+
+---
+
+### Self-hosted assets (no third-party requests)
+
+The theme makes **no third-party requests**. Fonts and icons ship with it, so there is no
+extra DNS lookup, no second TLS handshake and nothing render-blocking from another origin.
+
+| Asset | Where it comes from | How to refresh |
+| --- | --- | --- |
+| Inter, Roboto Mono | `assets/fonts/*.woff2` (latin + latin-ext) | `node scripts/sync-fonts.mjs` |
+| Icons | `partials/icon.hbs`, inline SVG | `node scripts/sync-icons.mjs` |
+
+Both scripts are run by hand, not by the build: they download from Google Fonts and
+jsDelivr respectively and rewrite committed files, so a build stays offline and
+reproducible. `assets/css/fonts.css` is generated by the font script — edit the script,
+not the CSS. Licence texts live next to what they cover (`assets/fonts/LICENSE-*`,
+`assets/licenses/`), which is what OFL and MIT require.
+
+Icons are inline SVG rather than an icon font: they render with the first paint instead of
+waiting for a webfont, they inherit colour through `currentColor`, and the theme no longer
+pays for a stylesheet describing glyphs it never uses. Call them as
+`{{> "icon" name="clock" class="w-3 h-3 mr-1"}}` — the size is explicit because an SVG has
+no font-size, and `class` defaults to `w-4 h-4`.
+
+`tests/no-third-party.test.mjs` fails the build if a third-party host or a Font Awesome
+class comes back.
+
+## 🎨 Theming
+
+The palette is **dark by default**, and light once the reader chooses it. The operating
+system's preference is not consulted; nothing has to be configured.
+
+**Tokens are named by role, never by colour** — `bg-surface`, `text-muted`,
+`border-border-strong` — so a palette is a list of values rather than a rewrite of every
+template. Each token is one `light-dark(light, dark)` pair, and `color-scheme` decides
+which half applies: `data-theme` on `<html>` when the reader has chosen, the dark default
+otherwise.
+
+```css
+:root { color-scheme: dark; }                     /* the default */
+:root[data-theme="light"] { color-scheme: light; } /* explicit choice */
+:root[data-theme="dark"] { color-scheme: dark; }
+
+@theme {
+  --color-surface: light-dark(#ffffff, #0d0e11);
+  --color-strong:  light-dark(#111827, #f3f4f6);
+}
+```
+
+`{{> "icon" name="sun"}}` / `{{> "icon" name="moon"}}` inside `.theme-toggle` are both
+rendered and CSS shows the one matching the current theme, so the control is correct
+before any script runs. The `ThemeToggle` island only labels the button and writes the
+choice; a small inline script in `partials/head.hbs` applies a stored choice before the
+first paint, which is the one thing a deferred module cannot do.
+
+`light-dark()` requires Chrome 111+, Safari 16.4+ or Firefox 120-era browsers — no more
+than Tailwind v4 already asks for. Adding a locale or a palette means editing the token
+block in `assets/css/index.css`, not the templates. See
+[docs/adr/0002](docs/adr/0002-theming-semantic-tokens.md).
 
 ## ✍️ Locale Content Authoring
 
@@ -202,6 +310,13 @@ tags:
 
 ⚠️ **Critical**: Omitting either `en`/`es`/`br` **or** its `hash-*` counterpart will cause the post to not appear in locale-specific collections due to the `filter` logic in `routes.yaml`.
 
+⚠️ **Also required for the document language**: a post in a locale collection must be
+assigned that locale's template — `custom-es` or `custom-es` for Spanish — in the
+post's settings. Collections are served by the locale shells (`default-es.hbs`,
+`default-br.hbs`) which set `<html lang>`, but an *individual* post that has no locale
+template falls back to `post.hbs` → `default.hbs` and renders with the site locale. A
+Ghost layout cannot see the post context, so the theme cannot infer the language from the
+post's tags (see `docs/v3-roadmap.md`, Phase 4 notes).
 
 ### Template Resolution Flow
 
@@ -306,7 +421,11 @@ yarn build
 
 # Validate theme against Ghost spec
 yarn test:dev    # Verbose output
-yarn test:ci     # Fail on warnings (for CI)
+yarn test:ci     # Same check, used by the gate: fails on errors, not only on fatals
+
+# The gate runs the pinned gscan from devDependencies. Do not add --fatal: that flag
+# only fails on *fatal* issues, so error-level findings (a removed helper, an empty
+# translation) pass CI while Ghost logs a warning at boot.
 ```
 
 ### Locale-Specific Validation
@@ -317,6 +436,17 @@ curl -I http://localhost:2368/es/ | grep "lang"
 # Expected: <html lang="es">
 
 ```
+
+### Packaging a release
+
+```bash
+yarn package    # dist/<name>-<version>.zip, read back and validated by GScan
+```
+
+The archive contains exactly the files `scripts/ship-manifest.mjs` allows — the built
+assets, not the sources — and `gscan --zip` validates it the way Ghost does on upload.
+The full sequence, including what to smoke-test afterwards and how to roll back, is in
+[docs/release-checklist.md](docs/release-checklist.md).
 
 ### Lighthouse Audits
 
@@ -334,18 +464,25 @@ Run via Chrome DevTools
 
 ### Option 1: Ghost Admin Upload
 
-1. Build assets:
+1. Build assets (the zip must already contain them — Ghost never runs a build):
 
    ```bash
    yarn build
+   yarn verify      # build + GScan + package-contents + bundle smoke test
    ```
 
-2. Zip the theme:
+2. Zip the theme. Check what ships first, then exclude everything else:
 
    ```bash
+   yarn test:ship --list
    zip -r sredevopsorg-ghost-theme.zip . \
-     -x "*.git*" "node_modules/*" ".github/*"
+     -x "*.git*" "node_modules/*" ".github/*" "lib/*" "scripts/*" "tests/*" "docs/*" \
+        "vite.config.js" "docker-compose.dev.yml" "yarn.lock" "*.md"
    ```
+
+   `assets/built/**` is generated and untracked, so a zip from a fresh clone without
+   `yarn build` would ship the placeholder partials and render unstyled — `yarn test:ship`
+   fails in exactly that case.
 
 3. Upload via **Ghost Admin → Design → Upload theme**
 
@@ -427,7 +564,7 @@ We welcome contributions aligned with our project conventions.
   - [RuntimeWire Website](https://runtimewire.com/)
   - [@TryGhost "Source" Theme](https://github.com/TryGhost/Source)
 - **Community**: Ghost Forum contributors for multi-locale pattern validation
-- **Tooling**: Tailwind CSS, Gulp, PostCSS, GScan
+- **Tooling**: Tailwind CSS v4, Vite, GScan
 
 ---
 

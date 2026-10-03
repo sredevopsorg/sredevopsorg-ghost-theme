@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Dev</title>
+<script>
+(function () {
+try {
+var stored = localStorage.getItem("theme");
+if (stored === "light" || stored === "dark") {
+document.documentElement.setAttribute("data-theme", stored);
+}
+} catch (error) {
+/* storage unavailable: the dark default stands */
+}
+})();
+</script>
+<link rel="stylesheet" href="/assets/built/index-HASH.css?v=HASH">
+<link rel="modulepreload" href="/assets/built/index-HASH.js?v=HASH">
+<script id="theme-config" type="application/json">
+{"readingProgress":"Reading progress","closeMenu":"Close menu","openMenu":"Open menu","shareVia":"Share via Email","share":"Share","linkCopied":"Link copied!","copyLink":"Copy link","toc":"Table of Contents","locale":"en","siteUrl":"http://localhost:2368"}
+</script>
+<meta name="generator" content="Ghost 6.67">
+<link rel="alternate" type="application/rss+xml" title="Local Dev" href="http://localhost:2368/es/rss/">
+<script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.71/umd/portal.min.js" data-i18n="true" data-ghost="http://localhost:2368/" data-key="7d4e0c71149feae71b36b6efca" data-api="http://localhost:2368/ghost/api/content/" data-locale="en" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+display: flex;
+flex-direction: column;
+align-items: center;
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+text-align: center;
+width: 100%;
+color: #ffffff;
+font-size: 16px;
+}
+.gh-post-upgrade-cta-content {
+border-radius: 8px;
+padding: 40px 4vw;
+}
+.gh-post-upgrade-cta h2 {
+color: #ffffff;
+font-size: 28px;
+letter-spacing: -0.2px;
+margin: 0;
+padding: 0;
+}
+.gh-post-upgrade-cta p {
+margin: 20px 0 0;
+padding: 0;
+}
+.gh-post-upgrade-cta small {
+font-size: 16px;
+letter-spacing: -0.2px;
+}
+.gh-post-upgrade-cta a {
+color: #ffffff;
+cursor: pointer;
+font-weight: 500;
+box-shadow: none;
+text-decoration: underline;
+}
+.gh-post-upgrade-cta a:hover {
+color: #ffffff;
+opacity: 0.8;
+box-shadow: none;
+text-decoration: underline;
+}
+.gh-post-upgrade-cta a.gh-btn {
+display: block;
+background: #ffffff;
+text-decoration: none;
+margin: 28px 0 0;
+padding: 8px 18px;
+border-radius: 4px;
+font-size: 16px;
+font-weight: 600;
+}
+.gh-post-upgrade-cta a.gh-btn:hover {
+opacity: 0.92;
+}</style>
+<script defer src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/sodo-search.min.js" data-key="7d4e0c71149feae71b36b6efca" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/main.css" data-sodo-search="http://localhost:2368/" data-locale="en" crossorigin="anonymous"></script>
+<link href="http://localhost:2368/webmentions/receive/" rel="webmention">
+<script defer src="/public/cards.min.js?v=HASH"></script>
+<link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=HASH">
+<script defer src="/public/comment-counts.min.js?v=HASH" data-ghost-comments-counts-api="http://localhost:2368/members/api/comments/counts/"></script><style>:root {--ghost-accent-color: #aa3cfd;}</style>
+</head>
+<body class="bg-surface text-strong antialiased font-sans">
+<header class="sticky top-0 z-50 w-full bg-surface/80 backdrop-blur-md border-b border-inverse/10 py-3 min-h-[60px]">
+<div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+<div class="flex items-center">
+<a href="http://localhost:2368" rel="me" alt="Local Dev" aria-label="Local Dev">
+<img src="http://localhost:2368/content/images/2024/11/sredevopsorg.svg" alt="Local Dev" class="h-7 w-auto sm:h-8" />
+</a>
+<span class="mx-3 hidden h-6 w-px bg-inverse/15 sm:inline-block" aria-hidden="true"></span>
+<a href="http://localhost:2368" rel="me" aria-hidden="true" tabindex="-1"
+class="hidden rounded-md sm:inline-flex">
+<img src="http://localhost:2368/content/images/2024/07/Icon-App-76x76@2x.png" alt="" class="h-7 w-7 rounded-md" />
+</a>
+</div>
+<div class="hidden md:flex items-center">
+<ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
+<li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/en/" class="block w-full text-muted transition-colors hover:text-strong">English</a>
+</li>
+<li class="nav-espanol flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/es/" class="block w-full text-muted transition-colors hover:text-strong">Español</a>
+</li>
+<li class="nav-brazil flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/br/" class="block w-full text-muted transition-colors hover:text-strong">Brazil</a>
+</li>
+<li class="nav-projects flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/our-open-source-projects/" class="block w-full text-muted transition-colors hover:text-strong">Projects</a>
+</li>
+<li class="nav-categories flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/tags/" class="block w-full text-muted transition-colors hover:text-strong">Categories</a>
+</li>
+<li class="nav-about-us flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/about-us/" class="block w-full text-muted transition-colors hover:text-strong">About Us</a>
+</li>
+<li class="nav-links flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
+</li>
+</ul>
+</div>
+<div class="icon-pill hidden md:inline-flex">
+<button type="button" data-ghost-search
+aria-label="Search in SREDevOps.org" title="Search in SREDevOps.org">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
+</button>
+<button type="button" class="theme-toggle "
+data-island="ThemeToggle"
+data-switch-to-light="Switch to light theme"
+data-switch-to-dark="Switch to dark theme"
+aria-label="Toggle theme" title="Toggle theme">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-sun" aria-hidden="true" focusable="false"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-moon" aria-hidden="true" focusable="false"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>
+</button>
+<a href="#/portal/signin" data-portal="signin"
+aria-label="Sign in" title="Sign in">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3" aria-hidden="true" focusable="false"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/></svg>
+</a>
+</div>
+<details id="mobile-menu" data-island="MobileMenu" data-desktop-min-width="768" class="group md:hidden">
+<summary
+class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-muted transition-colors hover:text-strong"
+aria-label="Open menu">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-5 h-5 group-open:hidden" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-5 h-5 hidden group-open:inline" aria-hidden="true" focusable="false"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+</summary>
+<nav
+class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b border-inverse/10 p-6 flex flex-col gap-4 text-sm font-medium z-50">
+<ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
+<li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/en/" class="block w-full text-muted transition-colors hover:text-strong">English</a>
+</li>
+<li class="nav-espanol flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/es/" class="block w-full text-muted transition-colors hover:text-strong">Español</a>
+</li>
+<li class="nav-brazil flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/br/" class="block w-full text-muted transition-colors hover:text-strong">Brazil</a>
+</li>
+<li class="nav-projects flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/our-open-source-projects/" class="block w-full text-muted transition-colors hover:text-strong">Projects</a>
+</li>
+<li class="nav-categories flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/tags/" class="block w-full text-muted transition-colors hover:text-strong">Categories</a>
+</li>
+<li class="nav-about-us flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/about-us/" class="block w-full text-muted transition-colors hover:text-strong">About Us</a>
+</li>
+<li class="nav-links flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
+</li>
+</ul>
+<button type="button" class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
+data-island="ThemeToggle"
+data-switch-to-light="Switch to light theme"
+data-switch-to-dark="Switch to dark theme"
+aria-label="Toggle theme" title="Toggle theme">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-sun" aria-hidden="true" focusable="false"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-moon" aria-hidden="true" focusable="false"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>
+<span>Toggle theme</span>
+</button>
+<button type="button" data-ghost-search
+class="flex items-center gap-2 text-muted transition-colors hover:text-strong">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
+Search in SREDevOps.org
+</button>
+<a href="#/portal/signin" data-portal="signin"
+class="flex items-center gap-2 text-muted transition-colors hover:text-strong">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/></svg>
+Sign in
+</a>
+</nav>
+</div>
+</header>
+<main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
+<article class="max-w-2xl mx-auto py-16 text-center">
+<section class="mb-8">
+<h1 class="text-6xl md:text-7xl font-bold text-strong tracking-tight mb-4">404</h1>
+<p class="text-xl text-muted mb-2">Page not found</p>
+<p class="text-subtle-text">
+Go to the front page of <a href="http://localhost:2368" class="text-brand-blue hover:underline" rel="home">Local Dev</a> or try searching below.
+</p>
+</section>
+<section class="max-w-md mx-auto">
+<button
+class="flex items-center w-full gap-2 px-4 py-2 rounded-md border border-border-strong bg-raised text-muted hover:text-strong transition-colors duration-200"
+data-ghost-search
+aria-label="Search in SREDevOps.org"
+title="Press / to search">
+<span class="flex-grow text-left">Search in SREDevOps.org</span>
+<kbd class="hidden px-2 py-1 text-xs rounded border border-border-strong text-subtle-text md:inline-block">/</kbd>
+</button>
+</section>
+</article>
+</main>
+<footer class="mt-16 pt-8 border-t border-border-subtle pb-12">
+<div class="mb-6 text-xs font-medium sm:text-sm">
+<nav aria-label="Secondary navigation">
+<ul class="flex flex-wrap items-center justify-center divide-x divide-border-subtle" role="menu">
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/about-us/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">About Us</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/que-es-sredevops/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Nosotros</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/our-open-source-projects/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Our Projects</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/contact-us/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Contact us</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/terms-of-service/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Terms of Service</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/privacy-policy/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Privacy</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/es/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Español</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/br/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Portugues</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/en/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">English</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/tags/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Categories</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/recommendations/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Recommendations</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/sitemap.xml" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Sitemap</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="http://localhost:2368/rss/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">RSS</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://github.com/sredevopsorg" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Github</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://www.linkedin.com/company/sredevops/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">LinkedIn</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://discord.com/invite/bK9rXFTvpk" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Discord</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://x.com/sredevopsorg" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">X</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://mastodon.social/@sredevopsorg" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Mastodon</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://www.instagram.com/sredevopsorg/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Instagram</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://threads.net/sredevopsorg" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Threads</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://www.reddit.com/r/sredevops/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Reddit</a>
+</li>
+</ul>
+</nav>
+</div>
+<div class="text-center text-xs text-subtle-text pt-4 border-t border-border-subtle/50">
+&copy; 2026 Local Dev. Built with Ghost.
+</div>
+</footer>
+<script type="module" src="/assets/built/index-HASH.js?v=HASH"></script>
+</body>
+</html>

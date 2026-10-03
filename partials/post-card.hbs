@@ -1,5 +1,13 @@
+{{!-- `lang` is the *post's* language, not the page's, and the two differ on a mixed
+     feed: / shows Spanish and English posts together under <html lang="en">, and a
+     screen reader would otherwise read the Spanish titles and excerpts with an English
+     voice. The `locale` argument above cannot serve here — on that feed it is the page's
+     "en" — so the language is read off the post's own URL, which is the locale prefix
+     routes.yaml gives each collection. A post in no locale collection keeps the default
+     permalink and is treated as English, which is the theme's existing convention. --}}
 <article
-  class="bg-dark-card border border-gray-700 rounded-xl overflow-hidden hover:border-gray-500 transition-colors group flex flex-col h-full">
+  lang="{{#match url "~" "/es/"}}es{{else match url "~" "/br/"}}pt{{else}}en{{/match}}"
+  class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
   {{#if feature_image}}
   <a href="{{url}}" class="block aspect-[16/9] overflow-hidden">
     <img src="{{img_url feature_image size="m" format="webp"}}"
@@ -12,12 +20,20 @@
     <a href="{{primary_tag.url}}"
       class="text-xs font-bold text-brand-purple uppercase tracking-wider mb-2 hover:underline font-mono">{{primary_tag.name}}</a>
     {{/if}}
-    <h3 class="text-lg font-semibold text-white group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
+    <h3 class="text-lg font-semibold text-strong group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
         href="{{url}}">{{title}}</a></h3>
-    <p class="text-sm text-gray-400 flex-grow line-clamp-2">{{excerpt words="20"}}</p>
-    <div class="flex items-center justify-between text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800">
+    <p class="text-sm text-muted flex-grow line-clamp-2">{{excerpt words="20"}}</p>
+    <div class="flex items-center justify-between text-xs text-subtle-text mt-4 pt-3 border-t border-border-subtle">
+      {{#match locale "=" "es"}}
+      <span>{{date published_at format="DD/MM/YYYY"}}</span>
+      <span>{{reading_time minute="Menos de un minuto" minutes="% minutos aprox."}}</span>
+      {{else match locale "=" "br"}}
+      <span>{{date published_at format="DD/MM/YYYY"}}</span>
+      <span>{{reading_time minute="Menos de um minuto" minutes="% minutos aprox."}}</span>
+      {{else}}
       <span>{{date published_at format="MMM d, YYYY"}}</span>
       <span>{{reading_time minute=(t "Just a minute or less") minutes=(t "Takes about % minutes to read")}}</span>
+      {{/match}}
     </div>
   </div>
 </article>

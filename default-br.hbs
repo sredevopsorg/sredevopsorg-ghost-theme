@@ -1,22 +1,5 @@
-<!DOCTYPE html>
-<html lang="pt" class="dark">
-
-<head>
-    {{> "head"}}
-</head>
-
-<body class="bg-dark-bg text-dark-text antialiased font-sans">
-
-    {{> "header"}}
-
-    <main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
-        {{{body}}}
-    </main>
-    {{> "footer"}}
-
-    {{ghost_foot}}
-
-    {{> "scripts"}}
-</body>
-
-</html>
+{{!-- Brazilian Portuguese shell. `documentLang="pt"` is the BCP-47 tag for the
+     document; `locale="br"` is the theme's content-locale key, matching the /br/
+     collection in routes.yaml and the `locale` argument the layouts already take.
+     Keeping them separate is why <html lang> is `pt` and not the invalid `br`. --}}
+{{> "shell" documentLang="pt" locale="br"}}

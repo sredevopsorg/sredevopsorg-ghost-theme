@@ -1,22 +1,6 @@
-<!DOCTYPE html>
-<html lang="es" class="dark">
-
-<head>
-    {{> "head"}}
-</head>
-
-<body class="bg-dark-bg text-dark-text antialiased font-sans">
-
-    {{> "header"}}
-
-    <main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
-        {{{body}}}
-    </main>
-    {{> "footer"}}
-
-    {{ghost_foot}}
-
-    {{> "scripts"}}
-</body>
-
-</html>
+{{!-- Spanish shell. Two vocabularies meet here, so both are named explicitly:
+     `documentLang` is the BCP-47 tag that goes in <html lang>, and `locale` is the
+     theme's content-locale key — the same es/br/en value the layouts and post cards
+     already take. They differ for Portuguese: the tag is `pt`, the key is `br`
+     (matching the /br/ collection in routes.yaml). --}}
+{{> "shell" documentLang="es" locale="es"}}

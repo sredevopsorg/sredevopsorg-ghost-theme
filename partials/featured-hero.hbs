@@ -1,9 +1,13 @@
-{{!-- English Featured Post Hero — shown at the top of page 1 only. --}}
+{{!-- Featured post hero — page 1 of a locale collection only.
+     One file per locale rather than one parameterised partial: the label, date format
+     and reading time are rendered inside `{{#get}}` + `{{#foreach}}`, and a partial
+     argument does not survive either (Ghost's context-changing blocks drop partial
+     hash arguments — verified). The tag it draws from is fixed per locale too. --}}
 {{^is "paged"}}
 {{#get "posts" filter="featured:true+tag:en" limit="1" include="authors,tags" as |featuredPosts|}}
 {{#foreach featuredPosts}}
 <a href="{{url}}"
-    class="group block mb-12 rounded-2xl overflow-hidden border border-gray-800 bg-dark-card hover:border-brand-purple transition-colors">
+    class="group block mb-12 rounded-2xl overflow-hidden border border-border-subtle bg-raised hover:border-brand-purple transition-colors">
     <div class="grid grid-cols-1 lg:grid-cols-2">
         {{#if feature_image}}
         <div class="aspect-[16/9] lg:aspect-auto overflow-hidden">
@@ -18,13 +22,13 @@
         <div class="p-6 md:p-8 flex flex-col justify-center">
             <span class="text-xs font-bold text-brand-purple uppercase tracking-wider mb-3 font-mono">Featured</span>
             {{#if primary_tag}}
-            <span class="text-xs text-gray-500 uppercase tracking-wider mb-2">{{primary_tag.name}}</span>
+            <span class="text-xs text-subtle-text uppercase tracking-wider mb-2">{{primary_tag.name}}</span>
             {{/if}}
             <h2
-                class="text-2xl md:text-3xl font-bold text-white group-hover:text-brand-purple transition-colors leading-tight mb-3">
+                class="text-2xl md:text-3xl font-bold text-strong group-hover:text-brand-purple transition-colors leading-tight mb-3">
                 {{title}}</h2>
-            <p class="text-sm text-gray-400 line-clamp-3 mb-4">{{excerpt words="30"}}</p>
-            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+            <p class="text-sm text-muted line-clamp-3 mb-4">{{excerpt words="30"}}</p>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-text">
                 {{#foreach authors limit="1"}}<span>{{name}}</span>{{/foreach}}
                 <span>&middot;</span>
                 <span>{{date published_at format="MMM d, YYYY"}}</span>

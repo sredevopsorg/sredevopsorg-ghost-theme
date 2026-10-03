@@ -1,8 +1,6 @@
 {{!< default}}
-
-{{#page}}
-    <h1 class="text-4xl text-white font-bold mb-4">{{title}}</h1>
-    <article class="gh-content">
-        {{{content}}}
-    </article>
-{{/page}}
+{{!-- English pages. A page cannot choose its own shell — the layout cannot see the page
+     context, so the document language is decided by which layout the template extends.
+     custom-page-es.hbs is the Spanish counterpart; select it in the page's Template
+     setting. See docs/v3-roadmap.md, Phase 4 notes. --}}
+{{> "page-body" locale="en"}}
