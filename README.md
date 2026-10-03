@@ -245,12 +245,13 @@ frontend with search, SSE and its own filters; this is the small half of it, and
 widget's footer links to the real thing.
 
 ```
-Ghost renders                    the island fetches
-─────────────                    ────────────────
-partials/sec-feed.hbs            assets/js/islands/SecFeed.js
-  <section> + heading  ──────►     status line, tag chips, rows
-  <noscript> link                 poll every 5 min while visible
-  <div data-island="SecFeed"> ──► GET {base}/api/feed?limit=10
+Ghost renders                         the island fetches
+─────────────                         ────────────────
+partials/featured-row.hbs             assets/js/islands/SecFeed.js
+  ┌─ 2/3 ────────────┬─ 1/3 ─────┐     status line, tag chips, rows
+  │ featured post    │ sec feed   │ ──► poll every 5 min while visible
+  │                 │ <section>  │ ──► GET {base}/api/feed?limit=10
+  └──────────────────┴────────────┘     <noscript> link if JavaScript is off
 ```
 
 ### Turning it on
@@ -299,10 +300,18 @@ entirely, reverse-proxy the feed onto the publication's own domain and set
 
 ### Where it appears
 
-Included by `partials/collection-layout.hbs`, which the four **channel** templates use:
-`/` (or `/en/`), `/es/` and `/br/`. It is *not* on post or page templates, and *not* on
-`/tag/…` or `/author/…` — `tag.hbs` and `author.hbs` carry their own markup rather than
-sharing `collection-layout.hbs`.
+Included by `partials/featured-row.hbs`, which the four **channel** templates reach through
+`collection-layout.hbs`: `/` (or `/en/`), `/es/` and `/br/`. It sits in a **1/3 column beside
+the featured post, which takes the other 2/3**, and stacks below it on mobile (the post is
+first in the DOM, so it also reads first without CSS).
+
+When `sec_feed_api_url` is empty, `featured-row.hbs` renders the bare full-width featured post
+and no grid at all — an unconfigured site's HTML is byte-identical to a theme without this
+feature. If a channel has **no** featured post configured, the 2/3 column is empty and the feed
+sits beside it; a site with no featured post on a channel would want the feed moved.
+
+It is *not* on post or page templates, and *not* on `/tag/…` or `/author/…` — `tag.hbs` and
+`author.hbs` carry their own markup rather than sharing `collection-layout.hbs`.
 
 The block is one partial, so anywhere else it goes where you put it:
 

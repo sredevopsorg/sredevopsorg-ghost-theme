@@ -389,6 +389,27 @@ test("the widget block is opt-in: no setting, no markup and no request", () => {
   assert.match(partial, /\{\{\/if\}\}\s*$/, "the gate must close at the end of the partial");
   assert.match(partial, /data-island="SecFeed"/);
   assert.match(partial, /data-api-url="\{\{@custom\.sec_feed_api_url\}\}"/, "the API URL must come from the setting");
-  // Every collection renders the partial, so an unconfigured site stays byte-identical.
-  assert.match(readFileSync("partials/collection-layout.hbs", "utf8"), /\{\{> "sec-feed"/);
+  // Every collection renders the row, so an unconfigured site stays byte-identical.
+  assert.match(readFileSync("partials/collection-layout.hbs", "utf8"), /\{\{> "featured-row"/);
+});
+
+test("the feed sits beside the hero only when it is configured", () => {
+  const row = readFileSync("partials/featured-row.hbs", "utf8");
+
+  // The grid must be inside the gate: an always-present grid would reserve a 1/3
+  // column for an absent widget and shrink the hero on every site that never set it.
+  assert.match(row, /\{\{#if @custom\.sec_feed_api_url\}\}/);
+  assert.match(row, /\{\{> "sec-feed"/);
+  assert.match(row, /lg:col-span-2/, "the hero takes two of the three columns");
+  assert.match(row, /lg:col-span-1/, "the feed takes one");
+
+  // ...and the hero must still be reachable with no feed at all, outside that branch.
+  const offBranch = row.slice(row.lastIndexOf("{{else}}"));
+  assert.match(offBranch, /\{\{> "featured-hero"/, "without the feed the hero renders on its own");
+
+  // The block itself carries no vertical margin: the row owns the spacing.
+  assert.ok(
+    !/class="[^"]*\bmt-\d|\bmb-\d/.test(readFileSync("partials/sec-feed.hbs", "utf8").split("<section")[1] ?? ""),
+    "sec-feed.hbs must not bring its own margins into a row that already spaces it",
+  );
 });

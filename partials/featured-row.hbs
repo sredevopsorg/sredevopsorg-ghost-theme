@@ -1,0 +1,33 @@
+{{!-- The featured post and the security feed, side by side.
+
+     Why one partial that branches on the setting, instead of putting the grid in
+     collection-layout.hbs: the hero must stay *exactly* where it is, full width, when
+     no feed is configured — which is the default for every site that has not set
+     `sec_feed_api_url`. A grid that is always present would reserve a 1/3 column for
+     an absent widget and shrink the hero, and it would change the HTML of every
+     collection page for no visible reason. So the grid exists only when the feed does.
+
+     The duplicate `{{#match}}` below is the cost of that: a Handlebars partial cannot
+     take an argument conditionally, and the alternative — always emitting the grid —
+     costs every site a layout change it did not ask for. One line, one reason.
+
+     `items-start` keeps the feed from stretching to the hero's height. `locale` only
+     selects which hero partial renders; the feed gets its own strings from the page
+     language. --}}
+{{#if @custom.sec_feed_api_url}}
+<div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
+    {{!-- 2/3: the featured post. --}}
+    <div class="lg:col-span-2">
+        {{#match locale "=" "es"}}{{> "featured-hero-es"}}{{else match locale "=" "br"}}{{> "featured-hero-br"}}{{else}}{{> "featured-hero"}}{{/match}}
+    </div>
+
+    {{!-- 1/3: the security feed, as a column beside the hero. It carries no vertical
+         margin of its own — the row owns the rhythm — and stacks below the hero on
+         mobile, where the hero stays first. --}}
+    <div class="lg:col-span-1">
+        {{> "sec-feed" locale=locale}}
+    </div>
+</div>
+{{else}}
+{{#match locale "=" "es"}}{{> "featured-hero-es"}}{{else match locale "=" "br"}}{{> "featured-hero-br"}}{{else}}{{> "featured-hero"}}{{/match}}
+{{/if}}

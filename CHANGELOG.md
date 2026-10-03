@@ -7,8 +7,9 @@
 - **Security feed widget** — the newest advisories from
   [SREDevOps Sec Feed](https://github.com/sredevopsorg/sredevopsorg-sec-feed) (Ubuntu, Debian,
   Red Hat, NVD, CISA, AWS, Kubernetes and OpenSSF, enriched with CISA KEV, EPSS and OSV.dev)
-  rendered as a block above the post grid on every collection: relative timestamps, severity
-  badges, KEV and CVE markers, client-side tag filters, and a link to the full live feed.
+  rendered in a 1/3 column beside the featured post on every channel collection:
+  relative timestamps, severity badges, KEV and CVE markers, client-side tag filters,
+  and a link to the full live feed.
   **Off by default** — set `sec_feed_api_url` in Admin → Design → Theme to enable it. See
   [README](README.md#-security-feed-widget) for the `CORS_ORIGINS` entry the service needs,
   since it fails CORS closed, and [docs/adr/0003](docs/adr/0003-security-feed-widget.md) for
@@ -16,6 +17,15 @@
 - **`unmountIslands()`**, and the island runtime now collects a disposer returned by `mount`
   as well as by `enhance`, so an island owning timers or in-flight requests can be stopped.
   Ghost navigation is still a full page load, so nothing calls it yet.
+
+### Changed
+
+- **The security feed now sits beside the featured post** instead of above it: the
+  featured post takes 2/3 of the row and the feed 1/3, stacking below it on mobile
+  (the post stays first in the DOM). With `sec_feed_api_url` unset, `featured-row.hbs`
+  renders the bare full-width featured post and no grid — an unconfigured site's HTML
+  is byte-identical, and all eight golden fixtures still match. See
+  [docs/adr/0003](docs/adr/0003-security-feed-widget.md).
 
 ## 3.0.0
 
