@@ -12,7 +12,7 @@ if (stored === "light" || stored === "dark") {
 document.documentElement.setAttribute("data-theme", stored);
 }
 } catch (error) {
-/* storage unavailable: follow the operating system */
+/* storage unavailable: the dark default stands */
 }
 })();
 </script>
@@ -169,8 +169,7 @@ class="hidden rounded-md sm:inline-flex">
 aria-label="Search in SREDevOps.org" title="Search in SREDevOps.org">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
 </button>
-<button type="button"
-class="theme-toggle "
+<button type="button" class="theme-toggle "
 data-island="ThemeToggle"
 data-switch-to-light="Switch to light theme"
 data-switch-to-dark="Switch to dark theme"
@@ -215,8 +214,7 @@ class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b 
 <a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
 </li>
 </ul>
-<button type="button"
-class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
+<button type="button" class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
 data-island="ThemeToggle"
 data-switch-to-light="Switch to light theme"
 data-switch-to-dark="Switch to dark theme"
@@ -246,6 +244,7 @@ Sign in
 </div>
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 <article
+lang="en"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/p/49ca9ebc-0583-4f5b-b9ad-903d92f75c63/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://static.ghost.org/v4.0.0/images/feature-image.jpg"
@@ -264,6 +263,7 @@ href="/p/49ca9ebc-0583-4f5b-b9ad-903d92f75c63/">Coming soon</a></h3>
 </div>
 </div>
 </article><article
+lang="en"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/p/13d2c163-556f-4a76-ab4a-811e97796d70/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://static.ghost.org/v4.0.0/images/feature-image.jpg"
@@ -282,6 +282,7 @@ href="/p/13d2c163-556f-4a76-ab4a-811e97796d70/">Coming soon</a></h3>
 </div>
 </div>
 </article><article
+lang="en"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/p/13d2c163-556f-4a76-ab4a-811e97796d70/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://static.ghost.org/v4.0.0/images/feature-image.jpg"
@@ -300,6 +301,7 @@ href="/p/13d2c163-556f-4a76-ab4a-811e97796d70/">Coming soon</a></h3>
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/que-es-platform-engineering-sre-devops-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -320,6 +322,7 @@ En esta columna intentaré definir y explicar los</p>
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/que-es-platform-engineering-sre-devops/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -340,6 +343,7 @@ En esta columna intentaré definir y explicar los</p>
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instancia-sin-ip-publica/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2024/08/ec2-instance-connect-endpoint.png"
@@ -358,6 +362,7 @@ href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instanc
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/que-es-platform-engineering-para-que-me-sirve-que-paso-con-devops/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDN8fGludGVncmF0aW9ufGVufDB8fHx8MTY4ODA5NDYzMXww&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -376,6 +381,7 @@ href="/es/que-es-platform-engineering-para-que-me-sirve-que-paso-con-devops/">Qu
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/kernel-linux-6-4-ya-disponible/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1640552435388-a54879e72b28?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDZ8fExJTlVYfGVufDB8fHx8MTY4Nzc3NzE2N3ww&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -395,6 +401,7 @@ Esta versión ofrece muchas mejoras,</p>
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/inteligencia-artificial-vs-bomba-atomica-oppenheimer-y-el-mensaje-de-nolan/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1655721530791-59f5bbd64a48?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDI1fHxudWNsZWFyJTIwYWl8ZW58MHx8fHwxNjg3NjY3NjI5fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -413,6 +420,7 @@ href="/es/inteligencia-artificial-vs-bomba-atomica-oppenheimer-y-el-mensaje-de-n
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/ted-talks-cual-sera-la-proxima-superpotencia-global-esta-mucho-mas-cerca-de-ti-de-lo-que-imaginas/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDF8fHRlZCUyMHRhbGtzfGVufDB8fHx8MTY4NzI1MjkxNHww&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -431,6 +439,7 @@ href="/es/ted-talks-cual-sera-la-proxima-superpotencia-global-esta-mucho-mas-cer
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/como-desplegar-ghost-en-kubernetes/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2025/12/ghost-on-kubernetes.png"
@@ -449,6 +458,7 @@ href="/es/como-desplegar-ghost-en-kubernetes/">Cómo desplegar Ghost (CMS/Blog) 
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/groundcover-monitorea-tus-apps-en-kubernetes-con-menor-costo-basado-en-ebpf/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/09/groundcover.webp"

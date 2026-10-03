@@ -4,8 +4,49 @@
 
      Keys are flat and named exactly as the islands read them. Keep it small:
      this is inline on every page, and anything already rendered in the DOM
-     should be read from the DOM instead. Add a key only when an island uses it. --}}
+     should be read from the DOM instead. Add a key only when an island uses it.
+
+     Why the strings are written out per locale instead of being read from
+     locales/*.json through the translate helper: it renders the *site*
+     language, which Ghost sets once in Admin, and it takes no locale argument —
+     so on a site configured as English it returns English on a Spanish post no
+     matter what the document says. The page's own language only reaches here as
+     the `locale` key handed down by default-es.hbs / default-br.hbs, and matching
+     on it is the same remedy the rest of the theme uses for per-locale markup.
+     The strings are copied verbatim from locales/es.json and locales/pt.json, so
+     those files stay the place a translator edits and this stays a lookup.
+
+     The final branch keeps the helper: an unlisted locale still falls back to
+     English through it, and a site whose language is es/pt keeps working even
+     where no locale shell is in play. --}}
 <script id="theme-config" type="application/json">
+{{#match locale "=" "es"}}
+{{json
+    siteUrl=@site.url
+    locale="es"
+    toc="Índice de contenidos"
+    copyLink="Copiar enlace"
+    linkCopied="¡Enlace copiado!"
+    share="Compartir"
+    shareVia="Compartir por correo"
+    openMenu="Abrir menú"
+    closeMenu="Cerrar menú"
+    readingProgress="Progreso de lectura"
+}}
+{{else match locale "=" "br"}}
+{{json
+    siteUrl=@site.url
+    locale="br"
+    toc="Sumário"
+    copyLink="Copiar link"
+    linkCopied="Link copiado!"
+    share="Compartilhar"
+    shareVia="Compartilhar por e-mail"
+    openMenu="Abrir menu"
+    closeMenu="Fechar menu"
+    readingProgress="Progresso de leitura"
+}}
+{{else}}
 {{json
     siteUrl=@site.url
     locale=@site.locale
@@ -18,4 +59,5 @@
     closeMenu=(t "Close menu")
     readingProgress=(t "Reading progress")
 }}
+{{/match}}
 </script>

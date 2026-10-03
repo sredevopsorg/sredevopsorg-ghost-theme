@@ -1,4 +1,12 @@
+{{!-- `lang` is the *post's* language, not the page's, and the two differ on a mixed
+     feed: / shows Spanish and English posts together under <html lang="en">, and a
+     screen reader would otherwise read the Spanish titles and excerpts with an English
+     voice. The `locale` argument above cannot serve here — on that feed it is the page's
+     "en" — so the language is read off the post's own URL, which is the locale prefix
+     routes.yaml gives each collection. A post in no locale collection keeps the default
+     permalink and is treated as English, which is the theme's existing convention. --}}
 <article
+  lang="{{#match url "~" "/es/"}}es{{else match url "~" "/br/"}}pt{{else}}en{{/match}}"
   class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
   {{#if feature_image}}
   <a href="{{url}}" class="block aspect-[16/9] overflow-hidden">

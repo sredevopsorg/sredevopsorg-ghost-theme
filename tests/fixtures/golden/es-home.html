@@ -12,14 +12,14 @@ if (stored === "light" || stored === "dark") {
 document.documentElement.setAttribute("data-theme", stored);
 }
 } catch (error) {
-/* storage unavailable: follow the operating system */
+/* storage unavailable: the dark default stands */
 }
 })();
 </script>
 <link rel="stylesheet" href="/assets/built/index-HASH.css?v=HASH">
 <link rel="modulepreload" href="/assets/built/index-HASH.js?v=HASH">
 <script id="theme-config" type="application/json">
-{"readingProgress":"Reading progress","closeMenu":"Close menu","openMenu":"Open menu","shareVia":"Share via Email","share":"Share","linkCopied":"Link copied!","copyLink":"Copy link","toc":"Table of Contents","locale":"en","siteUrl":"http://localhost:2368"}
+{"readingProgress":"Progreso de lectura","closeMenu":"Cerrar menú","openMenu":"Abrir menú","shareVia":"Compartir por correo","share":"Compartir","linkCopied":"¡Enlace copiado!","copyLink":"Copiar enlace","toc":"Índice de contenidos","locale":"es","siteUrl":"http://localhost:2368"}
 </script>
 <meta name="description" content="Contenido SRE, DevOps, Kubernetes, Linux, Open Source, Cloud Native en Español">
 <link rel="icon" href="http://localhost:2368/content/images/size/w256h256/2024/07/Icon-App-76x76@2x.png" type="image/png">
@@ -166,12 +166,11 @@ class="hidden rounded-md sm:inline-flex">
 aria-label="Search in SREDevOps.org" title="Search in SREDevOps.org">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
 </button>
-<button type="button"
-class="theme-toggle "
+<button type="button" class="theme-toggle "
 data-island="ThemeToggle"
-data-switch-to-light="Switch to light theme"
-data-switch-to-dark="Switch to dark theme"
-aria-label="Toggle theme" title="Toggle theme">
+data-switch-to-light="Cambiar a tema claro"
+data-switch-to-dark="Cambiar a tema oscuro"
+aria-label="Cambiar tema" title="Cambiar tema">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-sun" aria-hidden="true" focusable="false"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-moon" aria-hidden="true" focusable="false"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>
 </button>
@@ -183,7 +182,7 @@ aria-label="Sign in" title="Sign in">
 <details id="mobile-menu" data-island="MobileMenu" data-desktop-min-width="768" class="group md:hidden">
 <summary
 class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-muted transition-colors hover:text-strong"
-aria-label="Open menu">
+aria-label="Abrir menú">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-5 h-5 group-open:hidden" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-5 h-5 hidden group-open:inline" aria-hidden="true" focusable="false"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
 </summary>
@@ -212,15 +211,14 @@ class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b 
 <a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
 </li>
 </ul>
-<button type="button"
-class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
+<button type="button" class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
 data-island="ThemeToggle"
-data-switch-to-light="Switch to light theme"
-data-switch-to-dark="Switch to dark theme"
-aria-label="Toggle theme" title="Toggle theme">
+data-switch-to-light="Cambiar a tema claro"
+data-switch-to-dark="Cambiar a tema oscuro"
+aria-label="Cambiar tema" title="Cambiar tema">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-sun" aria-hidden="true" focusable="false"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-moon" aria-hidden="true" focusable="false"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>
-<span>Toggle theme</span>
+<span>Cambiar tema</span>
 </button>
 <button type="button" data-ghost-search
 class="flex items-center gap-2 text-muted transition-colors hover:text-strong">
@@ -273,6 +271,7 @@ En esta columna intentaré definir y explicar los conceptos de Platform Engineer
 </a>
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 <article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/que-es-platform-engineering-sre-devops-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -293,6 +292,7 @@ En esta columna intentaré definir y explicar los</p>
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/que-es-platform-engineering-sre-devops/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -313,6 +313,7 @@ En esta columna intentaré definir y explicar los</p>
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instancia-sin-ip-publica/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2024/08/ec2-instance-connect-endpoint.png"
@@ -331,6 +332,7 @@ href="/es/no-mas-bastiones-en-aws-con-ec2-instance-connect-conectar-a-tu-instanc
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/que-es-platform-engineering-para-que-me-sirve-que-paso-con-devops/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDN8fGludGVncmF0aW9ufGVufDB8fHx8MTY4ODA5NDYzMXww&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -349,6 +351,7 @@ href="/es/que-es-platform-engineering-para-que-me-sirve-que-paso-con-devops/">Qu
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/kernel-linux-6-4-ya-disponible/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1640552435388-a54879e72b28?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDZ8fExJTlVYfGVufDB8fHx8MTY4Nzc3NzE2N3ww&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -368,6 +371,7 @@ Esta versión ofrece muchas mejoras,</p>
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/inteligencia-artificial-vs-bomba-atomica-oppenheimer-y-el-mensaje-de-nolan/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1655721530791-59f5bbd64a48?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDI1fHxudWNsZWFyJTIwYWl8ZW58MHx8fHwxNjg3NjY3NjI5fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -386,6 +390,7 @@ href="/es/inteligencia-artificial-vs-bomba-atomica-oppenheimer-y-el-mensaje-de-n
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/ted-talks-cual-sera-la-proxima-superpotencia-global-esta-mucho-mas-cerca-de-ti-de-lo-que-imaginas/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDF8fHRlZCUyMHRhbGtzfGVufDB8fHx8MTY4NzI1MjkxNHww&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -404,6 +409,7 @@ href="/es/ted-talks-cual-sera-la-proxima-superpotencia-global-esta-mucho-mas-cer
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/como-desplegar-ghost-en-kubernetes/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2025/12/ghost-on-kubernetes.png"
@@ -422,6 +428,7 @@ href="/es/como-desplegar-ghost-en-kubernetes/">Cómo desplegar Ghost (CMS/Blog) 
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/groundcover-monitorea-tus-apps-en-kubernetes-con-menor-costo-basado-en-ebpf/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/09/groundcover.webp"
@@ -440,6 +447,7 @@ href="/es/groundcover-monitorea-tus-apps-en-kubernetes-con-menor-costo-basado-en
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/platformcon-2023/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/08/platform--1-.jpg"
@@ -458,6 +466,7 @@ href="/es/platformcon-2023/">PlatformCon 2023: 8 y 9 de Junio, ¡participa!</a><
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/nhost-alternativa-opensource-a-firebase-graphql-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/11/68747470733a2f2f692e696d6775722e636f6d2f5a656e6f556c4d2e706e67.png"
@@ -476,6 +485,7 @@ href="/es/nhost-alternativa-opensource-a-firebase-graphql-2/">Nhost: Plataforma 
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/nhost-alternativa-opensource-a-firebase-graphql/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/11/68747470733a2f2f692e696d6775722e636f6d2f5a656e6f556c4d2e706e67.png"

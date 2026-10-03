@@ -13,28 +13,24 @@
 
 /* Theme toggle. Both icons are rendered server-side and CSS shows the one for the
    current theme, so the control is correct before any script runs: a sun while the
-   page is dark (click to go light), a moon while it is light. The `:not()` guard keeps
-   an explicit light choice from being overridden by a dark operating system. */
+   page is dark (click to go light), a moon while it is light. Dark is the default, so
+   the sun is what an undecided reader gets; only an explicit light choice swaps it.
+   No prefers-color-scheme here: the palette and the icon must agree, and the palette
+   no longer follows the operating system. */
 .theme-toggle .theme-icon-sun {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-toggle .theme-icon-sun {
-    display: inline-block;
-  }
-
-  :root:not([data-theme="light"]) .theme-toggle .theme-icon-moon {
-    display: none;
-  }
-}
-
-:root[data-theme="dark"] .theme-toggle .theme-icon-sun {
   display: inline-block;
 }
 
-:root[data-theme="dark"] .theme-toggle .theme-icon-moon {
+.theme-toggle .theme-icon-moon {
   display: none;
+}
+
+:root[data-theme="light"] .theme-toggle .theme-icon-sun {
+  display: none;
+}
+
+:root[data-theme="light"] .theme-toggle .theme-icon-moon {
+  display: inline-block;
 }
 
 .theme-toggle {

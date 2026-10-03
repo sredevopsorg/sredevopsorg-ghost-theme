@@ -48,7 +48,9 @@
 
   {{!-- Main Content Grid (Unchanged) --}}
   <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8 relative">
-    <div class="lg:col-span-8 gh-content" data-island="CodeBlocks" data-prismjs-copy="{{t "Copy"}}" data-prismjs-copy-success="{{t "Copied!"}}">
+    <div class="lg:col-span-8 gh-content" data-island="CodeBlocks"
+      data-prismjs-copy="{{#match locale "=" "es"}}Copiar{{else match locale "=" "br"}}Copiar{{else}}{{t "Copy"}}{{/match}}"
+      data-prismjs-copy-success="{{#match locale "=" "es"}}¡Copiado!{{else match locale "=" "br"}}Copiado!{{else}}{{t "Copied!"}}{{/match}}">
       {{{content}}}
     </div>
     <aside class="lg:col-span-4 relative">

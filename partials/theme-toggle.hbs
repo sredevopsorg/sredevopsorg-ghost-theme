@@ -1,0 +1,43 @@
+{{!-- One theme-toggle button, rendered in two places (the desktop icon row and the
+     mobile panel) with different classes.
+
+     The labels are the only part that depends on the page's language, and they are
+     island UI: the ThemeToggle island relabels the button from theme-config on mount,
+     so the strings here and the ones in partials/island-config.hbs must agree.
+     They are written per locale for the reason documented there — the translate
+     helper renders the site language, not the page's — and `locale` arrives from
+     the shell.
+
+     `class` shapes the two variants; `showLabel` adds the visible text the mobile
+     panel shows. Neither is localised. --}}
+{{#match locale "=" "es"}}
+<button type="button" class="{{class}}"
+  data-island="ThemeToggle"
+  data-switch-to-light="Cambiar a tema claro"
+  data-switch-to-dark="Cambiar a tema oscuro"
+  aria-label="Cambiar tema" title="Cambiar tema">
+  {{> "icon" name="sun" class="w-3 h-3 theme-icon-sun"}}
+  {{> "icon" name="moon" class="w-3 h-3 theme-icon-moon"}}
+  {{#if showLabel}}<span>Cambiar tema</span>{{/if}}
+</button>
+{{else match locale "=" "br"}}
+<button type="button" class="{{class}}"
+  data-island="ThemeToggle"
+  data-switch-to-light="Mudar para tema claro"
+  data-switch-to-dark="Mudar para tema escuro"
+  aria-label="Alternar tema" title="Alternar tema">
+  {{> "icon" name="sun" class="w-3 h-3 theme-icon-sun"}}
+  {{> "icon" name="moon" class="w-3 h-3 theme-icon-moon"}}
+  {{#if showLabel}}<span>Alternar tema</span>{{/if}}
+</button>
+{{else}}
+<button type="button" class="{{class}}"
+  data-island="ThemeToggle"
+  data-switch-to-light="{{t "Switch to light theme"}}"
+  data-switch-to-dark="{{t "Switch to dark theme"}}"
+  aria-label="{{t "Toggle theme"}}" title="{{t "Toggle theme"}}">
+  {{> "icon" name="sun" class="w-3 h-3 theme-icon-sun"}}
+  {{> "icon" name="moon" class="w-3 h-3 theme-icon-moon"}}
+  {{#if showLabel}}<span>{{t "Toggle theme"}}</span>{{/if}}
+</button>
+{{/match}}

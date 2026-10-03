@@ -1,0 +1,9 @@
+{{!< default-es}}
+{{!-- Spanish pages. Ghost resolves a page's template as page-:slug.hbs -> custom-*.hbs
+     -> page.hbs, so this file is a custom template: it reaches a Spanish page only when
+     that page's Template setting is switched to "page-es" in the editor. There is no
+     automatic route to it, because a layout cannot read the page's tags — the same
+     limitation that makes custom-es.hbs necessary for posts.
+
+     Until a page selects it, that page keeps page.hbs and declares lang="en". --}}
+{{> "page-body" locale="es"}}

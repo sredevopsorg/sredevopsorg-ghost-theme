@@ -183,6 +183,103 @@ Two things came out of testing rather than review:
 **Unverified:** the light palette's contrast. There is no browser in this repository, so
 the values need a human look — recorded here rather than assumed.
 
+## Phase 6 notes — production audit, dark default, and the locale fixes
+
+v3 was deployed to <https://www.sredevops.org/> and audited against the live site. The audit
+is the source of the work below; the measurements are recorded because they are the reason
+each fix looks the way it does.
+
+### The live site is v3-dev, exactly
+
+Deploying is a manual `workflow_dispatch` of `deploy-theme`, which ran on `v3/deploy-archive`
+(`a5bfb55`). That commit is content-identical to `v3-dev` HEAD, and a local rebuild produced
+byte-identical asset hashes (`index-ByNK2Yzm.js`, `index-DqLgj5_n.css`), so "what is live" is
+pinned to a commit rather than to a feeling. Both contexts the goldens could not cover were
+checked there instead:
+
+- **`page.hbs`** renders on all six default pages, so the `@page.show_title_and_feature_image`
+  toggle works;
+- **`/br/`** renders with `lang="pt"`, 14 posts and working pagination — the locale shell is
+  genuinely reached, not shadowed by `tag.hbs`.
+
+Ghost reports no per-post locale: `posts.locale` is `NULL` for all 207 posts, and
+`{{t}}` is documented as rendering the *site* language, which is what `settings.locale = "en"`
+gives. That is the root of the next two items and it is not fixable in a theme.
+
+### Dark is the default now
+
+`:root { color-scheme: dark }`. See [ADR 0002](adr/0002-theming-semantic-tokens.md) for the
+amendment and why "follow the operating system" was never actually chosen.
+
+### Island UI followed the site language, not the page's
+
+On a Spanish post, `<html lang="es">` sat above English island chrome: the ToC heading read
+"Table of Contents", the share buttons said "Share"/"Copy link"/"Link copied!", the mobile
+menu's labels said "Open menu", the theme toggle said "Toggle theme", and the code blocks'
+copy button said "Copy". `locales/es.json` and `locales/pt.json` already contained **every one
+of those strings**; nothing was selecting them.
+
+The cause is that `partials/island-config.hbs` is reached from `partials/head.hbs` ←
+`partials/shell.hbs`, and a layout cannot see page context, so `{{t}}` fell back to the site
+language. Fixed by threading the content locale down from the shell — the one level that knows
+it — and writing the strings per locale in `island-config.hbs` and the new
+`partials/theme-toggle.hbs`. The two vocabularies are named explicitly, because they differ:
+
+| | value | who sets it |
+| --- | --- | --- |
+| `documentLang` | `es`, `pt` (BCP-47, for `<html lang>`) | `default-es.hbs`, `default-br.hbs` |
+| `locale` | `es`, `br`, `en` (the layouts' existing key) | same two files, plus `custom-es.hbs` |
+
+**Not fixed, and deliberately:** the *server-rendered* chrome still speaks the site language —
+"Search", "Sign in", pagination, the sidebar's subscribe form, `error-404.hbs`. That is ~30
+strings across 10 partials, and unlike the island strings it is not mechanical: it is a
+question about which language a trilingual site's interface should speak, and Ghost supports
+exactly one. The options are to localise each of those partials the same way (large, and it
+duplicates `locales/*.json` into templates), or to set the site language to Spanish and accept
+Spanish chrome on the English posts. **This needs a decision before it is worth doing.**
+
+### A page could not declare its own language
+
+`page.hbs` extended `default`, so every page was `lang="en"` — including
+`/que-es-sredevops/`, whose title is *"Quiénes somos"*. A layout cannot read the page's tags
+(the Phase 4 measurement above), so there is no automatic route: the page's language has to be
+chosen by *which layout the template extends*. Added `custom-page-es.hbs` →
+`default-es.hbs`, with the shared body in `partials/page-body.hbs`, mirroring `custom-es.hbs`
+for posts.
+
+**Requires one admin step:** select Template → `page-es` on each Spanish page. Nothing selects
+it automatically, and until it is selected that page keeps declaring `lang="en"`.
+
+### Post cards did not declare their language
+
+`/` has no filter in `routes.yaml`, so it is a mixed feed — 11 Spanish posts and 1 English
+under `<html lang="en">`, with no per-post language. Screen readers had no way to switch
+voice. `partials/post-card.hbs` now emits `lang` from the post's own URL prefix
+(`{{#match url "~" "/es/"}}`), which is the locale collection's permalink — the authoritative
+answer, where the `locale` argument cannot be, because on that feed it is the *page's* `en`.
+The tag route is unavailable: the locale tag is secondary on every post, and `{{#has}}`
+matches the primary tag only (Phase 4b).
+
+### Three Ghost/Handlebars traps measured this phase
+
+1. **`{{#page}}` drops partial hash arguments**, exactly like `{{#post}}`/`{{#get}}`/`{{#foreach}}`.
+   `page-body.hbs` first passed `locale="es"` and matched on it *inside* `{{#page}}`; the page
+   rendered `data-prismjs-copy="Copy"` — English, silently. The element now opens `{{#page}}`
+   inside itself so the match stays at the partial's top level.
+2. **`{{#if body_class}}` is always false.** In a condition position Handlebars resolves a bare
+   name against the context rather than calling the helper, so this form silently dropped
+   *every* context class — `post-template`, `tag-*`, `paged` — and the fixture diff caught it.
+   The helper needs a subexpression, `(body_class)`.
+3. **`(body_class)` is a truthy SafeString even where its value is empty** (the error context),
+   so `{{#if (body_class)}}` is true there too and left the stray leading space it was meant to
+   remove. Comparing the value — `{{#match (body_class) "!=" ""}}` — is what distinguishes the
+   two cases.
+
+Also fixed: `scripts/fixtures.mjs diff` compared `golden/` against `current/` without
+regenerating it, so `capture` followed straight by `diff` reported **"All fixtures match"**
+against two stale captures — a green that no template change could break. It now refuses to
+compare when `raw/` is newer than `current/`.
+
 ## Island contract (applies to every Phase 3 branch)
 
 Implemented in Phase 2 by `assets/js/islands.js` (runtime) and
