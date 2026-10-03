@@ -258,19 +258,19 @@ class comes back.
 
 ## 🎨 Theming
 
-The palette is dark by default, light when the reader's system asks for it, and either
-when they choose. Nothing has to be configured.
+The palette is **dark by default**, and light once the reader chooses it. The operating
+system's preference is not consulted; nothing has to be configured.
 
 **Tokens are named by role, never by colour** — `bg-surface`, `text-muted`,
 `border-border-strong` — so a palette is a list of values rather than a rewrite of every
 template. Each token is one `light-dark(light, dark)` pair, and `color-scheme` decides
-which half applies: `data-theme` on `<html>` when the reader has chosen, `light dark`
-otherwise, so the operating system is in charge until someone says otherwise.
+which half applies: `data-theme` on `<html>` when the reader has chosen, the dark default
+otherwise.
 
 ```css
-:root { color-scheme: light dark; }               /* follow the system */
-:root[data-theme="dark"] { color-scheme: dark; }  /* explicit choice */
-:root[data-theme="light"] { color-scheme: light; }
+:root { color-scheme: dark; }                     /* the default */
+:root[data-theme="light"] { color-scheme: light; } /* explicit choice */
+:root[data-theme="dark"] { color-scheme: dark; }
 
 @theme {
   --color-surface: light-dark(#ffffff, #0d0e11);

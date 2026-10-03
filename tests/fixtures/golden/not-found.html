@@ -12,7 +12,7 @@ if (stored === "light" || stored === "dark") {
 document.documentElement.setAttribute("data-theme", stored);
 }
 } catch (error) {
-/* storage unavailable: follow the operating system */
+/* storage unavailable: the dark default stands */
 }
 })();
 </script>
@@ -85,7 +85,7 @@ opacity: 0.92;
 <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=HASH">
 <script defer src="/public/comment-counts.min.js?v=HASH" data-ghost-comments-counts-api="http://localhost:2368/members/api/comments/counts/"></script><style>:root {--ghost-accent-color: #aa3cfd;}</style>
 </head>
-<body class=" bg-surface text-strong antialiased font-sans">
+<body class="bg-surface text-strong antialiased font-sans">
 <header class="sticky top-0 z-50 w-full bg-surface/80 backdrop-blur-md border-b border-inverse/10 py-3 min-h-[60px]">
 <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
 <div class="flex items-center">
@@ -128,8 +128,7 @@ class="hidden rounded-md sm:inline-flex">
 aria-label="Search in SREDevOps.org" title="Search in SREDevOps.org">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
 </button>
-<button type="button"
-class="theme-toggle "
+<button type="button" class="theme-toggle "
 data-island="ThemeToggle"
 data-switch-to-light="Switch to light theme"
 data-switch-to-dark="Switch to dark theme"
@@ -174,8 +173,7 @@ class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b 
 <a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
 </li>
 </ul>
-<button type="button"
-class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
+<button type="button" class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
 data-island="ThemeToggle"
 data-switch-to-light="Switch to light theme"
 data-switch-to-dark="Switch to dark theme"

@@ -2,22 +2,24 @@
  * Theme toggle — behaviour only, no framework.
  *
  * The button and its two icons are server-rendered, so the control exists (and is
- * labelled, and works) without JavaScript: the palette follows the operating system
- * through `color-scheme` until the user chooses, which is the default rather than a
- * third state anyone has to manage.
+ * labelled, and works) without JavaScript: the palette is dark by default through
+ * `color-scheme`, and a choice is what moves it off that default. There is no third
+ * state to manage, and no dependence on the operating system's preference — the
+ * stylesheet sets `color-scheme: dark` on `:root` and only `data-theme` overrides it.
  *
  * Choosing writes `<html data-theme>` and localStorage. Nothing sets the attribute
- * until then, which is what keeps the system preference in charge; `partials/head.hbs`
- * has the small inline script that applies a stored choice before the first paint.
+ * until then, which is what keeps the default in charge; `partials/head.hbs` has the
+ * small inline script that applies a stored choice before the first paint.
  */
 const STORAGE_KEY = "theme";
+const DEFAULT_THEME = "dark";
 
 function stored() {
   try {
     const value = localStorage.getItem(STORAGE_KEY);
     return value === "light" || value === "dark" ? value : null;
   } catch {
-    return null; // storage blocked (private mode, cookies off): follow the system
+    return null; // storage blocked (private mode, cookies off): the default applies
   }
 }
 
@@ -29,19 +31,15 @@ function store(theme) {
   }
 }
 
-function systemTheme() {
-  return globalThis.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark";
-}
-
 export function enhance(element, props = {}) {
   const root = document.documentElement;
   const buttons = element.matches("button") ? [element] : [...element.querySelectorAll("button")];
   if (buttons.length === 0) return undefined;
 
   // The applied theme is held here, not re-derived on every read: when storage is
-  // unavailable (private mode), re-deriving would fall back to the system preference
-  // after every click, so the toggle could move one way and never back.
-  let current = stored() ?? systemTheme();
+  // unavailable (private mode), re-deriving would fall back to the default after every
+  // click, so the toggle could move one way and never back.
+  let current = stored() ?? DEFAULT_THEME;
 
   const labelFor = (theme) =>
     theme === "dark"
@@ -71,24 +69,12 @@ export function enhance(element, props = {}) {
   const onClick = () => apply(current === "dark" ? "light" : "dark", { persist: true });
   const onThemeChange = () => sync();
 
-  // Follow the system while no choice is stored, so a reader who changes their OS
-  // preference is not stuck with whatever was true when the page loaded.
-  const query = globalThis.matchMedia?.("(prefers-color-scheme: light)");
-  const onSystemChange = () => {
-    if (stored() === null) {
-      current = systemTheme();
-      sync();
-    }
-  };
-
   for (const button of buttons) button.addEventListener("click", onClick);
   document.addEventListener("themechange", onThemeChange);
-  query?.addEventListener?.("change", onSystemChange);
   sync();
 
   return () => {
     for (const button of buttons) button.removeEventListener("click", onClick);
     document.removeEventListener("themechange", onThemeChange);
-    query?.removeEventListener?.("change", onSystemChange);
   };
 }

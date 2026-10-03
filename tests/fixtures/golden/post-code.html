@@ -12,7 +12,7 @@ if (stored === "light" || stored === "dark") {
 document.documentElement.setAttribute("data-theme", stored);
 }
 } catch (error) {
-/* storage unavailable: follow the operating system */
+/* storage unavailable: the dark default stands */
 }
 })();
 </script>
@@ -20,7 +20,7 @@ document.documentElement.setAttribute("data-theme", stored);
 <link rel="stylesheet" href="/assets/built/index-HASH.css?v=HASH">
 <link rel="modulepreload" href="/assets/built/index-HASH.js?v=HASH">
 <script id="theme-config" type="application/json">
-{"readingProgress":"Reading progress","closeMenu":"Close menu","openMenu":"Open menu","shareVia":"Share via Email","share":"Share","linkCopied":"Link copied!","copyLink":"Copy link","toc":"Table of Contents","locale":"en","siteUrl":"http://localhost:2368"}
+{"readingProgress":"Progreso de lectura","closeMenu":"Cerrar menú","openMenu":"Abrir menú","shareVia":"Compartir por correo","share":"Compartir","linkCopied":"¡Enlace copiado!","copyLink":"Copiar enlace","toc":"Índice de contenidos","locale":"es","siteUrl":"http://localhost:2368"}
 </script>
 <meta name="description" content="Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes">
 <link rel="icon" href="http://localhost:2368/content/images/size/w256h256/2024/07/Icon-App-76x76@2x.png" type="image/png">
@@ -198,12 +198,11 @@ class="hidden rounded-md sm:inline-flex">
 aria-label="Search in SREDevOps.org" title="Search in SREDevOps.org">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
 </button>
-<button type="button"
-class="theme-toggle "
+<button type="button" class="theme-toggle "
 data-island="ThemeToggle"
-data-switch-to-light="Switch to light theme"
-data-switch-to-dark="Switch to dark theme"
-aria-label="Toggle theme" title="Toggle theme">
+data-switch-to-light="Cambiar a tema claro"
+data-switch-to-dark="Cambiar a tema oscuro"
+aria-label="Cambiar tema" title="Cambiar tema">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-sun" aria-hidden="true" focusable="false"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-moon" aria-hidden="true" focusable="false"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>
 </button>
@@ -215,7 +214,7 @@ aria-label="Sign in" title="Sign in">
 <details id="mobile-menu" data-island="MobileMenu" data-desktop-min-width="768" class="group md:hidden">
 <summary
 class="js-mobile-summary list-none cursor-pointer rounded-lg p-2 text-muted transition-colors hover:text-strong"
-aria-label="Open menu">
+aria-label="Abrir menú">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-5 h-5 group-open:hidden" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-5 h-5 hidden group-open:inline" aria-hidden="true" focusable="false"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
 </summary>
@@ -244,15 +243,14 @@ class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b 
 <a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
 </li>
 </ul>
-<button type="button"
-class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
+<button type="button" class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
 data-island="ThemeToggle"
-data-switch-to-light="Switch to light theme"
-data-switch-to-dark="Switch to dark theme"
-aria-label="Toggle theme" title="Toggle theme">
+data-switch-to-light="Cambiar a tema claro"
+data-switch-to-dark="Cambiar a tema oscuro"
+aria-label="Cambiar tema" title="Cambiar tema">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-sun" aria-hidden="true" focusable="false"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3 theme-icon-moon" aria-hidden="true" focusable="false"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278M4.858 1.311A7.27 7.27 0 0 0 1.025 7.71c0 4.02 3.279 7.276 7.319 7.276a7.32 7.32 0 0 0 5.205-2.162q-.506.063-1.029.063c-4.61 0-8.343-3.714-8.343-8.29 0-1.167.242-2.278.681-3.286"/><path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>
-<span>Toggle theme</span>
+<span>Cambiar tema</span>
 </button>
 <button type="button" data-ghost-search
 class="flex items-center gap-2 text-muted transition-colors hover:text-strong">
@@ -297,7 +295,9 @@ class="w-full h-auto object-cover rounded-xl border border-border-subtle shadow-
 </div>
 </div>
 <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8 relative">
-<div class="lg:col-span-8 gh-content" data-island="CodeBlocks" data-prismjs-copy="Copy" data-prismjs-copy-success="Copied!">
+<div class="lg:col-span-8 gh-content" data-island="CodeBlocks"
+data-prismjs-copy="Copiar"
+data-prismjs-copy-success="¡Copiado!">
 <h2 id="ghost-en-kubernetes-v6x-por-sredevopsorg">Ghost en Kubernetes (v6.x) por SREDevOps.Org</h2><p>Despliega la principal plataforma de publicación de código abierto, <strong>Ghost</strong>, en Kubernetes con la máxima <strong>seguridad</strong> y <strong>eficiencia</strong> utilizando una imagen de contenedor endurecida y multi-arquitectura.</p><p>Mantenido por <a href="http://localhost:2368/"><strong><em>SREDevOps.org</em></strong></a><em>: SRE, DevOps, Linux, Hacking Ético, IA, ML, Código Abierto, Cloud Native, Platform Engineering en Inglés, Español y Portugués (Brasil).</em></p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/sredevopsorg/ghost-on-kubernetes"><div class="kg-bookmark-content"><div class="kg-bookmark-title">GitHub - sredevopsorg/ghost-on-kubernetes: Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image.</div><div class="kg-bookmark-description">Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image. - sredevopsorg/ghost-on-kubernetes</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="http://localhost:2368/content/images/icon/pinned-octocat-093da3e6fa40-22.svg" alt=""><span class="kg-bookmark-author">GitHub</span><span class="kg-bookmark-publisher">sredevopsorg</span></div></div><div class="kg-bookmark-thumbnail"><img src="http://localhost:2368/content/images/thumbnail/395b82c9-df81-4aee-95a5-4269616a550f" alt="" onerror="this.style.display = 'none'"></div></a></figure><h3 id="aspectos-destacados-seguridad-y-eficiencia"><strong>Aspectos Destacados: Seguridad y Eficiencia</strong></h3><p>Este repositorio implementa Ghost CMS v6.xx.x de <a href="https://github.com/TryGhost/Ghost">@TryGhost (Oficial)</a> en Kubernetes con una imagen personalizada, que ofrece mejoras significativas para el uso en producción y características de seguridad en Kubernetes.</p><h3 id="seguridad-mejorada"><strong>Seguridad Mejorada</strong></h3><ul><li><strong>Ejecución Sin Root:</strong> Tanto los componentes de Ghost como los de MySQL se ejecutan exclusivamente como un <strong>usuario sin privilegios (non-root)</strong> (UID/GID 65532) en Kubernetes, previniendo posibles ataques de escalada de privilegios.</li><li><strong>Tiempo de Ejecución Distroless:</strong> Utilizamos <strong>Google Container Tools Distroless Debian 13 - NodeJS 22</strong> como el entorno de tiempo de ejecución final. Las imágenes <strong>Distroless</strong> contienen solo las dependencias de la aplicación y el lenguaje requeridas, <strong>excluyendo shells y gestores de paquetes</strong>, lo que las hace sustancialmente más seguras y reduce la superficie de ataque.</li><li><strong>Reducción de Vulnerabilidades:</strong> Al reemplazar <code>gosu</code> con un flujo de ejecución de contenedor nativo y adoptar Distroless, eliminamos varias vulnerabilidades críticas reportadas en la imagen original de Ghost:<ul><li><strong>Resultado:</strong> Solo este cambio redujo <strong>6 vulnerabilidades críticas</strong> y <strong>34 vulnerabilidades altas</strong> reportadas por Docker Scout en la imagen oficial.</li></ul></li></ul><p><strong>Ejemplo de Reportes de Seguridad:</strong></p>
 <!--kg-card-begin: html-->
 <table>
@@ -445,6 +445,7 @@ Register with Email
 <h2 class="text-2xl font-bold text-strong mb-6">Contenido relacionado</h2>
 <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
 <article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/que-es-platform-engineering-sre-devops-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -463,6 +464,7 @@ En esta columna intentaré definir y explicar los</p>
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/que-es-platform-engineering-sre-devops/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"

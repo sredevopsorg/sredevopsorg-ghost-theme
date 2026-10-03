@@ -26,6 +26,9 @@ yarn fixtures:diff
 Expect either "All fixtures match", or a diff you can explain line by line. Promote
 deliberately — `yarn fixtures:promote` — and never as a way to make a red run green.
 
+`diff` refuses to run when `raw/` is newer than `current/`, because skipping `normalize`
+used to compare two stale captures and report a false "All fixtures match".
+
 ## 3. Version and changelog
 
 - `package.json` → `version` (the theme's own version, which Ghost shows).
@@ -60,10 +63,24 @@ With the new theme active, on a real browser:
 
 - [ ] home, a post, a tag archive, an author archive, and a 404
 - [ ] `/es/` and a Spanish post: **`<html lang="es">`**, Spanish dates and reading times
+- [ ] **dark by default**: clear `localStorage.theme` (or use a private window) on a machine
+      whose OS is set to *light* — the site must still be dark. Then toggle to light,
+      navigate away and back: light, and no flash.
+- [ ] **island chrome follows the page**: on a Spanish post the table-of-contents heading,
+      the share and copy labels, the mobile-menu label and the theme-toggle label are all
+      Spanish — not just `<html lang>`
+- [ ] **a Spanish page**: with Template → `page-es` selected in the page editor,
+      `/que-es-sredevops/` reports `<html lang="es">`. Without that selection it stays `en`.
+- [ ] **a mixed feed**: `/` declares `lang="en"` and each Spanish card carries `lang="es"`
 - [ ] light and dark, and the toggle: choose one, navigate away, come back — no flash
 - [ ] mobile: the menu opens, closes on Escape and on an outside tap
 - [ ] search, the copy button on a code block, and the share buttons
 - [ ] with JavaScript disabled: text, links, images and the mobile menu still work
+
+Known gaps, so they are not re-reported as new: the theme's *interface* strings (search,
+sign-in, pagination, the subscribe form) follow the **site** language, and Ghost offers no
+per-page alternative — see `docs/v3-roadmap.md`, Phase 6 notes. The light palette's contrast
+has still never been measured by a human.
 
 ## 7. Rollback
 

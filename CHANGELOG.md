@@ -32,9 +32,24 @@ makes **no third-party requests at all**.
   `text-white` / `text-gray-400` / `bg-gray-800` / `border-gray-700` and the old `dark-*`
   names were replaced by `text-strong`, `text-muted`, `bg-subtle`, `border-border-strong`
   and friends, so a palette is a list of values rather than a rewrite of every template.
-- **Light and dark palettes with a toggle.** Dark by default, light when the operating
-  system asks for it, either when the reader chooses. The choice persists and is applied
-  before the first paint, so it never flashes.
+- **Light and dark palettes with a toggle.** **Dark is the default**, for everyone and
+  regardless of the operating system; light is what a reader gets when they choose it. The
+  choice persists and is applied before the first paint, so it never flashes.
+- **A page can finally declare its own language.** `page.hbs` extended the English shell, so
+  `/que-es-sredevops/` — a page titled *"Quiénes somos"* — declared `lang="en"`. There is no
+  automatic route to the page's tags from a layout, so this mirrors what posts already do:
+  `custom-page-es.hbs` extends `default-es.hbs`, with the shared body in
+  `partials/page-body.hbs`. **Select Template → `page-es` on each Spanish page**; until then
+  that page keeps declaring `lang="en"`.
+- **Post cards declare their own language.** `/` has no filter and serves a mixed feed under
+  `<html lang="en">`, so Spanish cards were announced with an English voice. Each card now
+  emits `lang` read from the post's own URL prefix — the locale collection's permalink.
+- **Island UI follows the page, not the site** ([#227](https://github.com/sredevopsorg/sredevopsorg-ghost-theme/pull/227)).
+  The table of contents, share buttons, mobile menu, theme toggle and the code-block copy
+  button spoke the site language, so a Spanish post showed `<html lang="es">` above English
+  chrome — while `locales/es.json` already held every one of those strings. The content locale
+  is now threaded from the shell, which is the only level that knows it.
+- **The error page no longer emits an empty class token**, so `<body class=" …">` is gone.
 - **`error.hbs` added**, self-contained (no layout, no partials, no helpers) so an error
   page cannot depend on the pipeline that may be what broke.
 
@@ -59,7 +74,9 @@ makes **no third-party requests at all**.
   template or island resolves in the built stylesheet.
 - Golden HTML fixtures captured from a real Ghost instance
   ([#217](https://github.com/sredevopsorg/sredevopsorg-ghost-theme/pull/217)) detect
-  unintended markup changes between phases.
+  unintended markup changes between phases. `fixtures.mjs diff` now refuses to compare when
+  `raw/` is newer than `current/`: it previously reported "All fixtures match" against two
+  stale captures, a green that no template change could break.
 
 ### Upgrading
 
@@ -67,6 +84,10 @@ makes **no third-party requests at all**.
 - Posts in a locale collection must be assigned that locale's template (`custom-es`) for
   `<html lang>` to be that language. A Ghost layout cannot see the post's tags, so the
   theme cannot infer it — see `docs/v3-roadmap.md`, Phase 4 notes.
+- Pages are the same: assign `page-es` to a Spanish page, or it keeps declaring `lang="en"`.
+- The theme's *interface* strings (search, sign-in, pagination, the subscribe form) still
+  follow the site language, because Ghost's translate helper has no per-page form. This is a
+  decision waiting to be made rather than an oversight — see the Phase 6 notes.
 - If you forked a template, expect the class renames above; the mapping is in the
   Phase 5b commit.
 

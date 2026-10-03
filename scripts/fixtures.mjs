@@ -18,7 +18,7 @@
  *
  * Zero dependencies (Node >= 20 for global fetch).
  */
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync, copyFileSync, existsSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join, dirname, basename, resolve } from "node:path";
 
@@ -223,6 +223,26 @@ function diff() {
   }
   const goldenFiles = existsSync(golden) ? readdirSync(golden).filter((f) => f.endsWith(".html")).sort() : [];
   const currentFiles = readdirSync(current).filter((f) => f.endsWith(".html")).sort();
+
+  // Nothing regenerates current/ on the way in, so `capture` followed straight by
+  // `diff` compares two stale trees and prints "All fixtures match" — a false green
+  // that no template change can break. Refuse to compare instead: a gate that lies is
+  // worse than no gate.
+  if (existsSync(DIRS.raw) && currentFiles.length) {
+    const newestMtime = (dir) =>
+      Math.max(
+        ...readdirSync(dir)
+          .filter((f) => f.endsWith(".html"))
+          .map((f) => statSync(join(dir, f)).mtimeMs),
+      );
+    if (newestMtime(DIRS.raw) > newestMtime(current)) {
+      console.error(
+        `${rel(DIRS.raw)}/ is newer than ${rel(current)}/ — run \`yarn fixtures:normalize\` first,\n` +
+          "otherwise this compares two old captures and reports a false match.",
+      );
+      process.exit(1);
+    }
+  }
 
   if (!goldenFiles.length) {
     console.warn(

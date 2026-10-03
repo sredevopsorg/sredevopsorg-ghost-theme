@@ -1,0 +1,30 @@
+{{!-- The body of a static page, extracted from page.hbs so a locale shell can reuse it
+     instead of copying it: custom-page-es.hbs renders exactly this with locale="es".
+
+     `locale` is the content-locale key (es/br/en) and only decides the two Prism copy
+     labels, which are island data — the CodeBlocks island's copy-to-clipboard plugin
+     reads them off the container. Everything else on a page is content.
+
+     Note where the {{#match}} calls sit: at this partial's own top level, never inside
+     {{#page}}. A context-changing block silently drops the partial's hash arguments, so
+     matching on `locale` inside {{#page}} always took the English branch — the same trap
+     already documented for {{#post}}/{{#get}}/{{#foreach}} in docs/v3-roadmap.md. That is
+     also why the article opens {{#page}} inside itself instead of being wrapped by it:
+     the element needs `locale`, its content needs the page context. --}}
+
+{{#page}}
+    {{!-- @page.show_title_and_feature_image is the per-page toggle in the editor. When
+         it is off, both the title and the feature image are hidden (GScan warns if a
+         theme ignores it). This used to live in post.hbs behind an {{#is "page"}} branch
+         that could never run: page.hbs takes precedence for pages. --}}
+    {{#if @page.show_title_and_feature_image}}
+    <h1 class="text-4xl text-strong font-bold mb-4">{{title}}</h1>
+    {{> "feature-image"}}
+    {{/if}}
+{{/page}}
+
+<article class="gh-content" data-island="CodeBlocks"
+  data-prismjs-copy="{{#match locale "=" "es"}}Copiar{{else match locale "=" "br"}}Copiar{{else}}{{t "Copy"}}{{/match}}"
+  data-prismjs-copy-success="{{#match locale "=" "es"}}¡Copiado!{{else match locale "=" "br"}}Copiado!{{else}}{{t "Copied!"}}{{/match}}">
+    {{#page}}{{{content}}}{{/page}}
+</article>

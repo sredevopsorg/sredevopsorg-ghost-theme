@@ -12,7 +12,7 @@ if (stored === "light" || stored === "dark") {
 document.documentElement.setAttribute("data-theme", stored);
 }
 } catch (error) {
-/* storage unavailable: follow the operating system */
+/* storage unavailable: the dark default stands */
 }
 })();
 </script>
@@ -133,8 +133,7 @@ class="hidden rounded-md sm:inline-flex">
 aria-label="Search in SREDevOps.org" title="Search in SREDevOps.org">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-3 h-3" aria-hidden="true" focusable="false"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/></svg>
 </button>
-<button type="button"
-class="theme-toggle "
+<button type="button" class="theme-toggle "
 data-island="ThemeToggle"
 data-switch-to-light="Switch to light theme"
 data-switch-to-dark="Switch to dark theme"
@@ -179,8 +178,7 @@ class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b 
 <a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
 </li>
 </ul>
-<button type="button"
-class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
+<button type="button" class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
 data-island="ThemeToggle"
 data-switch-to-light="Switch to light theme"
 data-switch-to-dark="Switch to dark theme"
@@ -210,6 +208,7 @@ Sign in
 </div>
 <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 <article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/platformcon-2023/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/08/platform--1-.jpg"
@@ -228,6 +227,7 @@ href="/es/platformcon-2023/">PlatformCon 2023: 8 y 9 de Junio, ¡participa!</a><
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/nhost-alternativa-opensource-a-firebase-graphql-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/11/68747470733a2f2f692e696d6775722e636f6d2f5a656e6f556c4d2e706e67.png"
@@ -246,6 +246,7 @@ href="/es/nhost-alternativa-opensource-a-firebase-graphql-2/">Nhost: Plataforma 
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/nhost-alternativa-opensource-a-firebase-graphql/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/11/68747470733a2f2f692e696d6775722e636f6d2f5a656e6f556c4d2e706e67.png"
@@ -264,6 +265,7 @@ href="/es/nhost-alternativa-opensource-a-firebase-graphql/">Nhost: Plataforma op
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <div class="p-5 flex flex-col flex-grow">
 <a href="http://localhost:2368/tag/es/"
@@ -277,6 +279,7 @@ href="/es/por-fin-una-playlist-para-kubernetes/">Por fin... una playlist para Ku
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/nauticus-administrar-kubernetes-en-simple-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/05/1_R4vTTYsn5rfXpV4E2dmg1g-1.webp"
@@ -295,6 +298,7 @@ href="/es/nauticus-administrar-kubernetes-en-simple-2/">Nauticus: Administrar ku
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/nauticus-administrar-kubernetes-en-simple/" class="block aspect-[16/9] overflow-hidden">
 <img src="/content/images/size/w300/format/webp/2023/05/1_R4vTTYsn5rfXpV4E2dmg1g-1.webp"
@@ -313,6 +317,7 @@ href="/es/nauticus-administrar-kubernetes-en-simple/">Nauticus: Administrar kube
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/9-escenarios-donde-implementamos-devops-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1512758017271-d7b84c2113f1?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDF8fHNjZW5hcmlvc3xlbnwwfHx8fDE2ODQ3MjczNDd8MA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -333,6 +338,7 @@ href="/es/9-escenarios-donde-implementamos-devops-2/">9 escenarios donde impleme
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/9-escenarios-donde-implementamos-devops/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1512758017271-d7b84c2113f1?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDF8fHNjZW5hcmlvc3xlbnwwfHx8fDE2ODQ3MjczNDd8MA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -353,6 +359,7 @@ href="/es/9-escenarios-donde-implementamos-devops/">9 escenarios donde implement
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/la-edad-tu-genero-raza-o-cualquier-factor-no-es-impedimento-para-cambiar-de-profesion-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1534030819-e584013b0531?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDZ8fGluY2x1c2lvbnxlbnwwfHx8fDE2ODQ3Mjc0NjZ8MA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -371,6 +378,7 @@ href="/es/la-edad-tu-genero-raza-o-cualquier-factor-no-es-impedimento-para-cambi
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/la-edad-tu-genero-raza-o-cualquier-factor-no-es-impedimento-para-cambiar-de-profesion/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1534030819-e584013b0531?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDZ8fGluY2x1c2lvbnxlbnwwfHx8fDE2ODQ3Mjc0NjZ8MA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -389,6 +397,7 @@ href="/es/la-edad-tu-genero-raza-o-cualquier-factor-no-es-impedimento-para-cambi
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/kubernetes-lanza-version-1-27-aqui-puedes-ver-los-cambios-2/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1667372459470-5f61c93c6d3f?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDN8fGt1YmVybmV0ZXN8ZW58MHx8fHwxNjg0MTQxNTg2fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
@@ -407,6 +416,7 @@ href="/es/kubernetes-lanza-version-1-27-aqui-puedes-ver-los-cambios-2/">Kubernet
 </div>
 </div>
 </article><article
+lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
 <a href="/es/kubernetes-lanza-version-1-27-aqui-puedes-ver-los-cambios/" class="block aspect-[16/9] overflow-hidden">
 <img src="https://images.unsplash.com/photo-1667372459470-5f61c93c6d3f?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDN8fGt1YmVybmV0ZXN8ZW58MHx8fHwxNjg0MTQxNTg2fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
