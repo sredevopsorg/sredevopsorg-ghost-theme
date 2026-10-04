@@ -86,8 +86,9 @@
             },
             "sec_feed_items": {
                 "type": "select",
-                "default": "10",
+                "default": "3",
                 "options": [
+                    "3",
                     "5",
                     "10",
                     "15",
