@@ -20,9 +20,11 @@
 
      Reuse: `{{> "sec-feed" locale="en"}}` from any template. `locale` only picks
      the strings for the heading and the no-JS fallback; the island reads the page
-     language for relative timestamps, which is why no locale is passed through. --}}
+     language for relative timestamps, which is why no locale is passed through.
+     The block carries no vertical margin: partials/featured-row.hbs owns the rhythm
+     for the side-by-side layout, and any other caller chooses its own spacing. --}}
 {{#if @custom.sec_feed_api_url}}
-<section class="mt-12 mb-12 rounded-xl border border-border-subtle bg-raised p-5 md:p-6" aria-labelledby="sec-feed-title">
+<section class="rounded-xl border border-border-subtle bg-raised p-5" aria-labelledby="sec-feed-title">
   <div class="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
     <h2 id="sec-feed-title" class="text-sm font-bold tracking-wider text-strong uppercase">
       {{#match locale "=" "es"}}Inteligencia de seguridad{{else match locale "=" "br"}}Inteligência de segurança{{else}}{{t "Security feed"}}{{/match}}

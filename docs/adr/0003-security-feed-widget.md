@@ -22,9 +22,22 @@ page without taking the page over".
 ## Decision
 
 Add the feed to the theme as a **single vanilla island mounted from one partial**,
-opt-in through a theme setting, rendered above the post grid on the four channel
-collections (`/`, `/en/`, `/es/`, `/br/` — the templates that share
-`partials/collection-layout.hbs`).
+opt-in through a theme setting, rendered in a **1/3 column beside the featured post
+(2/3)** on the four channel collections (`/`, `/en/`, `/es/`, `/br/` — the templates
+that share `partials/collection-layout.hbs`).
+
+The row lives in `partials/featured-row.hbs` rather than in `collection-layout.hbs`
+because the grid must exist *only* when the feed does. A permanently present grid
+would reserve a 1/3 column for an absent widget, shrink the featured post on every
+site that never set `sec_feed_api_url`, and change the HTML of every collection page
+for no visible reason. The cost is one duplicated `{{#match}}` chain — a Handlebars
+partial cannot take an argument conditionally — which is a fair trade for "an
+unconfigured site is byte-identical".
+
+Consequence to know about: the row assumes the channel **has** a featured post.
+When one is not configured the 2/3 column renders empty and the feed sits beside
+nothing. Both production channels do have one; a channel without one should move
+the feed above the post grid rather than half-fill a row.
 
 - `partials/sec-feed.hbs` — the block: `<section>`, heading, `<noscript>` link and
   the mount point. Gated on `{{#if @custom.sec_feed_api_url}}`.
