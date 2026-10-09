@@ -21,7 +21,11 @@ import {
  *
  * Mount point (partials/sec-feed.hbs, gated on the `sec_feed_api_url` setting):
  *   <div data-island="SecFeed" data-api-url="…" data-limit="10" data-poll="5"
- *        data-feed-link="…"></div>
+ *        data-fill="page"></div>
+ *
+ * `data-fill="page"` is the full-page variant (page-secfeed.hbs): the widget renders in
+ * normal flow and the document scrolls, instead of dividing a bounded panel and scrolling
+ * its own list. Absent, the embedded layout applies.
  *
  * Why this is an island, and not a page: the upstream service already ships a full
  * single-page frontend with search, SSE and its own filters. This is deliberately
@@ -116,6 +120,10 @@ function readProps(props) {
     // on the full frontend rather than on an API path.
     link: buildFeedLink(base),
     pollMs: clampPollMinutes(props.poll, DEFAULT_POLL_MINUTES) * 60_000,
+    // The embedded block sits in a bounded box and scrolls its own list; a full page
+    // (partials/sec-feed.hbs called with `full=true`) lets the document scroll instead.
+    // The template says which by tagging the mount point with `data-fill="page"`.
+    pageMode: props.fill === "page",
   };
 }
 
@@ -165,9 +173,11 @@ function createWidget(element_, config) {
 
   const footer = element("p", "mt-4 border-t border-border-subtle pt-3 text-xs");
 
-  // The mount point is a fixed box, not a grown one: partials/sec-feed.hbs hands the
-  // panel the column's height and the column's height comes from the featured post, so
-  // the widget has to *divide* that box rather than add up to its own height. Hence a
+  // Two layouts, and the template picks one (see partials/sec-feed.hbs).
+  //
+  // EMBEDDED (default): the mount point is a fixed box, not a grown one. The partial
+  // hands the panel the column's height and that height comes from the featured post, so
+  // the widget has to *divide* the box rather than add up to its own height. Hence a
   // flex column with the parts that must stay put first (status, chips, notices), the
   // list as the single flexible child, and the footer after it. `min-h-0` on the list
   // is what lets it be shorter than its content; without it a flex item refuses to
@@ -175,24 +185,34 @@ function createWidget(element_, config) {
   // instead of scrolling. The list scrolls rather than a wrapper around it: `<ul>` is
   // already a block, and a wrapper would be one more box to keep in step.
   //
+  // PAGE (`data-fill="page"`, from page-secfeed.hbs): the section is an ordinary
+  // in-flow card and the document scrolls, so none of that applies. It is not merely
+  // unnecessary, it is actively wrong: `flex: 1 1 0%` with `min-height: 0` resolves
+  // against a definite height, and in an auto-height box the zero basis wins and would
+  // collapse the list to nothing while giving it its own scrollbar. So page mode leaves
+  // the list in normal flow and lets it grow.
+  //
   // The status line stays outside the scroller on purpose. It is the widget's only live
   // region, and a reader who has scrolled to the bottom of twenty advisories should
   // still be told when the list changed under them.
+  const { pageMode } = config;
   const pinned = [status, filters, notices];
   for (const node of pinned) element_.appendChild(node);
 
-  // The scroller holds focusable links, so it is reachable by keyboard already and gets
-  // no `tabindex`: adding one would put a stop in front of the rows that does nothing
-  // for a keyboard user, and on a panel of five advisories it would be a stop before a
-  // box that cannot even scroll. `role="list"` restores the list semantics `overflow`
-  // takes away in some engines once the element becomes a scroll container; the
-  // `aria-label` above is what names it.
+  // In the embedded layout the list is the scroller, and it holds focusable links, so it
+  // is reachable by keyboard already and gets no `tabindex`: adding one would put a stop
+  // in front of the rows that does nothing for a keyboard user, and on a panel of five
+  // advisories it would be a stop before a box that cannot even scroll. `role="list"`
+  // restores the list semantics `overflow` takes away in some engines once the element
+  // becomes a scroll container; the `aria-label` above is what names it.
   const scroller = list;
-  scroller.classList.add("min-h-0", "flex-1", "overflow-y-auto");
   scroller.setAttribute("role", "list");
+  if (!pageMode) {
+    scroller.classList.add("min-h-0", "flex-1", "overflow-y-auto");
+    element_.classList.add("flex", "flex-col");
+  }
   element_.appendChild(scroller);
   element_.appendChild(footer);
-  element_.classList.add("flex", "flex-col");
 
   const controller = new AbortController();
   let timer = 0;
@@ -398,14 +418,15 @@ function createWidget(element_, config) {
       if (changed) {
         renderFilters();
         renderList();
-        // Rows were rewritten, so the list is a different list and the reader is at the
-        // top of it: the position they had is not a position in *this* list. Resetting
-        // only on `changed` is the point: a poll that returns the same advisories
-        // touches no DOM and leaves `scrollTop` exactly where it was, so a reader can
-        // sit halfway down a long list for hours without being yanked back to the top
-        // every five minutes. Sorting is stable upstream, so "same signature" really
-        // does mean "same rows in the same order" here.
-        scroller.scrollTop = 0;
+        // Rows were rewritten, so the embedded list is a different list and the reader
+        // is at the top of it: the position they had is not a position in *this* list.
+        // Resetting only on `changed` is the point: a poll that returns the same
+        // advisories touches no DOM and leaves `scrollTop` exactly where it was, so a
+        // reader can sit halfway down a long list for hours without being yanked back to
+        // the top every five minutes. Sorting is stable upstream, so "same signature"
+        // really does mean "same rows in the same order" here. A full page does not
+        // scroll the list at all, so there the document keeps its own position.
+        if (!pageMode) scroller.scrollTop = 0;
       }
     } catch (error) {
       if (disposed || error?.name === "AbortError") return;

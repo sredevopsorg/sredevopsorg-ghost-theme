@@ -353,8 +353,8 @@ hero, then 764.5px of feed). Bounding it there would nest a scrollbar inside the
 trap touch scrolling, so it is left alone. "Same height as the 2/3 element" is a side-by-side
 property; there is no 2/3 element once the columns stack.
 
-It is *not* on post or page templates, and *not* on `/tag/…` or `/author/…` — `tag.hbs` and
-`author.hbs` carry their own markup rather than sharing `collection-layout.hbs`.
+It is *not* on post templates and *not* on `/tag/…` or `/author/…` — `tag.hbs` and `author.hbs`
+carry their own markup rather than sharing `collection-layout.hbs`.
 
 The block is one partial, so anywhere else it goes where you put it:
 
@@ -365,6 +365,41 @@ The block is one partial, so anywhere else it goes where you put it:
 Verified against a local Ghost 6: the block renders with the expected `data-*` attributes,
 `/es/` gets the Spanish heading and no-JS link from the locale passed through, and no post,
 page, tag or author template gains any widget markup.
+
+### Full-page feed (`page-secfeed.hbs`)
+
+`page-secfeed.hbs` renders the same block as a page rather than a sidebar. Ghost resolves a
+page's template as `page-:slug.hbs` → `custom-*.hbs` → `page.hbs`, so it applies automatically
+to a page whose **slug is `secfeed`** — create one and the feed is there, no template setting to
+change. The page's own title and excerpt render above it, respecting the editor's
+"show title and feature image" toggle.
+
+```handlebars
+{{> "sec-feed" locale="en" full=true}}
+```
+
+`full=true` changes three things, and they are not cosmetic:
+
+| | Embedded (default) | Full page (`full=true`) |
+| --- | --- | --- |
+| Frame | `lg:absolute lg:inset-0 h-full min-h-0 flex flex-col overflow-hidden` | an ordinary in-flow card |
+| What scrolls | the list, inside the panel | the document |
+| How many advisories | the `sec_feed_items` setting | 25, the API maximum (`MAX_LIMIT`) |
+
+The mode exists because the embedded layout's contract is *relative to a bounded box*: the list
+is `flex: 1 1 0%` with `min-height: 0`, which resolves against the panel the partial is pinned
+into. In an auto-height box the zero basis would win and the list would collapse to nothing while
+scrolling inside its own frame. So `full=true` also sets `data-fill="page"` on the mount point,
+and `assets/js/islands/SecFeed.js` skips the flex/overflow layout entirely — the status line, the
+filter chips and the rows stay in normal flow and the page scrolls.
+
+Measured in Chromium (`/secfeed/`, 25 advisories): the panel is 2634.5px tall, the list has
+`overflow-y: visible` and `clientHeight == scrollHeight` (no nested scrollbar), and the document
+scrolls. The embedded homepage panel on the same run is still 467px with `overflow-y: auto` and
+a `clientHeight` of 255 against a 532px list — the two modes do not interfere.
+
+For a Spanish or Portuguese feed page, add a file like this one extending `default-es.hbs` /
+`default-br.hbs` and pass the matching `locale`, the same remedy `custom-page-es.hbs` documents.
 
 ### Weight
 

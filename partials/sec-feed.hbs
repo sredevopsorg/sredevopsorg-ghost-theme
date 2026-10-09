@@ -18,25 +18,37 @@
      The island owns only what the API decides: the status line, the tag filters,
      the rows and the footer link.
 
-     The frame is a bounded flex column. `h-full` makes it exactly as tall as the box
-     that holds it (in the side-by-side layout, the 1/3 grid column that
-     partials/featured-row.hbs pins this panel onto); `min-h-0` is what lets it be
-     *shorter* than its content instead of being pushed open by it, because a flex
-     item's automatic minimum size is its content; `flex-col` keeps the heading above
-     the scroll region; `overflow-hidden` clips what the rounded frame would otherwise
-     let poke out, and it is also what keeps the whole panel from ever becoming a
-     second scrollbar next to the list's own.
+     TWO MODES, one partial. Every caller gets the same frame, heading and no-JS link;
+     only the box around the island changes.
 
-     The mount point is a bounded box, not a scroll region, and that is deliberate:
-     the island decides what scrolls. It lays the widget out as a flex column inside
-     this box and lets the *list* take the remaining height and scroll, so the status
-     line and the tag chips stay on screen while the reader scrolls twenty advisories.
-     Putting the overflow on the mount point instead would have scrolled the chips and
-     the footer away with the rows, and would have buried the status live region the
-     accessibility story depends on. The two classes here are what make that possible:
-     `flex-1` gives the island the height that is left, `min-h-0` lets it be shorter
-     than its own content rather than pushing the panel open. See
-     assets/js/islands/SecFeed.js for the other half of the contract.
+     * Embedded (the default, how partials/featured-row.hbs calls it): the frame is a
+       bounded flex column. `h-full` makes it exactly as tall as the box that holds it
+       (the 1/3 grid column that partials/featured-row.hbs pins this panel onto);
+       `min-h-0` is what lets it be *shorter* than its content instead of being pushed
+       open by it, because a flex item's automatic minimum size is its content;
+       `flex-col` keeps the heading above the scroll region; `overflow-hidden` clips
+       what the rounded frame would otherwise let poke out, and keeps the panel from
+       becoming a second scrollbar next to the list's own.
+
+     * Full page (`{{> "sec-feed" locale="en" full=true}}`, see page-secfeed.hbs): none
+       of those apply. The section is an ordinary in-flow card, the mount point carries
+       no height, and `data-fill="page"` tells the island to lay the widget out as a
+       plain block rather than a column with a scroll region - the *document* scrolls
+       and the list grows to its natural height. That is the whole reason the mode
+       exists: the embedded flex contract (`flex-1` + `min-h-0` on the list) resolves
+       against a bounded box, and in an auto-height one it would collapse the list to
+       zero and make it scroll inside its own frame.
+
+     In the embedded mode the mount point is a bounded box, not a scroll region, and
+     that is deliberate: the island decides what scrolls. It lays the widget out as a
+     flex column inside this box and lets the *list* take the remaining height and
+     scroll, so the status line and the tag chips stay on screen while the reader
+     scrolls twenty advisories. Putting the overflow on the mount point instead would
+     have scrolled the chips and the footer away with the rows, and would have buried
+     the status live region the accessibility story depends on. The two classes here
+     are what make that possible: `flex-1` gives the island the height that is left,
+     `min-h-0` lets it be shorter than its own content rather than pushing the panel
+     open. See assets/js/islands/SecFeed.js for the other half of the contract.
 
      The `lg:absolute lg:inset-0` here only takes effect in the side-by-side layout,
      where partials/featured-row.hbs makes the column `lg:relative` and the column
@@ -44,20 +56,18 @@
      just drops the partial into a page, no positioning applies and the panel is an
      ordinary in-flow block.
 
-     Reuse: `{{> "sec-feed" locale="en"}}` from any template. `locale` only picks
-     the strings for the heading and the no-JS fallback; the island reads the page
-     language for relative timestamps, which is why no locale is passed through.
+     Reuse: `{{> "sec-feed" locale="en"}}` from any template, or
+     `{{> "sec-feed" locale="en" full=true}}` for the full-page variant. `locale` only
+     picks the strings for the heading and the no-JS fallback; the island reads the
+     page language for relative timestamps, which is why no locale is passed through.
      The block carries no vertical margin: partials/featured-row.hbs owns the rhythm
      for the side-by-side layout, and any other caller chooses its own spacing. --}}
 {{#if @custom.sec_feed_api_url}}
-<section class="lg:absolute lg:inset-0 h-full min-h-0 flex flex-col overflow-hidden rounded-xl border border-border-subtle bg-raised p-5" aria-labelledby="sec-feed-title">
-  <div class="mb-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+<section class="{{#if full}}{{else}}lg:absolute lg:inset-0 h-full min-h-0 flex flex-col overflow-hidden {{/if}}rounded-xl border border-border-subtle bg-raised p-5" aria-labelledby="sec-feed-title">
+  <div class="mb-1">
     <h2 id="sec-feed-title" class="text-sm font-bold tracking-wider text-strong uppercase">
       {{#match locale "=" "es"}}Inteligencia de seguridad{{else match locale "=" "br"}}Inteligência de segurança{{else}}{{t "Security feed"}}{{/match}}
     </h2>
-    <p class="text-[11px] text-subtle-text font-mono uppercase tracking-wider">
-      {{#match locale "=" "es"}}Linux · Cloud · Kubernetes{{else match locale "=" "br"}}Linux · Cloud · Kubernetes{{else}}{{t "Linux · Cloud · Kubernetes"}}{{/match}}
-    </p>
   </div>
 
   {{!-- The island fills this and gives the list whatever height is left inside it, so
@@ -65,10 +75,13 @@
        part this template owns: the island's root only has a height because this box
        has one. `data-poll` is minutes between refreshes; it only polls while the tab
        is visible. --}}
-  <div class="min-h-0 flex-1" data-island="SecFeed" aria-busy="true"
+  <div class="{{#if full}}{{else}}min-h-0 flex-1{{/if}}" data-island="SecFeed" aria-busy="true"
        data-api-url="{{@custom.sec_feed_api_url}}"
-       data-limit="{{#if @custom.sec_feed_items}}{{@custom.sec_feed_items}}{{else}}10{{/if}}"
-       data-poll="5"></div>
+       {{!-- A full page shows as many advisories as the API allows (MAX_LIMIT in
+            assets/js/lib/sec-feed-model.js, which clamps this anyway); the embedded
+            block keeps the administrator setting. --}}
+       data-limit="{{#if full}}25{{else}}{{#if @custom.sec_feed_items}}{{@custom.sec_feed_items}}{{else}}10{{/if}}{{/if}}"
+       data-poll="5"{{#if full}} data-fill="page"{{/if}}></div>
 
   <noscript>
     <p class="mt-2 shrink-0 text-sm text-muted">

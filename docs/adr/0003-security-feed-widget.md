@@ -26,6 +26,15 @@ opt-in through a theme setting, rendered in a **1/3 column beside the featured p
 (2/3)** on the four channel collections (`/`, `/en/`, `/es/`, `/br/` — the templates
 that share `partials/collection-layout.hbs`).
 
+The same partial also serves a **full page** (`page-secfeed.hbs`, the `full=true` mode):
+the frame stops being a bounded box and the document scrolls instead of the list. One
+partial and one island, two layouts, because everything except the box around the mount
+point is identical — heading, no-JS link, filters, rows, footer. The mode is not a
+cosmetic switch: the embedded contract (`flex: 1 1 0%` plus `min-height: 0` on the list)
+only resolves against a definite height, and in an auto-height box it would collapse the
+list to nothing. So the template tags the mount point `data-fill="page"` and the island
+skips the flex/overflow layout for that case.
+
 The row lives in `partials/featured-row.hbs` rather than in `collection-layout.hbs`
 because the grid must exist *only* when the feed does. A permanently present grid
 would reserve a 1/3 column for an absent widget, shrink the featured post on every
@@ -43,6 +52,8 @@ the feed above the post grid rather than half-fill a row.
   the mount point. Gated on `{{#if @custom.sec_feed_api_url}}`.
 - `assets/js/islands/SecFeed.js` — the island: fetch, poll, render, tag filters.
 - `assets/js/lib/sec-feed-model.js` — pure logic, unit-tested.
+- `page-secfeed.hbs` — the full-page variant: page title and excerpt, then the block with
+  `full=true`. Applies automatically to a page whose slug is `secfeed`.
 
 ### The 1/3 column has a fixed height, and the feed scrolls inside it
 

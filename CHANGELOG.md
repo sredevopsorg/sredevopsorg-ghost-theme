@@ -4,6 +4,13 @@
 
 ### Added
 
+- **A full-page security feed**, `page-secfeed.hbs`: the same block partials/featured-row.hbs
+  puts beside the featured post, rendered as a destination. Ghost resolves it automatically for
+  a page whose slug is `secfeed`, so no template setting is needed. The frame becomes an
+  ordinary in-flow card and the *document* scrolls (instead of the list scrolling inside the
+  panel), and the island is asked for 25 advisories — the API maximum — rather than the
+  `sec_feed_items` setting. Both layouts are one partial and one island; only the box around
+  the mount point differs. See [README](README.md#full-page-feed-page-secfeedhbs).
 - **Security feed widget** — the newest advisories from
   [SREDevOps Sec Feed](https://github.com/sredevopsorg/sredevopsorg-sec-feed) (Ubuntu, Debian,
   Red Hat, NVD, CISA, AWS, Kubernetes and OpenSSF, enriched with CISA KEV, EPSS and OSV.dev)
@@ -20,6 +27,10 @@
 
 ### Changed
 
+- **The security feed's "Linux · Cloud · Kubernetes" caption is gone.** It sat beside the
+  "Security feed" heading and restated what the page already is; removing it leaves the heading
+  alone in the panel header and gives the embedded panel a little more room for rows. The now
+  unused translation key was dropped from `locales/en|es|pt.json`.
 - **The security feed now sits beside the featured post** instead of above it: the
   featured post takes 2/3 of the row and the feed 1/3, stacking below it on mobile
   (the post stays first in the DOM). With `sec_feed_api_url` unset, `featured-row.hbs`
