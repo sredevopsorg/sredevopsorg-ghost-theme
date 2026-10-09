@@ -2,7 +2,7 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost 6 theme for SREDevOps.org (https://www.sredevops.org) \u2014 multi-locale, Tailwind CSS v4 via Vite, React islands, light and dark palettes, and tag-based language filtering.",
     "demo": "https://www.sredevops.org",
-    "version": "3.0.1",
+    "version": "3.1.0",
     "type": "module",
     "engines": {
         "ghost": ">=6.0.0",
