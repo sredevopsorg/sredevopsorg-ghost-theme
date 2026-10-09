@@ -41,3 +41,9 @@ tests/fixtures/current/
 
 # v3: build output is generated, never committed (npm run build)
 assets/built/
+
+# v3: tooling probes must never land in the theme root. Ghost's gscan pass scandirs
+# this directory and a 0700 entry makes it throw EACCES, which makes Ghost treat the
+# active theme as invalid and 500 every frontend route in the dev stack.
+.twprobe-*
+.dsh-*

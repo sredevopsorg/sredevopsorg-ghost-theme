@@ -26,6 +26,18 @@
   renders the bare full-width featured post and no grid — an unconfigured site's HTML
   is byte-identical, and all eight golden fixtures still match. See
   [docs/adr/0003](docs/adr/0003-security-feed-widget.md).
+- **The feed panel is now exactly as tall as the featured post, and the advisory list
+  scrolls inside it.** The feed column no longer sizes the row: the featured post owns
+  the row height, the panel matches it, and the heading, status line and tag chips stay
+  pinned above a scrolling list. The panel also repeats the card's own `mb-12`, so the two
+  visible blocks end on the same line and leave the same 48px before the post grid. The
+  panel is 467.0px at 1440 whether the feed holds 5 advisories or 20 — before this, the
+  island's height grew with every advisory, resized the whole block on each poll, and sat
+  flush against the next block. Fixes the reported "island of SecFeed gets variable height
+  which breaks the block" and the follow-up "make them the same height and the same bottom
+  spacing". See
+  [README](README.md#height-and-scrolling) for the two mechanisms this needs and why the
+  obvious one-class fix does not work, and [docs/adr/0003](docs/adr/0003-security-feed-widget.md).
 
 ## 3.0.0
 

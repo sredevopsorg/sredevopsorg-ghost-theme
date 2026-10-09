@@ -310,6 +310,49 @@ and no grid at all — an unconfigured site's HTML is byte-identical to a theme 
 feature. If a channel has **no** featured post configured, the 2/3 column is empty and the feed
 sits beside it; a site with no featured post on a channel would want the feed moved.
 
+### Height and scrolling
+
+**The feed panel is the same height as the featured card, and leaves the same space below it.**
+The advisory list is the scroll region — the heading, the status line and the tag chips stay
+pinned above it — so a channel with twenty advisories is exactly as tall as one with three.
+
+The featured card carries `mb-12`, so the row's rhythm is *card + 48px*. The feed column repeats
+that same `mb-12` (`partials/featured-row.hbs`), and the panel is pinned to what is left. That is
+what makes the two visible surfaces line up: the panel is shortened by the margin to the card's
+height, and the margin is the space the row needs before the post grid. Two mechanisms are at
+work, and both matter:
+
+| Mechanism | Where | Why |
+| --- | --- | --- |
+| `align-items: stretch` (the grid default) | `partials/featured-row.hbs` row | gives both columns the row's height instead of their own |
+| `lg:relative` column + `lg:absolute lg:inset-0` panel | row / `partials/sec-feed.hbs` | takes the feed out of the row's intrinsic sizing, so the *hero card* decides the height |
+| `mb-12` on the feed column | `partials/featured-row.hbs` | matches the card's own bottom margin, so the panel is the card's height and the next block keeps the same gap |
+
+Without the second row of that table the height is merely *equal*, not stable: an in-flow grid
+item still contributes its content height to an auto-sized row track, so a feed of twenty
+advisories sized the track no matter how the column was clamped (`min-h-0` bounds a flex item,
+not a grid track). Without the third, the panel is one card-margin taller than the card and sits
+flush against the post grid. A hardcoded row height cannot replace any of it: the card measures
+504.5px at 1024x900 and 467px at every width from 1280 up, so any constant is wrong at one end.
+
+Measured in Chromium against a live feed:
+
+| Viewport | Featured card | Feed panel | Gap below card | Gap below panel | List scrollable |
+| --- | --- | --- | --- | --- | --- |
+| 1024×900 | 504.5 | 504.5 | 48px | 48px | 272px |
+| 1280×900 | 467.0 | 467.0 | 48px | 48px | 235px |
+| 1440×900 | 467.0 | 467.0 | 48px | 48px | 235px |
+| 1920×1080 | 467.0 | 467.0 | 48px | 48px | 235px |
+
+With **20** advisories the panel is still 467.0px and only the list grows — before this change
+the block grew with every advisory added.
+
+**On mobile the columns stack and are deliberately not equalised.** Below `lg` the panel is an
+ordinary in-flow block, so the feed sits *below* the hero at its own height (measured: 615.8px of
+hero, then 764.5px of feed). Bounding it there would nest a scrollbar inside the page's own and
+trap touch scrolling, so it is left alone. "Same height as the 2/3 element" is a side-by-side
+property; there is no 2/3 element once the columns stack.
+
 It is *not* on post or page templates, and *not* on `/tag/…` or `/author/…` — `tag.hbs` and
 `author.hbs` carry their own markup rather than sharing `collection-layout.hbs`.
 

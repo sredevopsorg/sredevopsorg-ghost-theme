@@ -44,6 +44,51 @@ the feed above the post grid rather than half-fill a row.
 - `assets/js/islands/SecFeed.js` — the island: fetch, poll, render, tag filters.
 - `assets/js/lib/sec-feed-model.js` — pure logic, unit-tested.
 
+### The 1/3 column has a fixed height, and the feed scrolls inside it
+
+The widget is a list of unbounded length in a column of bounded height, so the column cannot be
+sized by the feed: a panel that grows with every advisory would resize the whole row on every
+poll. The rule adopted is **the featured card owns the row height, the feed panel matches it,
+and the advisory list scrolls**. Measured at 1440x900: featured card 467.0, feed panel 467.0, a
+48px gap below each, list 235px of 532px visible. With **20** advisories instead of 5 the panel
+stays at 467.0 and only the list grows.
+
+The featured card carries `mb-12`, so the row's rhythm is card + 48px. The feed column repeats
+that margin and the panel is pinned to what remains, which is what makes the two visible surfaces
+line up rather than merely the two columns: matching the *columns* leaves the panel one
+card-margin taller than the card and flush against the post grid, which is the bug that prompted
+this. The columns still share the row through their margin boxes, so the grid stays symmetric.
+
+Two mechanisms are involved and it is worth being precise about which does what, because the
+obvious fix does not work:
+
+- **`align-items: stretch`** (the grid default, i.e. deleting `items-start`) gives both columns
+  the row's height rather than their own. Alone it is not enough, and the measurement shows why:
+  it equalises the columns by letting the *taller* one decide, so the row ends up feed-sized. The
+  first attempt therefore measured hero 752.5 / feed 752.5 — equal, still wrong, and still growing
+  with the feed. Deleting `items-start` is necessary, just not sufficient.
+- **`lg:relative` on the column, `lg:absolute lg:inset-0` on the panel** takes the feed out of
+  the row's intrinsic sizing. An in-flow grid item contributes its content height to an auto-sized
+  row track, so a feed of twenty advisories sizes the track no matter how the column is clamped —
+  `min-h-0` bounds a *flex* item's automatic minimum size, not a *grid track*, which is why the
+  `h-full min-h-0` column also measured 752.5. Out of flow the feed contributes nothing, the track
+  is the hero's max-content height, and the panel is stretched back onto the column it left.
+  Removing these classes at runtime reverts the row to 764.5 and stops the list scrolling at all,
+  so they are load-bearing rather than defensive.
+
+A declared row height cannot substitute for either mechanism: the hero column is 552.5px at
+1024x900 (the 16:9 image box is taller there than the text beside it) and 515px flat from 1280 up,
+so any single constant is wrong at one end, and `height: 100%` on an in-flow column resolves
+against an indefinite track and collapses to `auto`.
+
+Two deliberate limits. The scroll region is the **list**, not the panel: scrolling the panel would
+carry the tag chips, the footer and the `role="status"` live region out of view, so the island
+lays itself out as a flex column and gives the remaining height to the `<ul>`. And **below `lg`
+the columns stack and are not equalised** — the panel is in flow at its own height, because a
+scroll region on a narrow screen nests a scrollbar inside the page's own and traps touch
+scrolling. "The same height as the 2/3 element" is a side-by-side property; there is no 2/3
+element once the columns stack.
+
 ## The alternatives, and why not
 
 ### 1. A headless frontend replacing the theme (rejected)
@@ -161,3 +206,11 @@ own domain can set `sec_feed_api_url` to that path instead and needs no CORS cha
   change — and the goldens were re-promoted on that basis.
 - `yarn verify` (build → GScan → ship-manifest → unit → bundle → class-coverage)
   passes.
+- **Panel height, bottom spacing and scroll region** (2026-10-09, headless Chromium against the
+  local Ghost 6 with the setting enabled and a live feed): the feed panel and the featured card
+  agree to the pixel at 1024, 1280, 1440 and 1920, and the gap below each is the same 48px; the
+  panel is 467.0px with 5 advisories *and* with 20, which is the regression this change exists to
+  prevent; the columns still share the row (equal margin boxes); the list is a real scroll
+  container (`overflow-y: auto`, 235px visible of 532px, `scrollTop` movable); and the hero card
+  is not clipped at any width (`scrollHeight == clientHeight`).
+  `scripts/verify-sec-feed-layout.mjs` asserts all of this and fails on the pre-fix layout.
