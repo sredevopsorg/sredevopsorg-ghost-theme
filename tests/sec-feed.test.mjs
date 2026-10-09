@@ -408,8 +408,58 @@ test("the feed sits beside the hero only when it is configured", () => {
   assert.match(offBranch, /\{\{> "featured-hero"/, "without the feed the hero renders on its own");
 
   // The block itself carries no vertical margin: the row owns the spacing.
-  assert.ok(
-    !/class="[^"]*\bmt-\d|\bmb-\d/.test(readFileSync("partials/sec-feed.hbs", "utf8").split("<section")[1] ?? ""),
-    "sec-feed.hbs must not bring its own margins into a row that already spaces it",
+  //
+  // Assert on the <section> tag rather than on a slice of the file. The assertion this
+  // replaces split on the first "<section" — which is in the comment block, so it tested
+  // the prose between two mentions and passed no matter what the markup did. The real
+  // rule is about the block's own box: an inner `mb-1` under the heading is spacing
+  // inside the panel and cannot move the row, a margin on the section itself can.
+  const sectionTag = readFileSync("partials/sec-feed.hbs", "utf8").match(/<section[^>]*>/)?.[0] ?? "";
+  assert.ok(sectionTag, "sec-feed.hbs must render a <section>");
+  const sectionMargin = (sectionTag.match(/class="([^"]*)"/)?.[1] ?? "")
+    .split(/\s+/)
+    .filter((token) => /^(?:m|my|mt|mb)-\d/.test(token));
+  assert.deepEqual(
+    sectionMargin,
+    [],
+    "the section must not bring a vertical margin into a row that already spaces it: " + sectionMargin.join(" "),
   );
+});
+
+test("the full-page variant is one partial, and says so through data-fill", () => {
+  const page = readFileSync("page-secfeed.hbs", "utf8");
+  const partial = readFileSync("partials/sec-feed.hbs", "utf8");
+  const island = readFileSync("assets/js/islands/SecFeed.js", "utf8");
+
+  // Automatic resolution: Ghost maps page-<slug>.hbs to a page with that slug, so the
+  // file must keep the page- prefix and extend a shell.
+  assert.match(page, /^\{\{!< default\}\}/m, "page-secfeed.hbs must extend default.hbs");
+  assert.match(page, /\{\{> "sec-feed" locale="en" full=true\}\}/, "the page must ask for the full variant");
+
+  // The mode is a real difference, not a class tweak: the bounded-box classes are in
+  // the embedded branch only, and the mount point tells the island which mode it is in.
+  assert.match(partial, /\{\{#if full\}\}/, "the partial must branch on `full`");
+  assert.match(partial, /data-fill="page"/, "page mode must be declared on the mount point");
+  assert.match(partial, /data-limit="\{\{#if full\}\}25/, "a full page asks for the API maximum");
+
+  // The island has to honour it: the embedded flex contract (flex-1 + min-h-0 on the
+  // list) resolves against a definite height and would collapse the list in an
+  // auto-height page. Assert the guard exists rather than trusting the comment.
+  assert.match(island, /pageMode:\s*props\.fill === "page"/, "the island must read data-fill");
+  assert.match(island, /if \(!pageMode\)\s*\{/, "the island must skip the bounded layout in page mode");
+});
+
+test("the caption next to the heading is gone, and its translation key with it", () => {
+  const partial = readFileSync("partials/sec-feed.hbs", "utf8");
+  assert.ok(
+    !partial.includes("Linux · Cloud · Kubernetes"),
+    "the Linux · Cloud · Kubernetes caption must not come back into partials/sec-feed.hbs",
+  );
+  for (const file of ["locales/en.json", "locales/es.json", "locales/pt.json"]) {
+    const locale = JSON.parse(readFileSync(file, "utf8"));
+    assert.ok(
+      !("Linux · Cloud · Kubernetes" in locale),
+      file + " still carries the removed caption key",
+    );
+  }
 });

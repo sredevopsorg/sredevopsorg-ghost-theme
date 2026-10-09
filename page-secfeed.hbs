@@ -1,0 +1,36 @@
+{{!< default}}
+{{!-- Full-page security feed — the widget as a destination, not a sidebar block.
+
+     Ghost resolves a page's template as page-:slug.hbs -> custom-*.hbs -> page.hbs, so
+     this file is picked up automatically by a page whose slug is "secfeed". It renders
+     the same block partials/featured-row.hbs puts beside the featured post, with
+     `full=true` for the three things a page changes: the frame stops being a bounded
+     box, the document scrolls instead of the list, and the island is asked for the
+     maximum number of advisories instead of the administrator's `sec_feed_items`.
+     See partials/sec-feed.hbs for the contract and which half of it each mode owns.
+
+     `locale` is passed at this level, never inside {{#page}}: a context-changing block
+     drops a partial's hash arguments (see partials/page-body.hbs), so a match on
+     `locale` nested in {{#page}} would always take the English branch. The Spanish
+     counterpart is a file like this one extending default-es.hbs, selected in the
+     page's Template setting — the same remedy custom-page-es.hbs documents.
+
+     This is a *minified* frontend, not a replacement for the service's own app: the
+     footer link still hands over to https://security-feed.sredevops.org for search and
+     the full archive. --}}
+
+{{#page}}
+    {{!-- @page.show_title_and_feature_image is the per-page toggle in the editor.
+         Honouring it is why this is not simply an unconditional <h1>. --}}
+    {{#if @page.show_title_and_feature_image}}
+    <h1 class="text-4xl text-strong font-bold mb-4">{{title}}</h1>
+    {{> "feature-image"}}
+    {{/if}}
+    {{#if custom_excerpt}}
+    <p class="text-muted text-lg mb-8">{{custom_excerpt}}</p>
+    {{/if}}
+{{/page}}
+
+<div class="max-w-6xl mx-auto pb-12">
+    {{> "sec-feed" locale="en" full=true}}
+</div>
