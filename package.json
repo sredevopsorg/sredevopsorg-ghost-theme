@@ -9,6 +9,9 @@
         "node": ">=24"
     },
     "license": "MIT",
+    "resolutions": {
+        "handlebars": "4.7.10"
+    },
     "scripts": {
         "dev": "vite build --watch",
         "build": "vite build",
