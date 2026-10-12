@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.1.1
+
+### Security
+
+- **Bumped the transitive `handlebars` dependency to 4.7.10** to fix a JavaScript
+  injection via AST type confusion in `compile()`/`precompile()` (CVE-2026-106446 /
+  GHSA-8r5x-fm3f-whwj, critical, CVSS 9.8) and an unsafe inline embedding of
+  precompiled templates (CVE-2026-106444, medium). `handlebars` is pulled in only as a
+  dev-dependency of `gscan` (theme validation) and is pinned there, so the version is
+  forced via a Yarn `resolutions` override until `gscan` ships a patched release.
+
 ## 3.1.0
 
 ### Added
