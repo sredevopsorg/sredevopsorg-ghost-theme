@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 3.2.0
 
 ### Added
 
@@ -14,6 +14,13 @@
   chain from `partials/featured-row.hbs`. See
   [README](README.md#featured-hero-filtering) and
   [docs/adr/0004](docs/adr/0004-featured-hero-filter.md).
+
+### Changed
+
+- **The local development stack is environment-driven.** `docker-compose.dev.yml` now runs
+  the MySQL-backed image the deployment uses and reads `THEME_PATH` / `GHOST_DATA_PATH` from
+  `.env`; copy `.env.example` to `.env` and set both to absolute paths. Nothing in the theme
+  package changes — this only affects contributors running Ghost locally.
 
 ### Fixed
 
