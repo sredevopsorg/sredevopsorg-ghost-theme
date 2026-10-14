@@ -65,23 +65,34 @@
   
 
   {{#is "post"}}
+  {{!-- Related content: the newest posts sharing this post's primary tag,
+       current post excluded.
+
+       The tag slug must be a *separate* `concat` argument. Putting it inside the quoted
+       string is never interpolated: `concat` joins its arguments as strings and Handlebars
+       does not re-render a literal (verified against Ghost 6.70). The old form sent the
+       token to NQL verbatim, which matched nothing; the Spanish branch only looked
+       non-empty because its bracket OR also matched every `es` post, and the English
+       branch, which has no locale tag in the bracket, rendered empty. Every published
+       post's primary tag is shared by at least one other post, so the interpolated
+       filter always has something to show. --}}
   <div class="mt-16 border-t border-border-subtle pt-8">
     <h2 class="text-2xl font-bold text-strong mb-6">{{#match locale "=" "es"}}Contenido relacionado{{else match locale "=" "br"}}Conteúdo relacionado{{else}}{{t "Related content"}}{{/match}}</h2>
-    {{#match locale "=" "es"}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[es,{{primary_tag.slug}}]") limit="2" as |next|}}
+    {{#match locale "=" "es"}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[es," primary_tag.slug "]") limit="2" as |next|}}
       {{#if next}}
       <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {{#foreach next}}{{> "post-card" locale="es"}}{{/foreach}}
       </section>
       {{/if}}
       {{/get}}
-      {{else match locale "=" "br"}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[br,{{primary_tag.slug}}]") limit="2" as |next|}}
+      {{else match locale "=" "br"}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[br," primary_tag.slug "]") limit="2" as |next|}}
       {{#if next}}
       <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {{#foreach next}}{{> "post-card" locale="br"}}{{/foreach}}
       </section>
       {{/if}}
       {{/get}}
-      {{else}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[{{primary_tag.slug}}]") limit="2" as |next|}}
+      {{else}}{{#get "posts" include="authors" filter=(concat "id:-" id "+tags:[" primary_tag.slug "]") limit="2" as |next|}}
       {{#if next}}
       <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {{#foreach next}}{{> "post-card" locale="en"}}{{/foreach}}

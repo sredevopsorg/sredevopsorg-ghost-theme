@@ -1,0 +1,45 @@
+{{!-- Pick the locale's hero partial and hand it the NQL filter it must run.
+
+     Why the filter is assembled here and not inside each hero: a `{{#get}}` filter has to
+     be a literal at the call site, and the three inputs it depends on — the collection's
+     language tag (via `locale`), `featured_only` and `featured_tag` — are all readable in
+     this partial's own scope. The heroes stay per-locale because their label, date format
+     and reading-time strings sit *inside* `{{#get}}` + `{{#foreach}}`, where a partial hash
+     argument is dropped (measured; see docs/v3-roadmap.md, "What a partial argument can and
+     cannot do"). `featuredFilter` is read at the heroes' own top level — the `{{#get}}`
+     call itself — which is exactly where a hash argument does survive.
+
+     Two filters, independent, hence four combinations:
+
+       featured_only  featured_tag   filter
+       ─────────────  ────────────   ─────────────────────────────────────────
+       on  (default)  empty          featured:true+tag:<locale>      ← today's output
+       on             my-tag         featured:true+tag:<locale>+tag:my-tag
+       off            empty          tag:<locale>
+       off            my-tag         tag:<locale>+tag:my-tag
+
+     The custom tag is **added** (AND), never a replacement: the language tag is what keeps
+     /es/ Spanish-only, so dropping it would let an English post become the Spanish hero.
+     The default path therefore renders byte-for-byte what it rendered before this setting
+     existed — `tests/featured-filter.test.mjs` and the HTML goldens pin that. --}}
+{{#if @custom.featured_only}}
+    {{#if @custom.featured_tag}}
+        {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}
+        {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}
+        {{else}}{{> "featured-hero" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}{{/match}}
+    {{else}}
+        {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "featured:true+tag:" locale)}}
+        {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "featured:true+tag:" locale)}}
+        {{else}}{{> "featured-hero" featuredFilter=(concat "featured:true+tag:" locale)}}{{/match}}
+    {{/if}}
+{{else}}
+    {{#if @custom.featured_tag}}
+        {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}
+        {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}
+        {{else}}{{> "featured-hero" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}{{/match}}
+    {{else}}
+        {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "tag:" locale)}}
+        {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "tag:" locale)}}
+        {{else}}{{> "featured-hero" featuredFilter=(concat "tag:" locale)}}{{/match}}
+    {{/if}}
+{{/if}}

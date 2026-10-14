@@ -575,6 +575,34 @@ Customize behavior via **Ghost Admin → Settings → Theme**:
 | `show_login` | Boolean | `true` | Show a sign-in link in the main navigation |
 | `sec_feed_api_url` | Text | *(empty)* | Origin of the security feed API. Empty hides the [security feed widget](#-security-feed-widget) |
 | `sec_feed_items` | Select | `10` | How many advisories the security feed widget shows |
+| `featured_tag` | Text | *(empty)* | Extra tag slug ANDed into the featured hero filter, on top of the collection's language tag |
+| `featured_only` | Boolean | `true` | Require the `featured` flag on the hero post |
+
+### Featured hero filtering
+
+The hero at the top of every channel collection (`/`, `/en/`, `/es/`, `/br/`) is chosen by
+`partials/featured-hero-locale.hbs`. Two settings shape its NQL filter. The collection's
+**language tag** (`tag:en`, `tag:es`, `tag:br`) is always part of it, so a channel can never
+borrow another locale's post:
+
+| `featured_only` | `featured_tag` | filter on `/es/` |
+|-----------------|----------------|------------------|
+| `true` (default) | *(empty)* | `featured:true+tag:es` |
+| `true` | `news` | `featured:true+tag:es+tag:news` |
+| `false` | *(empty)* | `tag:es` |
+| `false` | `news` | `tag:es+tag:news` |
+
+- **AND, never a replacement.** `featured_tag` is *added* to the language tag; it cannot
+  replace it, because that would let an English post become the Spanish hero. The tag is a
+  **slug** (the same value that appears in the tag's URL) and must exist, or the hero renders
+  empty rather than erroring — the row's [1/3 column caveat](docs/adr/0003-security-feed-widget.md)
+  applies.
+- **Empty is the old behaviour.** With both defaults the output is byte-identical to a theme
+  without these settings; the HTML goldens and `tests/featured-filter.test.mjs` pin that.
+- **Four combinations, verified end to end.** Changing only `featured_tag` moves the hero to a
+  different tagged post and changing only `featured_only` moves it to the newest post on the
+  channel, which is what distinguishes all four rows. See
+  [docs/adr/0004](docs/adr/0004-featured-hero-filter.md) for the measurements.
 
 ### Image Size Presets
 

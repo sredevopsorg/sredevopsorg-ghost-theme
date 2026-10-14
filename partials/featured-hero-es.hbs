@@ -1,6 +1,8 @@
-{{!-- Featured Post Hero (Spanish) — shown at the top of page 1 only. --}}
+{{!-- Featured Post Hero (Spanish) — shown at the top of page 1 only.
+     `featuredFilter` comes from partials/featured-hero-locale.hbs and is read at this
+     partial's own top level (the `{{#get}}` call), where a partial hash argument survives. --}}
 {{^is "paged"}}
-{{#get "posts" filter="featured:true+tag:es" limit="1" include="authors,tags" as |featuredPosts|}}
+{{#get "posts" filter=featuredFilter limit="1" include="authors,tags" as |featuredPosts|}}
 {{#foreach featuredPosts}}
 <a href="{{url}}"
     class="group block mb-12 rounded-2xl overflow-hidden border border-border-subtle bg-raised hover:border-brand-purple transition-colors">

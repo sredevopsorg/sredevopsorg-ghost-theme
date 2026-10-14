@@ -1,8 +1,8 @@
 {
     "name": "sredevopsorg-ghost-theme",
-    "description": "Ghost 6 theme for SREDevOps.org (https://www.sredevops.org) \u2014 multi-locale, Tailwind CSS v4 via Vite, React islands, light and dark palettes, and tag-based language filtering.",
+    "description": "Ghost 6 theme for SREDevOps.org (https://www.sredevops.org) multi-locale, Tailwind CSS v4 via Vite, React islands, light and dark palettes, and tag-based language filtering.",
     "demo": "https://www.sredevops.org",
-    "version": "3.1.1",
+    "version": "3.2.0",
     "type": "module",
     "engines": {
         "ghost": ">=6.0.0",
@@ -98,6 +98,16 @@
                     "20"
                 ],
                 "description": "How many advisories the security feed widget shows"
+            },
+            "featured_tag": {
+                "type": "text",
+                "default": "",
+                "description": "Extra tag slug added to the featured hero filter, e.g. news. Empty keeps only the language tag."
+            },
+            "featured_only": {
+                "type": "boolean",
+                "default": true,
+                "description": "Require the Featured flag on the hero post. Off shows the newest post matching the tag filter."
             }
         },
         "image_sizes": {

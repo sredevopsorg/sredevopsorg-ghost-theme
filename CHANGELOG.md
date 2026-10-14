@@ -1,5 +1,38 @@
 # Changelog
 
+## 3.2.0
+
+### Added
+
+- **Featured hero filtering** — two theme settings, `featured_tag` (text) and `featured_only`
+  (boolean, default on), let an editor choose the hero post on every channel collection by a
+  custom tag and/or drop the `featured` requirement. The custom tag is **ANDed onto** the
+  collection's language tag (`featured:true+tag:es+tag:news`), never substituted for it, so a
+  channel still cannot render another locale's post; the defaults produce the previous filter
+  exactly. All four combinations are assembled in the new
+  `partials/featured-hero-locale.hbs`, which also removes the duplicated locale `{{#match}}`
+  chain from `partials/featured-row.hbs`. See
+  [README](README.md#featured-hero-filtering) and
+  [docs/adr/0004](docs/adr/0004-featured-hero-filter.md).
+
+### Changed
+
+- **The local development stack is environment-driven.** `docker-compose.dev.yml` now runs
+  the MySQL-backed image the deployment uses and reads `THEME_PATH` / `GHOST_DATA_PATH` from
+  `.env`; copy `.env.example` to `.env` and set both to absolute paths. Nothing in the theme
+  package changes — this only affects contributors running Ghost locally.
+
+### Fixed
+
+- **"Related content" was always empty on English posts.** The three locale branches build
+  their NQL filter with `concat`, but the primary tag slug was written inside the string
+  argument (`"+tags:[{{primary_tag.slug}}]"`), and `concat` does not interpolate a literal —
+  NQL received the token `{{primary_tag.slug}}`, which matches nothing. The Spanish branch
+  only looked populated because its bracket OR also matched every `es` post; the English
+  branch has no locale tag in the bracket, so it rendered an empty section. The slug is now a
+  separate `concat` argument, and `tests/related-content.test.mjs` pins the shape. See
+  [partials/post-layout.hbs](partials/post-layout.hbs).
+
 ## 3.1.1
 
 ### Security

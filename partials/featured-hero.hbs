@@ -2,9 +2,13 @@
      One file per locale rather than one parameterised partial: the label, date format
      and reading time are rendered inside `{{#get}}` + `{{#foreach}}`, and a partial
      argument does not survive either (Ghost's context-changing blocks drop partial
-     hash arguments — verified). The tag it draws from is fixed per locale too. --}}
+     hash arguments — verified). The NQL filter is *supplied* by
+     `partials/featured-hero-locale.hbs` and read here at this partial's own top level,
+     which is the one place a hash argument does survive. It carries `featured:true`
+     when the `featured_only` setting is on, the collection's language tag, and the
+     `featured_tag` setting when one is set. --}}
 {{^is "paged"}}
-{{#get "posts" filter="featured:true+tag:en" limit="1" include="authors,tags" as |featuredPosts|}}
+{{#get "posts" filter=featuredFilter limit="1" include="authors,tags" as |featuredPosts|}}
 {{#foreach featuredPosts}}
 <a href="{{url}}"
     class="group block mb-12 rounded-2xl overflow-hidden border border-border-subtle bg-raised hover:border-brand-purple transition-colors">

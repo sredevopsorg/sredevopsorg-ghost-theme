@@ -405,7 +405,7 @@ test("the feed sits beside the hero only when it is configured", () => {
 
   // ...and the hero must still be reachable with no feed at all, outside that branch.
   const offBranch = row.slice(row.lastIndexOf("{{else}}"));
-  assert.match(offBranch, /\{\{> "featured-hero"/, "without the feed the hero renders on its own");
+  assert.match(offBranch, /\{\{> "featured-hero-locale"/, "without the feed the hero renders on its own");
 
   // The block itself carries no vertical margin: the row owns the spacing.
   //
