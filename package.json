@@ -98,6 +98,16 @@
                     "20"
                 ],
                 "description": "How many advisories the security feed widget shows"
+            },
+            "featured_tag": {
+                "type": "text",
+                "default": "",
+                "description": "Extra tag slug added to the featured hero filter, e.g. news. Empty keeps only the language tag."
+            },
+            "featured_only": {
+                "type": "boolean",
+                "default": true,
+                "description": "Require the Featured flag on the hero post. Off shows the newest post matching the tag filter."
             }
         },
         "image_sizes": {

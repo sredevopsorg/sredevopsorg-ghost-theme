@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- **Featured hero filtering** — two theme settings, `featured_tag` (text) and `featured_only`
+  (boolean, default on), let an editor choose the hero post on every channel collection by a
+  custom tag and/or drop the `featured` requirement. The custom tag is **ANDed onto** the
+  collection's language tag (`featured:true+tag:es+tag:news`), never substituted for it, so a
+  channel still cannot render another locale's post; the defaults produce the previous filter
+  exactly. All four combinations are assembled in the new
+  `partials/featured-hero-locale.hbs`, which also removes the duplicated locale `{{#match}}`
+  chain from `partials/featured-row.hbs`. See
+  [README](README.md#featured-hero-filtering) and
+  [docs/adr/0004](docs/adr/0004-featured-hero-filter.md).
+
 ## 3.1.1
 
 ### Security

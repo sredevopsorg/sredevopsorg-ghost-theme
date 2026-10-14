@@ -32,13 +32,15 @@
      size to its content and grow the track it was measuring against. See
      docs/adr/0003-security-feed-widget.md.
 
-     `locale` only selects which hero partial renders; the feed gets its own strings from
-     the page language. --}}
+     `locale` only selects which hero partial renders and which language tag the hero
+     filters on; the feed gets its own strings from the page language. The hero dispatch
+     (and the `featured_only` / `featured_tag` filter it builds) lives in one partial,
+     `partials/featured-hero-locale.hbs`, so both branches below share it. --}}
 {{#if @custom.sec_feed_api_url}}
 <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
     {{!-- 2/3: the featured post. --}}
     <div class="lg:col-span-2">
-        {{#match locale "=" "es"}}{{> "featured-hero-es"}}{{else match locale "=" "br"}}{{> "featured-hero-br"}}{{else}}{{> "featured-hero"}}{{/match}}
+        {{> "featured-hero-locale" locale=locale}}
     </div>
 
     {{!-- 1/3: the security feed, as a column beside the hero. Its bottom margin matches
@@ -70,5 +72,5 @@
     </div>
 </div>
 {{else}}
-{{#match locale "=" "es"}}{{> "featured-hero-es"}}{{else match locale "=" "br"}}{{> "featured-hero-br"}}{{else}}{{> "featured-hero"}}{{/match}}
+{{> "featured-hero-locale" locale=locale}}
 {{/if}}
