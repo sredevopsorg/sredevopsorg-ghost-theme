@@ -11,13 +11,16 @@ import { readFileSync } from "node:fs";
  *      a control that does nothing (or GScan fails on an unused setting);
  *   2. a hero partial goes back to a hard-coded `filter="featured:true+tag:en"`, which
  *      would silently ignore the settings for that locale only;
- *   3. the filter string is assembled for the wrong combination — the four modes are
+ *   3. the filter string is assembled for the wrong combination — the eight modes are
  *      built by hand, and a copy-paste error in one branch is invisible on the default
- *      path, which is the one everyone tests.
+ *      path, which is the one everyone tests;
+ *   4. the root channel `/` starts filtering its hero by a language tag again (or a
+ *      locale collection drops it) — the root route is the intentionally unfiltered,
+ *      mixed feed, while /en/, /es/ and /br/ must stay locale-only.
  *
  * Ghost renders the templates server-side, so the honest end-to-end check is the HTML
  * goldens (tests/fixtures/README.md). These tests are the fast, offline half: they pin
- * the contract that makes the four combinations correct, and a live Ghost run is what
+ * the contract that makes the combinations correct, and a live Ghost run is what
  * proves the rendering (see the PR notes).
  */
 const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
@@ -30,6 +33,36 @@ const heroes = {
   es: readFileSync("partials/featured-hero-es.hbs", "utf8"),
   br: readFileSync("partials/featured-hero-br.hbs", "utf8"),
 };
+
+/**
+ * Body of a top-level block, cut at its first sibling `{{else}}`.
+ *
+ * The dispatch has one top-level `{{#if mixedFeed}}` whose alternate branch holds the
+ * locale filters, and both branches contain nested `{{#if}}`/`{{else}}`; a plain split on
+ * "{{else}}" would therefore truncate the mixed-feed body at a nested else.
+ */
+function blockBody(source, opener) {
+  const start = source.indexOf(opener);
+  assert.notEqual(start, -1, `missing ${opener}`);
+  const token = /\{\{([#/])?(?:if|match|foreach|unless|is|has)\b[^}]*\}\}|\{\{else\}\}/g;
+  token.lastIndex = start;
+  let depth = 0;
+  let bodyEnd = null;
+  let match;
+  while ((match = token.exec(source))) {
+    if (match[0] === "{{else}}") {
+      if (depth === 1) bodyEnd = match.index;
+      continue;
+    }
+    if (match[1] === "/") {
+      depth -= 1;
+      if (depth === 0) return source.slice(start + opener.length, bodyEnd ?? match.index);
+    } else {
+      depth += 1;
+    }
+  }
+  assert.fail(`unclosed ${opener}`);
+}
 
 // --- the settings contract -------------------------------------------------------
 
@@ -55,9 +88,9 @@ test("both settings are read, so neither is an unused setting GScan would reject
   assert.match(heroLocale, /@custom\.featured_only/);
 });
 
-// --- the four filter combinations -------------------------------------------------
+// --- the filter combinations, per channel kind ------------------------------------
 
-test("the four featured/tag combinations produce the documented NQL", () => {
+test("the four locale featured/tag combinations produce the documented NQL", () => {
   // on + custom tag → featured:true+tag:<locale>+tag:<custom>
   assert.match(
     heroLocale,
@@ -84,20 +117,77 @@ test("the four featured/tag combinations produce the documented NQL", () => {
   );
 });
 
-test("the custom tag is added, never substituted: every branch keeps the locale tag", () => {
+test("every locale branch keeps the language tag, and only the root branch drops it", () => {
   // The language tag is what keeps /es/ Spanish-only; dropping it would let an English
-  // post become the Spanish hero. Every `tag:` prefix in the dispatch partial must be
-  // followed by `locale`, never by `@custom.featured_tag` alone.
+  // post become the Spanish hero. Every `tag:` prefix in a locale branch must therefore be
+  // followed by `locale`, never by `@custom.featured_tag` alone. The mixed-feed branch has
+  // no language tag by design (the root route is the unfiltered feed), so its only tag is
+  // the optional custom one.
   const concats = [...heroLocale.matchAll(/concat\s+[^\n)]*?\)/g)].map((m) => m[0]);
-  assert.ok(concats.length >= 4, "expected at least four concat filters");
+  assert.ok(concats.length >= 14, "expected twelve locale concat filters and two root ones");
+
+  let localeBranches = 0;
+  let rootBranches = 0;
   for (const expr of concats) {
-    assert.match(expr, /"tag:"\s*locale|"featured:true\+tag:"\s*locale/, `locale tag missing in: ${expr}`);
-    assert.doesNotMatch(
-      expr,
-      /"(?:featured:true\+)?tag:"\s*@custom\.featured_tag/,
-      `custom tag must not replace the locale tag in: ${expr}`,
-    );
+    if (/\blocale\b/.test(expr)) {
+      localeBranches += 1;
+      assert.match(expr, /"tag:"\s*locale|"featured:true\+tag:"\s*locale/, `locale tag missing in: ${expr}`);
+      assert.doesNotMatch(
+        expr,
+        /"(?:featured:true\+)?tag:"\s*@custom\.featured_tag/,
+        `custom tag must not replace the locale tag in: ${expr}`,
+      );
+    } else {
+      rootBranches += 1;
+      assert.match(
+        expr,
+        /"(?:featured:true\+)?tag:"\s*@custom\.featured_tag/,
+        `root-channel concat must use the custom tag alone: ${expr}`,
+      );
+    }
   }
+  assert.equal(localeBranches, 12, "three heroes for each of the four locale combinations");
+  assert.equal(rootBranches, 2, "featured_tag is the only tag a root-channel filter can carry");
+});
+
+test("the root channel hero is the mixed feed: the language tag is never forwarded", () => {
+  assert.match(
+    readFileSync("home.hbs", "utf8"),
+    /\{\{> "collection-layout" locale="en" header="site" mixedFeed=true\}\}/,
+    "home.hbs must mark the root channel as the mixed feed",
+  );
+  assert.match(
+    readFileSync("partials/collection-layout.hbs", "utf8"),
+    /\{\{> "featured-row" locale=locale mixedFeed=mixedFeed\}\}/,
+    "collection-layout must forward mixedFeed to the featured row",
+  );
+  const row = readFileSync("partials/featured-row.hbs", "utf8");
+  const forwarded = row.match(/\{\{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed\}\}/g) ?? [];
+  assert.equal(forwarded.length, 2, "both featured-row layouts must forward mixedFeed");
+
+  // Locale wrappers must not opt in: their collections rely on the tag.
+  for (const file of ["home-en.hbs", "home-es.hbs", "home-br.hbs"]) {
+    assert.doesNotMatch(readFileSync(file, "utf8"), /mixedFeed/, `${file} must keep filtering by its locale tag`);
+  }
+});
+
+test("the mixed-feed branch filters on the two settings only, using the English hero", () => {
+  const mixed = blockBody(heroLocale, "{{#if mixedFeed}}");
+
+  for (const line of mixed.split("\n").filter((l) => l.includes("featuredFilter"))) {
+    assert.doesNotMatch(line, /locale/, `root hero filter must not use a language tag: ${line.trim()}`);
+  }
+  assert.ok(!mixed.includes('{{> "featured-hero-es"'), "the root channel renders inside default.hbs (English UI)");
+  assert.ok(!mixed.includes('{{> "featured-hero-br"'), "the root channel renders inside default.hbs (English UI)");
+
+  assert.match(mixed, /\{\{> "featured-hero" featuredFilter="featured:true"\}\}/,
+    "featured_only on + no featured_tag -> featured:true");
+  assert.match(mixed, /concat\s+"featured:true\+tag:"\s+@custom\.featured_tag/,
+    "featured_only on + featured_tag -> featured:true+tag:<custom>");
+  assert.match(mixed, /concat\s+"tag:"\s+@custom\.featured_tag/,
+    "featured_only off + featured_tag -> tag:<custom>");
+  assert.match(mixed, /\{\{> "featured-hero" featuredFilter=""\}\}/,
+    "featured_only off + no featured_tag -> no filter (newest post)");
 });
 
 // --- the heroes must consume the injected filter ----------------------------------
@@ -123,7 +213,7 @@ test("the dispatch partial covers all three locale heroes and is what featured-r
 
   // Both row layouts — with and without the security feed — must go through the same
   // dispatch, or the settings would apply to only one of them.
-  const calls = row.match(/\{\{> "featured-hero-locale" locale=locale\}\}/g) ?? [];
+  const calls = row.match(/\{\{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed\}\}/g) ?? [];
   assert.equal(calls.length, 2, "the hero dispatch must be shared by the feed-on and feed-off branches");
   assert.doesNotMatch(row, /\{\{> "featured-hero(?!-locale)/, "featured-row must not pick a hero directly");
 });

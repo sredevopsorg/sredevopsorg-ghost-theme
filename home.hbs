@@ -1,2 +1,4 @@
 {{!< default}}
-{{> "collection-layout" locale="en" header="site"}}
+{{!-- `/` is the unfiltered, mixed feed, not a locale collection: its featured hero must not
+     filter on a language tag. `mixedFeed` tells partials/featured-hero-locale.hbs to drop it. --}}
+{{> "collection-layout" locale="en" header="site" mixedFeed=true}}

@@ -92,7 +92,9 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 - Locale collections are defined in `routes.yaml`. A post belongs to a collection only
   when it has exactly one of the tags `en`, `es`, `br` (each filter negates the other
   two). `hash-*` tags are legacy; never add them.
-- Root `/` is intentionally an unfiltered, mixed feed.
+- Root `/` is intentionally an unfiltered, mixed feed, so its featured hero is chosen
+  without a language tag too (`home.hbs` passes `mixedFeed=true` through the listing
+  partials). The locale collections keep their `tag:<locale>`; never re-add it to `/`.
 - Two different values, do not conflate them:
   - `documentLang` — BCP-47 value for `<html lang>` (`en`, `es`, `pt`).
   - `locale` — the theme's content key used in filters and partial arguments

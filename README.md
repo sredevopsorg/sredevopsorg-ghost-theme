@@ -634,33 +634,44 @@ authoritative settings table; the [security feed section](#-security-feed-widget
 | `show_login` | Boolean | `true` | site-wide | Show a sign-in link in the main navigation |
 | `sec_feed_api_url` | Text | *(empty)* | Homepage | Origin of the security feed API. Empty hides the [security feed widget](#-security-feed-widget) |
 | `sec_feed_items` | Select | `3` | Homepage | How many advisories the widget shows (3 / 5 / 10 / 15 / 20) |
-| `featured_tag` | Text | *(empty)* | Homepage | Extra tag slug ANDed into the featured hero filter, on top of the collection's language tag |
+| `featured_tag` | Text | *(empty)* | Homepage | Extra tag slug ANDed into the featured hero filter, on top of the collection's language tag (none on `/`) |
 | `featured_only` | Boolean | `true` | Homepage | Require the `featured` flag on the hero post |
 
 ### Featured hero filtering
 
-The hero at the top of every channel collection (`/`, `/en/`, `/es/`, `/br/`) is chosen by
-`partials/featured-hero-locale.hbs`. Two settings shape its NQL filter. The collection's
-**language tag** (`tag:en`, `tag:es`, `tag:br`) is always part of it, so a channel can never
-borrow another locale's post:
+The hero at the top of every channel (`/`, `/en/`, `/es/`, `/br/`) is chosen by
+`partials/featured-hero-locale.hbs`. Two settings shape its NQL filter, and there are two
+kinds of channel. The **locale collections** keep their language tag (`tag:en`, `tag:es`,
+`tag:br`) in the filter, so they can never borrow another locale's post. The root channel
+`/` is deliberately the unfiltered, mixed feed ([routes.yaml](routes.yaml) gives it no
+collection filter), so its hero carries **no** language tag — the newest featured post wins,
+whichever locale it is:
 
-| `featured_only` | `featured_tag` | filter on `/es/` |
-|-----------------|----------------|------------------|
-| `true` (default) | *(empty)* | `featured:true+tag:es` |
-| `true` | `news` | `featured:true+tag:es+tag:news` |
-| `false` | *(empty)* | `tag:es` |
-| `false` | `news` | `tag:es+tag:news` |
+| Channel | `featured_only` | `featured_tag` | filter |
+|---------|-----------------|----------------|--------|
+| `/en/` `/es/` `/br/` | `true` (default) | *(empty)* | `featured:true+tag:<locale>` |
+| `/en/` `/es/` `/br/` | `true` | `news` | `featured:true+tag:<locale>+tag:news` |
+| `/en/` `/es/` `/br/` | `false` | *(empty)* | `tag:<locale>` |
+| `/en/` `/es/` `/br/` | `false` | `news` | `tag:<locale>+tag:news` |
+| `/` | `true` (default) | *(empty)* | `featured:true` |
+| `/` | `true` | `news` | `featured:true+tag:news` |
+| `/` | `false` | *(empty)* | *(no filter — the newest post)* |
+| `/` | `false` | `news` | `tag:news` |
 
-- **AND, never a replacement.** `featured_tag` is *added* to the language tag; it cannot
-  replace it, because that would let an English post become the Spanish hero. The tag is a
-  **slug** (the same value that appears in the tag's URL) and must exist, or the hero renders
-  empty rather than erroring — the row's [1/3 column caveat](docs/adr/0003-security-feed-widget.md)
-  applies.
-- **Empty is the old behaviour.** With both defaults the output is byte-identical to a theme
-  without these settings; the HTML goldens and `tests/featured-filter.test.mjs` pin that.
-- **Four combinations, verified end to end.** Changing only `featured_tag` moves the hero to a
-  different tagged post and changing only `featured_only` moves it to the newest post on the
-  channel, which is what distinguishes all four rows. See
+- **AND, never a replacement.** On a locale collection `featured_tag` is *added* to the
+  language tag; it cannot replace it, because that would let an English post become the
+  Spanish hero. The tag is a **slug** (the same value that appears in the tag's URL) and must
+  exist, or the hero renders empty rather than erroring — the row's
+  [1/3 column caveat](docs/adr/0003-security-feed-widget.md) applies.
+- **The root feed is the exception.** `/` has no language tag to add `featured_tag` to, so
+  the setting is the only tag in its filter. `home.hbs` passes `mixedFeed=true` through
+  the listing partials to drop the locale clause. This changes the root hero by design: a
+  locale collection's output is byte-identical to a theme without these settings, while
+  `/` now shows the globally newest featured post instead of the newest English one.
+  `tests/featured-filter.test.mjs` pins both contracts.
+- **Eight combinations, verified end to end.** Changing only `featured_tag` moves the hero to
+  a different tagged post and changing only `featured_only` moves it to the newest post on the
+  channel, which is what distinguishes the rows. See
   [docs/adr/0004](docs/adr/0004-featured-hero-filter.md) for the measurements.
 
 ### Image Size Presets
