@@ -217,8 +217,8 @@ own domain can set `sec_feed_api_url` to that path instead and needs no CORS cha
   change — and the goldens were re-promoted on that basis.
 - `yarn verify` (build → GScan → ship-manifest → unit → bundle → class-coverage)
   passes.
-- **Panel height, bottom spacing and scroll region** (2026-10-09, headless Chromium against the
-  local Ghost 6 with the setting enabled and a live feed): the feed panel and the featured card
+- **Panel height, bottom spacing and scroll region** (`yarn test:sec-feed-layout`;
+  2026-10-09, headless Chromium against the local Ghost 6 with the setting enabled and a live feed): the feed panel and the featured card
   agree to the pixel at 1024, 1280, 1440 and 1920, and the gap below each is the same 48px; the
   panel is 467.0px with 5 advisories *and* with 20, which is the regression this change exists to
   prevent; the columns still share the row (equal margin boxes); the list is a real scroll

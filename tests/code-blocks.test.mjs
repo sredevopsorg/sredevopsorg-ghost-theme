@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 /**
  * Behaviour tests for the CodeBlocks island (assets/js/islands/CodeBlocks.js).
@@ -47,6 +48,18 @@ test("marks every code block for line numbers", () => {
   enhance(element);
 
   assert.deepEqual(added, ["line-numbers", "line-numbers", "line-numbers"]);
+});
+
+test("every Prism component and plugin specifier is extension-explicit", () => {
+  const source = readFileSync("assets/js/islands/prism-setup.js", "utf8");
+  const specifiers = [...source.matchAll(/^import\s+"([^"]+)";$/gm)]
+    .map((match) => match[1])
+    .filter((spec) => spec.startsWith("prismjs/"));
+
+  assert.ok(specifiers.length >= 15, `expected the full Prism set, found ${specifiers.length}`);
+  for (const specifier of specifiers) {
+    assert.match(specifier, /\.js$/, `${specifier} must end in .js so Node ESM can resolve it`);
+  }
 });
 
 test("never throws when the highlighter cannot load", async () => {

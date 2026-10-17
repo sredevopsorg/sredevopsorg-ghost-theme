@@ -22,7 +22,8 @@
  *    never imports them statically — so a broken import path or a renamed export
  *    would otherwise only appear in a browser.
  *
- * Not a DOM test suite — Phase 3 adds Playwright for behaviour.
+ * Not a DOM test suite — browser behaviour is checked locally with
+ * scripts/verify-sec-feed-layout.mjs and the fixture harness.
  */
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";

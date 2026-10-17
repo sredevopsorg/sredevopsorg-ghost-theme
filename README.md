@@ -1,6 +1,6 @@
 # SREDevOps.org Ghost Theme (v3)
 
-> **Ghost 6 theme** for [SREDevOps.org](https://www.sredevops.org) — multi-locale, Tailwind CSS v4 built with Vite, React islands where interactivity is needed, light and dark palettes, and tag-based language filtering. Makes no third-party requests.
+> **Ghost 6 theme** for [SREDevOps.org](https://www.sredevops.org) — multi-locale, Tailwind CSS v4 built with Vite, React islands where interactivity is needed, light and dark palettes, and tag-based language filtering. No third-party requests by default; the optional security feed adds cross-origin requests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ghost Compatibility](https://img.shields.io/badge/Ghost-%3E%3D6.0.0-lightgrey)](https://ghost.org)
@@ -10,70 +10,72 @@
 
 ## 🌐 Multi-Locale Architecture
 
-This theme implements a **template inheritance + tag-based routing strategy** to serve distinct content per locale without requiring separate Ghost instances. This approach aligns with community workarounds discussed in the [Ghost Forum](https://forum.ghost.org/t/different-locales-with-different-content/62836).
+One Ghost publication serves three content locales. `routes.yaml` defines the collections, locale-specific collection templates render them, and a per-post custom template sets the language of an individual post.
 
-### Template Inheritance Pattern
+### How a request is rendered
 
-```
-┌─────────────────────────────────────┐
-│ routes.yaml                          │
-│ • /en/* → home-en.hbs               │
-│ • /es/* → home-es.hbs               │
-│ • /br/* → home-br.hbs               │
-└─────────┬───────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────┐
-│ home-*.hbs (collection template)    │
-│ • Defines collection query/filter   │
-│ • Renders post list via partials    │
-│ • {{!< default-*.hbs}} inheritance  │
-└─────────┬───────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────┐
-│ custom-*.hbs (post/page template)   │
-│ • Locale-specific post layout       │
-│ • Localized metadata, TOC, comments │
-│ • {{!< default-*.hbs}} inheritance  │
-└─────────┬───────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────┐
-│ default-*.hbs (layout shell)        │
-│ • <html lang="*"> attribute         │
-│ • Common <head>, assets, footer     │
-│ • {{{body}}} injection point        │
-└─────────────────────────────────────┘
-```
+| Route | Collection template | Document shell | Filter |
+| --- | --- | --- | --- |
+| `/` | `home.hbs` | `default.hbs` (site locale) | none — mixed feed |
+| `/en/{slug}/` | `home-en.hbs` | `default.hbs` | `tag:en+tag:-es+tag:-br` |
+| `/es/{slug}/` | `home-es.hbs` | `default-es.hbs` (`lang="es"`) | `tag:es+tag:-en+tag:-br` |
+| `/br/{slug}/` | `home-br.hbs` | `default-br.hbs` (`lang="pt"`) | `tag:br+tag:-es+tag:-en` |
 
-> 💡 **Key Insight**: Each locale uses its own `default-*.hbs` layout shell to ensure proper `lang` attributes, meta tags, and localized UI strings. The `{{{body}}}` Handlebars placeholder in `default-*.hbs` receives the rendered output from `custom-*.hbs` or `home-*.hbs`.
+`home*.hbs` extends `default*.hbs`. Those files are one-line wrappers around `partials/shell.hbs`, which owns `<html lang>`, `<head>`, the header/footer and `{{{body}}}`. The locale wrappers pass two different values:
 
-### Language Routing & Tag Filtering
+- `documentLang` is the BCP-47 tag for `<html lang>` — `es` for Spanish, `pt` for Portuguese.
+- `locale` is the theme's content-locale key — `es`, `br`, `en` — matching the collection path and the value the layouts and cards already use.
 
-| Locale | URL Pattern | Required Tags | Exclusion Tags | Layout Shell |
-| -------- | ------------- | --------------- | ---------------- | -------------- |
-| **English (default)** | `/` or `/en/{slug}/` | `en`, `hash-en` | `-es`, `-br` | `default.hbs` |
-| **Spanish** | `/es/{slug}/` | `es`, `hash-es` | `-en`, `-br` | `default-es.hbs` |
-| **Portuguese (BR)** | `/br/{slug}/` | `br`, `hash-br` | `-en`, `-es` | `default-br.hbs` |
+### Language tags
 
-> ⚠️ **Critical**: The **default locale (English)** is configured in **Ghost Admin → Settings → General → Publication language**. All root-level routes (`/`, `/page/2/`, etc.) serve English content unless explicitly routed otherwise.
+A post appears in a locale collection when it carries that locale's tag and **no other locale tag**:
 
-### `routes.yaml` Core Configuration
+| Collection | A post must have | A post must not have |
+| --- | --- | --- |
+| `/en/{slug}/` | `en` | `es`, `br` |
+| `/es/{slug}/` | `es` | `en`, `br` |
+| `/br/{slug}/` | `br` | `en`, `es` |
+
+- **`hash-*` tags are not required.** Ghost's filter syntax ANDs (`+`) and negates (`-`) tags. Existing content may still carry `hash-en`, `hash-es` or `hash-br` from the v2 import; no route reads them. Do not add them for new posts.
+- **Root `/` is a mixed feed.** It has no filter and shows posts from every locale. Each card declares its own `lang`, so a Spanish card inside the English document is still read with a Spanish voice.
+- **One locale tag per post.** A post tagged with both `es` and `br` is excluded from both collections, because each filter explicitly negates the other locale tags.
+- **The site locale is still English.** It controls Ghost's own strings (`{{t}}`) and the shell used when a template does not extend a locale wrapper.
+
+### Individual posts and pages
+
+A layout cannot see the post context, so the document language is decided by the template the editor selects:
+
+| Content | Template | Document language |
+| --- | --- | --- |
+| English post | `post.hbs` | site locale (English) |
+| Spanish post | `custom-es.hbs` | `lang="es"` |
+| Portuguese post | `custom-br.hbs` | `lang="pt"` |
+| English page | `page.hbs` | site locale (English) |
+| Spanish page | `custom-page-es.hbs` | `lang="es"` |
+
+`custom-*.hbs` files are selectable per post/page in Ghost Admin. There is no automatic tag-to-template inference; an existing Spanish or Portuguese post keeps the site language until its Template setting is changed. A Portuguese page custom template does not exist yet — see [Known limitations](#-known-limitations).
+
+### `routes.yaml` core configuration
 
 ```yaml
-collections:
-  /es/:
-    template: home-es
-    permalink: /es/{slug}/
-    filter: tag:es+tag:-en+tag:-br
-    data: tag.es
+routes:
+  /:
+    controller: channel
+    template: home
+    rss: true
 
+collections:
   /en/:
     template: home-en
     permalink: /en/{slug}/
     filter: tag:en+tag:-es+tag:-br
     data: tag.en
+
+  /es/:
+    template: home-es
+    permalink: /es/{slug}/
+    filter: tag:es+tag:-en+tag:-br
+    data: tag.es
 
   /br/:
     template: home-br
@@ -81,13 +83,12 @@ collections:
     filter: tag:br+tag:-es+tag:-en
     data: tag.br
 
-# Fallback: English as default locale (configured in Ghost Admin)
 taxonomies:
   tag: /tag/{slug}/
   author: /author/{slug}/
 ```
 
-✅ **Why this works**: Ghost's `filter` syntax supports boolean logic (`+` for AND, `-` for NOT), enabling precise content segregation per locale while maintaining a single content database. The `template` directive ensures each collection uses its locale-specific layout chain.
+The locale collections carry `data: tag.<locale>`, so their templates get the tag object for the heading. The root channel has no filter and uses `home.hbs` with the site title and description.
 
 ---
 
@@ -95,14 +96,15 @@ taxonomies:
 
 - [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
-- [Development Workflow](#-development-workflow)
 - [Islands](#-islands-client-interactivity)
+- [Package scripts](#-package-scripts)
 - [Security feed widget](#-security-feed-widget)
 - [Locale Content Authoring](#-locale-content-authoring)
-- [Template Architecture](#-template-architecture)
+- [Template Architecture Reference](#-template-architecture-reference)
 - [Theme Configuration](#-theme-configuration)
 - [Testing & Validation](#-testing--validation)
 - [Deployment](#-deployment)
+- [Known limitations](#-known-limitations)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -112,56 +114,52 @@ taxonomies:
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **Node.js** | `>=24` | Runtime for build tooling (Vite 7, Tailwind v4) |
-| **Yarn** | `>=1.22` | Package management (preferred over npm) |
-| **Ghost** | `>=6.0` | Local development server |
-| **Docker** *(optional)* | Latest | Run Ghost via official container |
+| **Node.js** | `>=24` | Runtime for the build (Vite 8, Tailwind CSS v4) |
+| **Yarn** | `1.22.22` | Package manager, pinned through `packageManager` |
+| **Ghost** | `>=6.0` | Local development and production |
+| **Docker** *(optional)* | Latest | Run Ghost 6 + MySQL through `docker-compose.dev.yml` |
 
-> 🐳 **Ghost Local Setup**: Follow the [official Docker guide](https://docs.ghost.org/install/docker/) for a reproducible dev environment.
+> 🐳 **Local stack:** `docker-compose.dev.yml` uses the project's `ghcr.io/sredevopsorg/ghost-on-kubernetes:latest-docker` image with MySQL 8.4. For a manual install, use Ghost 6 or later.
 
 ---
 
 ## 🚀 Installation
 
-### 1. Clone & Install
+### 1. Clone and install
 
 ```bash
-# Clone the repository
 git clone https://github.com/sredevopsorg/sredevopsorg-ghost-theme.git
 cd sredevopsorg-ghost-theme
 
-# Install dependencies (Yarn required)
-yarn install
+yarn install --frozen-lockfile
 ```
 
 ### 2. Configure Ghost
 
-1. Start your local Ghost instance:
+1. Copy the environment template and set absolute host paths and database passwords:
 
    ```bash
-   # If using Docker Compose (recommended)
-   docker compose up -d
-   
-   # Or via Ghost-CLI
-   ghost start
+   cp .env.example .env
+   # edit THEME_PATH, GHOST_DATA_PATH, DATABASE_ROOT_PASSWORD and DATABASE_PASSWORD
+   yarn ghost:up
    ```
 
-2. Upload `routes.yaml` to **Ghost Admin → Settings → Routing**
+   The compose file serves Ghost at <http://localhost:2368>. On a fresh database volume, follow the one-time initialisation step in [tests/fixtures/README.md](tests/fixtures/README.md).
 
-3. Upload the theme:
-   - Via Admin: **Settings → Design → Upload theme**
-   - Or symlink for development:
+2. Upload `routes.yaml` to **Ghost Admin → Settings → Advanced → Routing**. Routing is stored in the database, not in the theme archive, so it is not deployed by CI.
 
-     ```bash
-     ln -s /path/to/sredevopsorg-ghost-theme \
-       /path/to/ghost/content/themes/sredevopsorg-ghost-theme
-     ```
+3. Activate the theme in **Ghost Admin → Settings → Design → Change theme**. The compose file mounts this repository at `content/themes/sredevopsorg-ghost-theme`, but activation is a one-time Admin step.
 
-4. **Critical**: Set your default locale in **Ghost Admin → Settings → General → Publication language** (e.g., `en` for English). This determines which templates serve root-level routes.
+4. Set the publication language in **Ghost Admin → Settings → General → Publication language**. It controls Ghost's own `{{t}}` strings and the fallback shell; the locale collections are selected by `routes.yaml`.
 
-5. Activate the theme in **Ghost Admin → Design**
+   For a non-Docker install, symlink the repository into `content/themes/` instead:
 
-### 3. Start Development Server
+   ```bash
+   ln -s /path/to/sredevopsorg-ghost-theme \
+     /path/to/ghost/content/themes/sredevopsorg-ghost-theme
+   ```
+
+### 3. Start the development build
 
 ```bash
 yarn dev        # vite build --watch: rebuilds assets/built/** on save
@@ -169,18 +167,15 @@ yarn dev        # vite build --watch: rebuilds assets/built/** on save
 
 This rebuilds, on every change:
 
-- `assets/css/index.css` (Tailwind CSS v4 + `assets/css/theme.css`) → `assets/built/index-<hash>.css`
+- `assets/css/index.css` (Tailwind CSS v4 + `assets/css/theme.css` + `assets/css/fonts.css`) → `assets/built/index-<hash>.css`
 - `assets/js/index.js` → `assets/built/index-<hash>.js`
 - `partials/vite_assets/{head,foot}.hbs`, regenerated from `assets/built/manifest.json`
 
-Because filenames are hashed, the generated partials are the only place asset URLs live —
-never hardcode them, and rebuild after pulling.
+Because filenames are hashed, the generated partials are the only place asset URLs live — never hardcode them, and rebuild after pulling.
 
-> 🔁 **Dev loop:** `yarn build` (or `--watch`) for assets, but **Ghost caches compiled
-> Handlebars templates** — after editing any `.hbs` file run `yarn ghost:restart`
-> (or `ghost restart`) before trusting what the browser shows.
-> `yarn ghost:up` starts a local Ghost 6 at <http://localhost:2368> with this repo mounted
-> as the active theme; see [tests/fixtures/README.md](tests/fixtures/README.md).
+> 🔁 **Dev loop:** `yarn build` (or `--watch`) for assets, but **Ghost caches compiled Handlebars templates** — after editing any `.hbs` file run `yarn ghost:restart` before trusting what the browser shows.
+>
+> `yarn ghost:up` starts the local Ghost 6 + MySQL stack and mounts this repository as a theme. It does not activate the theme or upload routing; both are one-time Admin steps. See [tests/fixtures/README.md](tests/fixtures/README.md) for the clean-database procedure.
 
 ---
 
@@ -210,8 +205,8 @@ export function enhance(element, props) {
 ```
 
 Pick the cheapest mode that does the job: `enhance` for DOM augmentation (the mobile menu
-costs 0.47 kB gzip), `mount` when the island really owns stateful UI (React is ~69 kB gzip,
-so it is code-split and only fetched where such an island exists).
+costs under 0.5 kB gzip), `mount` when the island really owns stateful UI (the React
+runtime is ~68 kB gzip, so it is code-split and only fetched where such an island exists).
 
 1. Register the module in `assets/js/islands.js` — the key must equal `data-island`.
 2. `yarn build`, then `yarn ghost:restart` (Ghost caches compiled templates).
@@ -230,6 +225,29 @@ so it is code-split and only fetched where such an island exists).
 Strings come from `partials/island-config.hbs` (`{{json}}` + `{{t}}`), read in an island with
 `t("key")` from `assets/js/lib/theme-config.js`. Keep that payload small: it is inline on every
 page.
+
+## 🧰 Package scripts
+
+All commands run from the theme root. The default `yarn test` is the full gate and is an alias for `yarn verify`.
+
+| Script | What it does | Needs |
+| --- | --- | --- |
+| `yarn build` | Vite 8 production build into `assets/built/` and regenerate `partials/vite_assets/*.hbs` | Node |
+| `yarn dev` | `vite build --watch`; rebuilds on source changes | Node |
+| `yarn verify` / `yarn test` | build + GScan + ship manifest + unit + bundle + class coverage | Node |
+| `yarn test:ci` | plain GScan; the same validation Ghost applies on upload | Node |
+| `yarn test:dev` | verbose GScan | Node |
+| `yarn test:unit` | `node:test` suite for models and `enhance` islands | Node |
+| `yarn test:bundle` | evaluates the built entry and checks code-splitting/island contracts | a build |
+| `yarn test:classes` | proves every class in a template or island has CSS | a build |
+| `yarn test:ship` | asserts the package contents and every `{{asset}}` reference | a build |
+| `yarn test:sec-feed-layout` | Chromium layout checks for the security-feed panel | Ghost + Playwright image |
+| `yarn package` | writes `dist/<name>-<version>.zip` and validates it with `gscan --zip`; older archives are preserved | a build |
+| `yarn ghost:up` / `ghost:down` / `ghost:restart` / `ghost:logs` | the local Ghost 6 + MySQL compose stack | Docker + `.env` |
+| `yarn fixtures:capture` / `normalize` / `diff` / `promote` | golden HTML regression workflow | a seeded Ghost |
+| `yarn sync:fonts` / `sync:icons` | regenerate committed fonts/icons and licence texts | network |
+
+`yarn verify` is the offline CI gate. The fixture and browser-layout checks are deliberately local-only because they need a populated Ghost instance and Chromium.
 
 ---
 
@@ -250,23 +268,22 @@ Ghost renders                         the island fetches
 partials/featured-row.hbs             assets/js/islands/SecFeed.js
   ┌─ 2/3 ────────────┬─ 1/3 ─────┐     status line, tag chips, rows
   │ featured post    │ sec feed   │ ──► poll every 5 min while visible
-  │                 │ <section>  │ ──► GET {base}/api/feed?limit=10
+  │                 │ <section>  │ ──► GET {base}/api/feed?limit=<n>
   └──────────────────┴────────────┘     <noscript> link if JavaScript is off
 ```
 
 ### Turning it on
 
-**Admin → Settings → Design → Theme**
+**Admin → Settings → Design → Theme** (the feed settings are grouped under “Homepage”)
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `sec_feed_api_url` | Text | *(empty)* | Origin of the feed API, e.g. `https://security-feed.sredevops.org`. Empty hides the widget entirely. |
-| `sec_feed_items` | Select | `10` | How many advisories the widget shows (5 / 10 / 15 / 20). |
+| `sec_feed_items` | Select | `3` | How many advisories the widget shows (3 / 5 / 10 / 15 / 20). |
 
 With `sec_feed_api_url` empty the partial renders **nothing**: no markup, no island chunk,
-no request. That keeps "the theme makes no third-party requests" true for an unmodified
-site, and it is what `tests/sec-feed.test.mjs` guards — the API origin appears in no source
-file, only as this setting.
+no request. That keeps "no third-party requests" true for an unmodified site, and it is what
+`tests/sec-feed.test.mjs` guards — the API origin appears in no source file, only as this setting.
 
 ### ⚠️ CORS is required — and it is not configured yet
 
@@ -403,7 +420,7 @@ For a Spanish or Portuguese feed page, add a file like this one extending `defau
 
 ### Weight
 
-The island is **3.87 kB gzip and loads no framework**, versus ~69 kB gzip for the React runtime
+The island is **3.78 kB gzip and loads no framework**, versus ~68 kB gzip for the React runtime
 the other islands share. That is why this one is vanilla while `ReadingProgress` and
 `TableOfContents` are React: there is no server-rendered content here to hydrate, and this is
 likely to sit on the homepage. The decisions worth testing live in
@@ -414,13 +431,15 @@ likely to sit on the homepage. The decisions worth testing live in
 
 ### Self-hosted assets (no third-party requests)
 
-The theme makes **no third-party requests**. Fonts and icons ship with it, so there is no
-extra DNS lookup, no second TLS handshake and nothing render-blocking from another origin.
+The theme makes **no third-party requests by default**. Fonts and icons ship with it, so
+there is no extra DNS lookup, no second TLS handshake and nothing render-blocking from
+another origin. The optional security feed is the only exception, and only when
+`sec_feed_api_url` is set.
 
 | Asset | Where it comes from | How to refresh |
 | --- | --- | --- |
-| Inter, Roboto Mono | `assets/fonts/*.woff2` (latin + latin-ext) | `node scripts/sync-fonts.mjs` |
-| Icons | `partials/icon.hbs`, inline SVG | `node scripts/sync-icons.mjs` |
+| Inter, Roboto Mono | `assets/fonts/*.woff2` (latin + latin-ext) | `yarn sync:fonts` |
+| Icons | `partials/icon.hbs`, inline SVG | `yarn sync:icons` |
 
 Both scripts are run by hand, not by the build: they download from Google Fonts and
 jsDelivr respectively and rewrite committed files, so a build stays offline and
@@ -472,111 +491,151 @@ block in `assets/css/index.css`, not the templates. See
 
 ## ✍️ Locale Content Authoring
 
-### Tagging Posts for Language Filtering
+### Tagging posts
 
-When creating content in Ghost Admin or via Markdown import:
+Create or import a post with the locale tag and its topic tags:
 
 ```md
 ---
 title: "My Post Title"
 slug: "my-post-slug"
 tags:
-  - en          # Primary language slug (required)
-  - hash-en     # Required for filter consistency
-  - Kubernetes  # Topic tags
+  - es          # the only locale tag on this post
+  - Kubernetes  # topic tags
   - SRE
 ---
-
 ```
 
-⚠️ **Critical**: Omitting either `en`/`es`/`br` **or** its `hash-*` counterpart will cause the post to not appear in locale-specific collections due to the `filter` logic in `routes.yaml`.
+- **Add exactly one** of `en`, `es` or `br`. The locale collections are defined by
+  AND/NOT filters, so a post with both `es` and `br` is excluded from both.
+- **`hash-*` tags are not required.** They exist in older imported content but no
+  route or template reads them.
+- **Root `/` is unfiltered.** It shows every locale; each post card carries its own
+  `lang` attribute.
+- **The template decides the document language.** Tagging a post `es` does not make it
+  Spanish by itself; the editor must also select the locale template.
 
-⚠️ **Also required for the document language**: a post in a locale collection must be
-assigned that locale's template — `custom-es` or `custom-es` for Spanish — in the
-post's settings. Collections are served by the locale shells (`default-es.hbs`,
-`default-br.hbs`) which set `<html lang>`, but an *individual* post that has no locale
-template falls back to `post.hbs` → `default.hbs` and renders with the site locale. A
-Ghost layout cannot see the post context, so the theme cannot infer the language from the
-post's tags (see `docs/v3-roadmap.md`, Phase 4 notes).
+### Selecting a locale template
 
-### Template Resolution Flow
+| Content | Template to select | Document language |
+| --- | --- | --- |
+| English post | `post.hbs` (default) | site locale (English) |
+| Spanish post | `custom-es.hbs` | `lang="es"` |
+| Portuguese post | `custom-br.hbs` | `lang="pt"` |
+| English page | `page.hbs` (default) | site locale (English) |
+| Spanish page | `custom-page-es.hbs` | `lang="es"` |
 
-```mermaid
-graph LR
-    A[Request: /es/my-post/] --> B[routes.yaml filter]
-    B --> C{tag:es AND NOT en/br?}
-    C -->|Yes| D[home-es.hbs]
-    D --> E[Inherits default-es.hbs]
-    E --> F[Render html lang='es']
-    F --> G[Inject body from custom-es.hbs]
+Ghost resolves a post as `post-:slug.hbs` → `custom-*.hbs` → `post.hbs`, so a custom
+template applies only when it is selected in that post's **Template** setting. A layout
+cannot read the post's tags; the theme cannot infer the language automatically.
+`custom-br.hbs` renders `post-layout`, so it is a post template; a Portuguese page would
+need a separate `custom-page-br.hbs` (not included yet).
+
+### Template resolution flow
+
+```text
+GET /es/                    GET /es/my-post/
+     |                           |
+     v                           v
+routes.yaml collection      post template resolution
+  template: home-es           post-my-post.hbs
+     |                       custom-*.hbs (selected)
+     v                       post.hbs (fallback)
+home-es.hbs                      |
+  extends default-es.hbs         +-- custom-es.hbs -> post-layout locale="es"
+     |                           |     extends default-es.hbs -> lang="es"
+     v                           |
+partials/shell.hbs                +-- post.hbs -> post-layout locale="en"
+  <html lang="es">              |     extends default.hbs -> site locale
+  partials/head.hbs
+  {{{body}}} from collection-layout.hbs
 ```
 
-### Creating Locale-Specific Templates
+### Creating locale-specific templates
 
-1. **Copy the base template**:
+Locale templates are thin wrappers, not copies of the shell:
 
-   ```bash
-   cp default.hbs default-es.hbs
-   cp custom.hbs custom-es.hbs
-   cp home.hbs home-es.hbs
-   ```
+```handlebars
+{{!-- default-es.hbs --}}
+{{> "shell" documentLang="es" locale="es"}}
 
-2. **Update the layout shell** (`default-es.hbs`):
+{{!-- home-es.hbs --}}
+{{!< default-es}}
+{{> "collection-layout" locale="es"}}
 
-   ```handlebars
-   <!DOCTYPE html>
-   <html lang="es"> {{!-- Critical for SEO/accessibility --}}
-   <head>
-     <meta charset="utf-8">
-     <title>{{meta_title}}</title>
-     {{!-- Spanish-specific OG tags --}}
-     <meta property="og:locale" content="es_CL">
-     {{ghost_head}}
-   </head>
-   <body class="{{body_class}}">
-     {{>"components/nav-es"}} {{!-- Optional: localized nav --}}
-     {{{body}}} {{!-- Injects custom-es.hbs content --}}
-     {{>"components/footer"}}
-   </body>
-   </html>
-   ```
+{{!-- custom-es.hbs --}}
+{{!< default-es}}
+{{#post}}{{> "post-layout" locale="es"}}{{/post}}
 
-3. **Customize content templates** (`custom-es.hbs`):
-   - Localize UI strings ("Autor", "Publicado", "Índice")
-   - Adjust date formats (`{{date published_at format="DD MMM YYYY"}}`)
-   - Conditionally render locale-specific components
+{{!-- custom-br.hbs --}}
+{{!< default-br}}
+{{#post}}{{> "post-layout" locale="br"}}{{/post}}
+
+{{!-- custom-page-es.hbs --}}
+{{!< default-es}}
+{{> "page-body" locale="es"}}
+```
+
+Adding a locale means adding these wrappers, a collection in `routes.yaml`, a
+`locales/<lang>.json` file, and the locale branches used by the post card, related
+content, hero, author box, island config and security feed. See “Adding a New Locale”
+below.
 
 ---
 
 ## 🏗️ Template Architecture Reference
 
-| File | Role | Inheritance | Locale Scope |
-|------|------|-------------|--------------|
-| `default.hbs` | Base HTML shell for English | None (root) | English (default) |
-| `default-es.hbs` | Base HTML shell for Spanish | None (root) | Spanish |
-| `default-br.hbs` | Base HTML shell for Portuguese | None (root) | Portuguese (BR) |
-| `custom.hbs` | Post/page content layout | `{{!< default}}` | English |
-| `custom-es.hbs` | Post/page content layout | `{{!< default-es}}` | Spanish |
-| `home.hbs` | Collection/listing template | `{{!< default}}` | English |
-| `home-es.hbs` | Collection/listing template | `{{!< default-es}}` | Spanish |
-| `post-card-es.hbs` | Post preview partial | Standalone | Spanish |
+| File | Role | Extends / includes | Locale |
+|------|------|--------------------|--------|
+| `default.hbs` | Default document shell | `partials/shell.hbs` | site |
+| `default-es.hbs` | Spanish document shell | `partials/shell.hbs` with `documentLang="es"`, `locale="es"` | es |
+| `default-br.hbs` | Portuguese document shell | `partials/shell.hbs` with `documentLang="pt"`, `locale="br"` | br |
+| `home.hbs` | Root channel (mixed feed) | `default.hbs` + `collection-layout` `header="site"` | site |
+| `home-en.hbs` | `/en/` collection | `default.hbs` + `collection-layout` `locale="en"` | en |
+| `home-es.hbs` | `/es/` collection | `default-es.hbs` + `collection-layout` `locale="es"` | es |
+| `home-br.hbs` | `/br/` collection | `default-br.hbs` + `collection-layout` `locale="br"` | br |
+| `index.hbs` | Generic listing fallback | `default.hbs` + `post-card` + pagination | en |
+| `post.hbs` | English post | `default.hbs` + `post-layout` `locale="en"` | en |
+| `custom-es.hbs` | Spanish post (editor-selected) | `default-es.hbs` + `post-layout` `locale="es"` | es |
+| `custom-br.hbs` | Portuguese post (editor-selected) | `default-br.hbs` + `post-layout` `locale="br"` | br |
+| `page.hbs` | Page | `default.hbs` + `page-body` `locale="en"` | site |
+| `custom-page-es.hbs` | Spanish page (editor-selected) | `default-es.hbs` + `page-body` `locale="es"` | es |
+| `tag.hbs` | Tag archive | `default.hbs` + cards + pagination | UI en |
+| `author.hbs` | Author archive | `default.hbs` + author box + cards | UI en |
+| `error.hbs` | Standalone error template | none (inline CSS, no helpers) | site |
+| `error-404.hbs` | 404 page | `default.hbs` | site |
+| `page-tags.hbs` | Tag index page | `default.hbs` | site |
+| `page-secfeed.hbs` | `/secfeed/` page | `default.hbs` + `sec-feed` `full=true` | en |
+| `page-recommendations.hbs` | `/recommendations/` page | `default.hbs` + recommendations | en |
 
-> 🔄 **Inheritance Syntax**: `{{!< filename}}` at the top of a template tells Ghost: *"Render this file's content inside the `{{{body}}}` placeholder of `filename`"*.
+Key partials:
+
+| Partial | Responsibility |
+| --- | --- |
+| `partials/shell.hbs` | `<html lang>`, `<head>`, header, `{{{body}}}`, footer, `{{ghost_foot}}`, scripts |
+| `partials/collection-layout.hbs` | Channel heading, featured row, post grid, pagination |
+| `partials/post-layout.hbs` | Article, sidebar/ToC, related content, comments, author box, sharing |
+| `partials/page-body.hbs` | Page title/feature image toggle and page content |
+| `partials/featured-row.hbs` | Featured hero, with the optional security feed column |
+| `partials/sec-feed.hbs` | Security-feed block and mount point, in embedded or full-page mode |
+
+> 🔄 **Inheritance syntax**: `{{!< filename}}` at the top of a template tells Ghost to render the file inside the `{{{body}}}` placeholder of `filename`. Partial hash arguments such as `locale` are dropped inside `{{#post}}`, `{{#page}}`, `{{#get}}` and `{{#foreach}}`, so pass them at the partial's own top level or as a literal at the call site.
 
 ---
 
 ## ⚙️ Theme Configuration
 
-Customize behavior via **Ghost Admin → Settings → Theme**:
+Customize behavior via **Ghost Admin → Settings → Design → Theme**. This is the
+authoritative settings table; the [security feed section](#-security-feed-widget) links back here.
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `show_search` | Boolean | `true` | Show a search icon in the main navigation |
-| `show_login` | Boolean | `true` | Show a sign-in link in the main navigation |
-| `sec_feed_api_url` | Text | *(empty)* | Origin of the security feed API. Empty hides the [security feed widget](#-security-feed-widget) |
-| `sec_feed_items` | Select | `10` | How many advisories the security feed widget shows |
-| `featured_tag` | Text | *(empty)* | Extra tag slug ANDed into the featured hero filter, on top of the collection's language tag |
-| `featured_only` | Boolean | `true` | Require the `featured` flag on the hero post |
+| Option | Type | Default | Group | Description |
+|--------|------|---------|-------|-------------|
+| `show_search` | Boolean | `true` | site-wide | Show a search icon in the main navigation |
+| `show_login` | Boolean | `true` | site-wide | Show a sign-in link in the main navigation |
+| `sec_feed_api_url` | Text | *(empty)* | Homepage | Origin of the security feed API. Empty hides the [security feed widget](#-security-feed-widget) |
+| `sec_feed_items` | Select | `3` | Homepage | How many advisories the widget shows (3 / 5 / 10 / 15 / 20) |
+| `featured_tag` | Text | *(empty)* | Homepage | Extra tag slug ANDed into the featured hero filter, on top of the collection's language tag |
+| `featured_only` | Boolean | `true` | Homepage | Require the `featured` flag on the hero post |
 
 ### Featured hero filtering
 
@@ -624,50 +683,79 @@ Use in templates: `{{img_url feature_image size="l"}}`
 
 ## 🧪 Testing & Validation
 
-### Local Testing
+### The offline gate
 
 ```bash
-# Build production assets
-yarn build
-
-# Validate theme against Ghost spec
-yarn test:dev    # Verbose output
-yarn test:ci     # Same check, used by the gate: fails on errors, not only on fatals
-
-# The gate runs the pinned gscan from devDependencies. Do not add --fatal: that flag
-# only fails on *fatal* issues, so error-level findings (a removed helper, an empty
-# translation) pass CI while Ghost logs a warning at boot.
+yarn verify     # build + GScan + package contents + unit + bundle + CSS classes
+yarn test       # alias for yarn verify
 ```
 
-### Locale-Specific Validation
+The individual checks are useful while iterating:
 
 ```bash
-# Test Spanish routing locally
-curl -I http://localhost:2368/es/ | grep "lang"
+yarn test:ci      # plain GScan; the same validation Ghost applies on upload
+yarn test:dev     # verbose GScan
+yarn test:unit    # node:test models and enhance islands
+yarn test:bundle  # built entry loads; React is not inlined; islands resolve
+yarn test:classes # every template/island class has CSS
+yarn test:ship    # package contents and asset references
+```
+
+> The gate runs the pinned GScan from `devDependencies`. Do not add `--fatal`: that flag
+> only fails on *fatal* issues, so error-level findings (a removed helper, an empty
+> translation) pass CI while Ghost logs a warning at boot.
+
+`yarn test:bundle`, `yarn test:classes` and `yarn test:ship` need a build; `yarn verify`
+does it for you. Running them directly after a source change will fail on stale output.
+
+### Locale-specific validation
+
+```bash
+# The Spanish collection shell, not an individual post
+curl -s http://localhost:2368/es/ | grep -o '<html[^>]*>'
 # Expected: <html lang="es">
 
+# A Portuguese post that has the custom-br template selected
+curl -s http://localhost:2368/br/some-post/ | grep -o '<html[^>]*>'
+# Expected: <html lang="pt">
 ```
+
+### Fixtures and browser layout checks
+
+These need a running Ghost and are intentionally local-only:
+
+```bash
+yarn ghost:up
+yarn fixtures:capture
+yarn fixtures:normalize
+yarn fixtures:diff
+```
+
+`yarn test:sec-feed-layout` additionally needs Chromium through the Playwright image; see
+[docs/adr/0003](docs/adr/0003-security-feed-widget.md).
 
 ### Packaging a release
 
 ```bash
+yarn verify
 yarn package    # dist/<name>-<version>.zip, read back and validated by GScan
 ```
 
 The archive contains exactly the files `scripts/ship-manifest.mjs` allows — the built
 assets, not the sources — and `gscan --zip` validates it the way Ghost does on upload.
-The full sequence, including what to smoke-test afterwards and how to roll back, is in
+Older archives in `dist/` are preserved for rollback. The full sequence, including what to
+smoke-test afterwards and how to roll back, is in
 [docs/release-checklist.md](docs/release-checklist.md).
 
-### Lighthouse Audits
+### Lighthouse audits
 
-The theme targets:
+These are targets, not CI gates:
 
 - ✅ Performance ≥ 90 (with lazy loading enabled)
 - ✅ Accessibility ≥ 95 (proper `lang` attributes per locale)
 - ✅ SEO ≥ 100 (with localized meta tags and hreflang)
 
-Run via Chrome DevTools
+Run via Chrome DevTools against a local Ghost instance.
 
 ---
 
@@ -675,27 +763,26 @@ Run via Chrome DevTools
 
 ### Option 1: Ghost Admin Upload
 
-1. Build assets (the zip must already contain them — Ghost never runs a build):
+Ghost never runs a build, so the archive must already contain the compiled assets.
+
+1. Build and validate:
 
    ```bash
-   yarn build
-   yarn verify      # build + GScan + package-contents + bundle smoke test
+   yarn verify      # build + GScan + package contents + tests
    ```
 
-2. Zip the theme. Check what ships first, then exclude everything else:
+2. Build the archive. `yarn package` uses `scripts/ship-manifest.mjs` as the only
+   inclusion rule, reads the zip back with `gscan --zip`, and leaves older archives in
+   `dist/` for rollback:
 
    ```bash
-   yarn test:ship --list
-   zip -r sredevopsorg-ghost-theme.zip . \
-     -x "*.git*" "node_modules/*" ".github/*" "lib/*" "scripts/*" "tests/*" "docs/*" \
-        "vite.config.js" "docker-compose.dev.yml" "yarn.lock" "*.md"
+   yarn package     # dist/sredevopsorg-ghost-theme-<version>.zip
    ```
 
-   `assets/built/**` is generated and untracked, so a zip from a fresh clone without
-   `yarn build` would ship the placeholder partials and render unstyled — `yarn test:ship`
-   fails in exactly that case.
+   Do not zip the repository by hand: a plain `zip -r .` would ship `assets/css`,
+   `assets/js`, `lib/`, `scripts/` and other build inputs.
 
-3. Upload via **Ghost Admin → Design → Upload theme**
+3. Upload `dist/<name>-<version>.zip` via **Ghost Admin → Settings → Design → Change theme → Upload theme**.
 
 ### Option 2: GitHub Actions (Recommended)
 
@@ -711,35 +798,75 @@ Configure secrets:
 
 ---
 
+## ⚠️ Known limitations
+
+- **The root `/` feed is intentionally mixed.** It has no locale filter; only the
+  `/en/`, `/es/` and `/br/` collections are segregated.
+- **The document language is chosen by the template, not the tags.** A Spanish or
+  Portuguese post keeps the site language until an editor selects `custom-es` or
+  `custom-br`.
+- **There is no Portuguese page template.** `custom-page-es.hbs` exists; a Portuguese
+  page still uses `page.hbs` and the site language.
+- **Server-rendered interface strings follow the site language.** `{{t}}` cannot be
+  per-page in Ghost, so search, sign-in, pagination and the subscribe form stay in the
+  publication language even on a locale post. Island chrome is localized per page.
+- **Tag and author archives use the English card locale.** Their dates and reading-time
+  strings are English because the route has no locale context; each card still declares
+  the post's own `lang` from its URL.
+- **The security feed is client-rendered and CORS-dependent.** With
+  `sec_feed_api_url` set, the browser fetches the feed cross-origin; the service must
+  allow the publication origin (see the CORS note above). The widget content is not in
+  the server HTML.
+- **The light palette's contrast is unverified by a human.** The token layer is tested
+  functionally, but the light colours have not been measured.
+- **Fixture and browser-layout checks are local-only.** They need a seeded Ghost and,
+  for the layout script, Chromium.
+- **`yarn dev` watches assets, not Ghost.** Ghost caches compiled templates; restart it
+  after editing `.hbs` files.
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions aligned with our project conventions.
 
-### Development Guidelines
+### Development guidelines
 
 - **Branching**: Use feature branches (`feat/locale-switcher`, `fix/og-tags-es`)
 - **Commits**: Follow [Conventional Commits](https://www.conventionalcommits.org/)
 - **PRs**: Include screenshots for UI changes; update README if behavior changes
-- **Testing**: Run `yarn test:ci` before submitting
+- **Testing**: Run `yarn verify` before submitting. It builds, runs GScan, checks the
+  package contents, and runs the unit, bundle and CSS-coverage suites.
 
-### Adding a New Locale (e.g., `pt` for Portugal)
+### Adding a New Locale (e.g. `pt` for Portugal)
 
-1. **Create layout shell**:
+Two values are easy to confuse, so choose both explicitly:
 
-   ```bash
-   cp default.hbs default-pt.hbs
-   # Edit: <html lang="pt">, OG locale, localized strings
+- **`documentLang`** is the BCP-47 tag in `<html lang>` — `pt` for Portuguese.
+- **`locale`** is the theme's content key, used in filters and partial arguments. The
+  existing Brazilian Portuguese collection uses `br`, not `pt`.
+
+1. **Add the wrapper templates**:
+
+   ```handlebars
+   {{!-- default-pt.hbs --}}
+   {{> "shell" documentLang="pt" locale="pt"}}
+
+   {{!-- home-pt.hbs --}}
+   {{!< default-pt}}
+   {{> "collection-layout" locale="pt"}}
+
+   {{!-- custom-pt.hbs --}}
+   {{!< default-pt}}
+   {{#post}}{{> "post-layout" locale="pt"}}{{/post}}
+
+   {{!-- custom-page-pt.hbs --}}
+   {{!< default-pt}}
+   {{> "page-body" locale="pt"}}
    ```
 
-2. **Create content templates**:
-
-   ```bash
-   cp custom.hbs custom-pt.hbs
-   cp home.hbs home-pt.hbs
-   # Localize UI text, date formats, component partials
-   ```
-
-3. **Update `routes.yaml`**:
+2. **Add the collection to `routes.yaml`**, and add `-pt` to the existing `/en/`,
+   `/es/` and `/br/` filters so the partitions stay exclusive:
 
    ```yaml
    /pt/:
@@ -749,14 +876,31 @@ We welcome contributions aligned with our project conventions.
      data: tag.pt
    ```
 
-4. **Update documentation**:
-   - Add row to the [Language Routing table](#language-routing--tag-filtering)
-   - Document any locale-specific partials (e.g., `nav-pt.hbs`)
+3. **Extend the locale branches in the shared code.** Search for `locale "="` and for
+   the `/es/` and `/br/` URL checks. At minimum this touches:
 
-5. **Test thoroughly**:
-   - Verify `lang="pt"` in rendered HTML
-   - Confirm tag filtering excludes other locales
-   - Validate SEO meta tags with `og:locale="pt_PT"`
+   - `partials/post-card.hbs` (card `lang`, date and reading-time strings)
+   - `partials/post-layout.hbs` (related-content filters, reading time, date, comments)
+   - `partials/collection-layout.hbs` (card loop)
+   - `partials/featured-hero-locale.hbs` and the three `featured-hero*.hbs` partials
+   - `partials/theme-toggle.hbs`, `partials/header.hbs`, `partials/island-config.hbs`
+   - `partials/sec-feed.hbs` and `partials/page-body.hbs`
+
+4. **Add or update the Ghost translation file** `locales/<lang>.json`. This is the
+   publication's site language, separate from the content-locale key above.
+
+5. **Select the locale template per post/page.** A layout cannot read tags, so no route
+   or tag can apply `custom-pt` automatically. Editors must choose it in the Template
+   setting after publishing.
+
+6. **Update docs and fixtures**: the locale table, the tag rules, `tests/fixtures/contexts.txt`,
+   and any golden fixtures for the new collection.
+
+7. **Test**:
+   - `<html lang="pt">` on the collection and on a post using `custom-pt`
+   - the filter excludes every other locale tag and does not hide the post from `/pt/`
+   - cards and related content use Portuguese date/reading-time strings
+   - `yarn verify` passes, and the fixture diff is intentional.
 
 ---
 
@@ -775,7 +919,7 @@ We welcome contributions aligned with our project conventions.
   - [RuntimeWire Website](https://runtimewire.com/)
   - [@TryGhost "Source" Theme](https://github.com/TryGhost/Source)
 - **Community**: Ghost Forum contributors for multi-locale pattern validation
-- **Tooling**: Tailwind CSS v4, Vite, GScan
+- **Tooling**: Tailwind CSS v4, Vite 8, GScan
 
 ---
 

@@ -23,8 +23,9 @@
  * a final PASS/FAIL line, so the numbers can be pasted as evidence.
  *
  * WHY THE IN-PAGE FUNCTION IS STRINGIFIED: this file must run under a bare
- * `node scripts/verify-sec-feed-layout.mjs` with no build step, so the in-page part is a
- * plain function whose source is serialized into page.evaluate().
+ * `yarn test:sec-feed-layout` (or `node scripts/verify-sec-feed-layout.mjs`) with no
+ * build step, so the in-page part is a plain function whose source is serialized into
+ * page.evaluate().
  *
  * HOW TO RUN (the local machine cannot install chromium and has no sudo; use the image):
  *

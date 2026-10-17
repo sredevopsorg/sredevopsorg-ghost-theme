@@ -1,0 +1,7 @@
+{{!< default-br}}
+{{!-- Portuguese custom post template. Ghost resolves a post's template as
+     post-:slug.hbs -> custom-*.hbs -> post.hbs, so this file only applies when the
+     editor selects it in the post's Template setting. It is the Portuguese counterpart
+     of custom-es.hbs: the locale is passed inside {{#post}} because a context-changing
+     block drops a partial's hash arguments. --}}
+{{#post}}{{> "post-layout" locale="br"}}{{/post}}

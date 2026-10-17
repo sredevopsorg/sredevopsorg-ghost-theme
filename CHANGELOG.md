@@ -1,5 +1,41 @@
 # Changelog
 
+## 3.2.1
+
+### Added
+
+- **Portuguese post template** — `custom-br.hbs` mirrors `custom-es.hbs` and renders
+  `post-layout` with `locale="br"`. It is an editor-selected custom template, like the
+  Spanish one: a Portuguese post still needs its Template setting changed to `custom-br`
+  before it declares `<html lang="pt">`.
+- **Package scripts and metadata** — `test` (alias for `verify`), `test:gscan`,
+  `test:sec-feed-layout`, `sync:fonts`, `sync:icons` and `ghost:logs`; a pinned
+  `packageManager: yarn@1.22.22`; homepage/docs/keywords metadata; and Homepage grouping
+  for the feed and featured-hero settings.
+- **Regression tests** for the locale template wrappers and for explicit `.js` Prism
+  import specifiers.
+
+### Changed
+
+- **Vite 8 / Rolldown** replaces Vite 7. The build config now uses
+  `build.rolldownOptions`, and the generated manifest partials were regenerated for the
+  new content hashes. `@vitejs/plugin-react` 5.2 already supports Vite 8.
+- **README and supporting docs** now describe the real architecture: root `/` is an
+  unfiltered mixed feed, `hash-*` tags are legacy and not required, locale posts need
+  `custom-es`/`custom-br` selected in the editor, `sec_feed_items` defaults to 3, and the
+  release archive is built with `yarn package`.
+
+### Fixed
+
+- **Prism component imports** now carry explicit `.js` extensions, so the specifiers
+  resolve under Node's ESM resolver as well as Vite's. The unit suite no longer emits a
+  module-resolution warning.
+- **Packaging keeps previous archives.** `scripts/package-theme.mjs` removes only the
+  target version's zip instead of deleting all of `dist/`, so the previous release remains
+  available for rollback.
+- **Removed the dead ESLint pre-commit hook.** The repository has no ESLint dependency or
+  configuration; the hook only produced a false sense of a lint gate.
+
 ## 3.2.0
 
 ### Added
