@@ -36,7 +36,7 @@ used to compare two stale captures and report a false "All fixtures match".
 ## 3. Version and changelog
 
 - `package.json` → `version` (the theme's own version, which Ghost shows). This release is
-  **3.2.1**.
+  **3.2.2**.
 - `CHANGELOG.md` → an entry for that version. Say what a *user* has to do, not what the
   commits did.
 - Commit both on the release branch, then merge the release branch into `main`.

@@ -1,45 +1,77 @@
 {{!-- Pick the locale's hero partial and hand it the NQL filter it must run.
 
      Why the filter is assembled here and not inside each hero: a `{{#get}}` filter has to
-     be a literal at the call site, and the three inputs it depends on — the collection's
-     language tag (via `locale`), `featured_only` and `featured_tag` — are all readable in
-     this partial's own scope. The heroes stay per-locale because their label, date format
-     and reading-time strings sit *inside* `{{#get}}` + `{{#foreach}}`, where a partial hash
-     argument is dropped (measured; see docs/v3-roadmap.md, "What a partial argument can and
-     cannot do"). `featuredFilter` is read at the heroes' own top level — the `{{#get}}`
-     call itself — which is exactly where a hash argument does survive.
+     be a literal at the call site, and the inputs it depends on — the collection's language
+     tag (via `locale`, or its absence on the root channel), `featured_only` and
+     `featured_tag` — are all readable in this partial's own scope. The heroes stay
+     per-locale because their label, date format and reading-time strings sit *inside*
+     `{{#get}}` + `{{#foreach}}`, where a partial hash argument is dropped (measured; see
+     docs/v3-roadmap.md, "What a partial argument can and cannot do"). `featuredFilter` is
+     read at the heroes' own top level — the `{{#get}}` call itself — which is exactly where
+     a hash argument does survive.
 
-     Two filters, independent, hence four combinations:
+     Two settings, independent, and two kinds of channel, so eight combinations:
 
-       featured_only  featured_tag   filter
-       ─────────────  ────────────   ─────────────────────────────────────────
-       on  (default)  empty          featured:true+tag:<locale>      ← today's output
-       on             my-tag         featured:true+tag:<locale>+tag:my-tag
-       off            empty          tag:<locale>
-       off            my-tag         tag:<locale>+tag:my-tag
+       channel        featured_only  featured_tag   filter
+       ─────────────  ─────────────  ────────────   ──────────────────────────────────
+       /en/ /es/ /br/ on  (default)  empty          featured:true+tag:<locale>
+       /en/ /es/ /br/ on             my-tag         featured:true+tag:<locale>+tag:my-tag
+       /en/ /es/ /br/ off            empty          tag:<locale>
+       /en/ /es/ /br/ off            my-tag         tag:<locale>+tag:my-tag
+       / (mixed feed) on  (default)  empty          featured:true
+       / (mixed feed) on             my-tag         featured:true+tag:my-tag
+       / (mixed feed) off            empty          (none — the newest post)
+       / (mixed feed) off            my-tag         tag:my-tag
 
-     The custom tag is **added** (AND), never a replacement: the language tag is what keeps
-     /es/ Spanish-only, so dropping it would let an English post become the Spanish hero.
-     The default path therefore renders byte-for-byte what it rendered before this setting
-     existed — `tests/featured-filter.test.mjs` and the HTML goldens pin that. --}}
-{{#if @custom.featured_only}}
-    {{#if @custom.featured_tag}}
-        {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}
-        {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}
-        {{else}}{{> "featured-hero" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}{{/match}}
+     `mixedFeed` is set only by home.hbs. `/` is intentionally the unfiltered, mixed feed
+     (routes.yaml gives it no filter), so a language tag there is wrong: it made the root
+     hero English-only while the grid below it was mixed. A locale collection keeps its tag
+     — that is what keeps /es/ Spanish-only — and the custom tag is *added* (AND) there,
+     never substituted for it. On the root channel there is no language tag to add to, so
+     `featured_tag` is the only tag in the filter.
+
+     The four locale combinations are unchanged, so /en/, /es/ and /br/ keep rendering
+     byte-for-byte what they rendered before the root exemption. tests/featured-filter.test.mjs
+     pins both contracts. --}}
+{{#if mixedFeed}}
+    {{!-- Root channel: no language tag. The English hero partial is the right one here
+         because `/` renders inside default.hbs (English UI); only the *filter* is mixed. --}}
+    {{#if @custom.featured_only}}
+        {{#if @custom.featured_tag}}
+            {{> "featured-hero" featuredFilter=(concat "featured:true+tag:" @custom.featured_tag)}}
+        {{else}}
+            {{> "featured-hero" featuredFilter="featured:true"}}
+        {{/if}}
     {{else}}
-        {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "featured:true+tag:" locale)}}
-        {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "featured:true+tag:" locale)}}
-        {{else}}{{> "featured-hero" featuredFilter=(concat "featured:true+tag:" locale)}}{{/match}}
+        {{#if @custom.featured_tag}}
+            {{> "featured-hero" featuredFilter=(concat "tag:" @custom.featured_tag)}}
+        {{else}}
+            {{!-- Neither setting constrains the root hero: no filter at all, so `{{#get}}`
+                 returns the newest post. That mirrors the locale collections, where turning
+                 `featured_only` off also falls back to the newest post. --}}
+            {{> "featured-hero" featuredFilter=""}}
+        {{/if}}
     {{/if}}
 {{else}}
-    {{#if @custom.featured_tag}}
-        {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}
-        {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}
-        {{else}}{{> "featured-hero" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}{{/match}}
+    {{#if @custom.featured_only}}
+        {{#if @custom.featured_tag}}
+            {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}
+            {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}
+            {{else}}{{> "featured-hero" featuredFilter=(concat "featured:true+tag:" locale "+tag:" @custom.featured_tag)}}{{/match}}
+        {{else}}
+            {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "featured:true+tag:" locale)}}
+            {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "featured:true+tag:" locale)}}
+            {{else}}{{> "featured-hero" featuredFilter=(concat "featured:true+tag:" locale)}}{{/match}}
+        {{/if}}
     {{else}}
-        {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "tag:" locale)}}
-        {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "tag:" locale)}}
-        {{else}}{{> "featured-hero" featuredFilter=(concat "tag:" locale)}}{{/match}}
+        {{#if @custom.featured_tag}}
+            {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}
+            {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}
+            {{else}}{{> "featured-hero" featuredFilter=(concat "tag:" locale "+tag:" @custom.featured_tag)}}{{/match}}
+        {{else}}
+            {{#match locale "=" "es"}}{{> "featured-hero-es" featuredFilter=(concat "tag:" locale)}}
+            {{else match locale "=" "br"}}{{> "featured-hero-br" featuredFilter=(concat "tag:" locale)}}
+            {{else}}{{> "featured-hero" featuredFilter=(concat "tag:" locale)}}{{/match}}
+        {{/if}}
     {{/if}}
 {{/if}}

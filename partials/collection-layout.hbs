@@ -3,7 +3,9 @@
      `locale` selects the featured post, the cards' date format and reading time.
      `header` is "site" for the root channel (title + description) or "tag" for a
      collection that carries tag data (routes.yaml `data: tag.<slug>`), which is what
-     /es/ and /br/ use. --}}
+     /es/ and /br/ use.
+     `mixedFeed` is set by home.hbs only: the root channel has no collection filter, so
+     its featured hero must not be language-filtered either (featured-hero-locale). --}}
 <div class="max-w-6xl mx-auto pb-12">
     {{#match header "=" "site"}}
     {{!-- Page Title & Description --}}
@@ -28,7 +30,7 @@
     {{!-- Featured post, with the security feed in a 1/3 column beside it when one is
          configured. The partial resolves to a bare, full-width hero when the feed is
          off, so an unconfigured site's HTML is unchanged. --}}
-    {{> "featured-row" locale=locale}}
+    {{> "featured-row" locale=locale mixedFeed=mixedFeed}}
 
     {{!-- Post Grid --}}
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
