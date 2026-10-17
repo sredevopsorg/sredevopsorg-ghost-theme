@@ -7,7 +7,7 @@
  * stylesheet in front of the first paint. The fonts are small enough to live in the
  * theme, so they do — this script is how they got there, and how they get updated.
  *
- * Run manually when a font needs a version bump:  node scripts/sync-fonts.mjs
+ * Run manually when a font needs a version bump:  yarn sync:fonts
  *
  * It asks Google's CSS API for the same families the theme used, keeps the latin and
  * latin-ext subsets (latin-ext is what Spanish accents need), downloads the woff2

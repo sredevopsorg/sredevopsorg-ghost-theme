@@ -7,7 +7,7 @@
  * needs no extra request, needs no font to finish loading before the icon appears, and
  * inherits colour through `currentColor`.
  *
- * Run manually when an icon needs to change:  node scripts/sync-icons.mjs
+ * Run manually when an icon needs to change:  yarn sync:icons
  *
  * Sources: Simple Icons (CC0 1.0) for brand marks, Bootstrap Icons (MIT) for the UI
  * glyphs. Licence texts are written to assets/licenses/. Sizes are set by the caller

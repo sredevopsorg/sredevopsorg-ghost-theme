@@ -1,12 +1,12 @@
-# Theme CI — runs on every v3 phase branch and on the integration branch.
+# Theme CI — runs on pull requests to main/v3-dev and pushes to v3-dev/v3 branches.
 #
 # Gates, in order of how early they fail:
 #   1. the build must produce the assets the templates reference
-#   2. GScan (the same validator Ghost runs on upload) must find no fatal issues
+#   2. GScan (the same validator Ghost runs on upload) must find no errors
 #   3. the package must be self-contained: no dev/test files, no missing assets
 #
-# Golden-HTML fixtures and Playwright are local-only for now (they need a seeded
-# Ghost); Phase 3 moves them into this workflow against docker-compose.dev.yml.
+# Golden-HTML fixtures, browser layout checks (yarn test:sec-feed-layout) and Playwright
+# are local-only: they need a seeded Ghost and, for the layout script, Chromium.
 name: theme-ci
 
 on:

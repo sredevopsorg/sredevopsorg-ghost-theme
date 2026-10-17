@@ -18,7 +18,9 @@ export default defineConfig({
     emptyOutDir: true,
     manifest: "manifest.json",
     sourcemap: false,
-    rollupOptions: {
+    // Vite 8 is Rolldown-powered: rollupOptions is deprecated in favour of
+    // rolldownOptions. The input shape is unchanged.
+    rolldownOptions: {
       input: "assets/js/index.js",
     },
   },
@@ -31,7 +33,7 @@ export default defineConfig({
     ),
     tailwindcss(),
     // JSX for the islands in assets/js/islands/**. Components are code-split by
-    // the registry in assets/js/islands.jsx, so this plugin adds no runtime by itself.
+    // the registry in assets/js/islands.js, so this plugin adds no runtime by itself.
     react(),
   ],
 });

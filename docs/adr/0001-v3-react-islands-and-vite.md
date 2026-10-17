@@ -1,6 +1,6 @@
 # ADR 0001 — v3: React islands on a Vite pipeline
 
-- **Status:** Accepted (integration branch `v3-dev`)
+- **Status:** Accepted — implemented in v3.0.0+; the branch plan below is historical
 - **Date:** 2026-10-01
 - **Supersedes:** the gulp + PostCSS + Tailwind v3 build described in `README.md` (v2.x)
 
@@ -125,3 +125,24 @@ manual `routes.yaml` step in Admin remains a documented release-checklist item.
 
 **Neutral:** Ghost's template caching still requires `ghost restart` after `.hbs` changes —
 `vite build --watch` cannot solve that.
+
+## Errata / post-implementation notes
+
+These notes correct details that changed while the v3 work shipped. The decisions above are
+kept as the record of what was decided at the time.
+
+- **D5 — manifest bridge.** The plugin generates only
+  `partials/vite_assets/head.hbs` and `partials/vite_assets/foot.hbs`. It does not
+  generate `partials/post.hbs`; post-only behaviour (Prism, code blocks, ToC, sharing)
+  lives in islands and their own chunks.
+- **D6 — editor-selectable templates.** `custom-notocbot.hbs` was removed as unused.
+  `custom-es.hbs` remains; `custom-br.hbs` was added in 3.2.1. All `custom-*` templates
+  are selected per post/page in Ghost Admin; assigning a locale tag does not select one.
+- **D7 — packaging.** The current command is `yarn package`
+  (`scripts/package-theme.mjs`). It checks the ship manifest, writes
+  `dist/<name>-<version>.zip`, validates it with `gscan --zip`, and now preserves
+  previous archives. It does not build assets: run `yarn verify` or `yarn build` first.
+- **D9 — branches.** The `v3-dev`/`v3/<phase>` flow was the build-out model. v3 shipped;
+  the current release checklist lives in `docs/release-checklist.md`.
+- **Build tool.** Vite 8/Rolldown is used from 3.2.1; `build.rollupOptions` is replaced by
+  `build.rolldownOptions` in `vite.config.js`.

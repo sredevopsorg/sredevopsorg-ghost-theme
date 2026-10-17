@@ -2,8 +2,11 @@
     "name": "sredevopsorg-ghost-theme",
     "description": "Ghost 6 theme for SREDevOps.org (https://www.sredevops.org) multi-locale, Tailwind CSS v4 via Vite, React islands, light and dark palettes, and tag-based language filtering.",
     "demo": "https://www.sredevops.org",
-    "version": "3.2.0",
+    "homepage": "https://www.sredevops.org",
+    "docs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme#readme",
+    "version": "3.2.1",
     "type": "module",
+    "packageManager": "yarn@1.22.22",
     "engines": {
         "ghost": ">=6.0.0",
         "node": ">=24"
@@ -15,20 +18,27 @@
     "scripts": {
         "dev": "vite build --watch",
         "build": "vite build",
-        "test:dev": "gscan --verbose .",
-        "test:ci": "gscan --verbose .",
+        "test": "yarn verify",
+        "test:gscan": "gscan .",
+        "test:gscan:verbose": "gscan --verbose .",
+        "test:ci": "yarn test:gscan",
+        "test:dev": "yarn test:gscan:verbose",
         "test:ship": "node scripts/ship-manifest.mjs --check",
-        "verify": "yarn build && gscan . && node scripts/ship-manifest.mjs --check && yarn test:unit && yarn test:bundle && yarn test:classes",
+        "test:unit": "node --test \"tests/*.test.mjs\"",
+        "test:bundle": "node scripts/smoke-bundle.mjs",
+        "test:classes": "node scripts/class-coverage.mjs --css assets/built --css assets/vendor",
+        "test:sec-feed-layout": "node scripts/verify-sec-feed-layout.mjs",
+        "verify": "yarn build && yarn test:ci && yarn test:ship && yarn test:unit && yarn test:bundle && yarn test:classes",
         "ghost:up": "docker compose -f docker-compose.dev.yml up -d",
         "ghost:down": "docker compose -f docker-compose.dev.yml down",
         "ghost:restart": "docker compose -f docker-compose.dev.yml restart ghost",
+        "ghost:logs": "docker compose -f docker-compose.dev.yml logs -f ghost",
         "fixtures:capture": "node scripts/fixtures.mjs capture",
         "fixtures:normalize": "node scripts/fixtures.mjs normalize",
         "fixtures:diff": "node scripts/fixtures.mjs diff",
         "fixtures:promote": "node scripts/fixtures.mjs promote",
-        "test:bundle": "node scripts/smoke-bundle.mjs",
-        "test:classes": "node scripts/class-coverage.mjs --css assets/built --css assets/vendor",
-        "test:unit": "node --test \"tests/*.test.mjs\"",
+        "sync:fonts": "node scripts/sync-fonts.mjs",
+        "sync:icons": "node scripts/sync-icons.mjs",
         "package": "node scripts/package-theme.mjs"
     },
     "author": {
@@ -48,7 +58,13 @@
     "keywords": [
         "ghost",
         "theme",
-        "ghost-theme"
+        "ghost-theme",
+        "tailwindcss",
+        "vite",
+        "react",
+        "multilingual",
+        "i18n",
+        "dark-mode"
     ],
     "repository": {
         "type": "git",
@@ -56,7 +72,10 @@
     },
     "bugs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme/issues",
     "contributors": [
-        "https://github.com/sredevopsorg/sredevopsorg-ghost-theme/graphs/contributors"
+        {
+            "name": "SREDevOps.org contributors",
+            "url": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme/graphs/contributors"
+        }
     ],
     "devDependencies": {
         "@tailwindcss/vite": "^4.3.3",
@@ -66,7 +85,7 @@
         "react": "^19.3.0",
         "react-dom": "^19.3.0",
         "tailwindcss": "^4.3.3",
-        "vite": "^7.3.6"
+        "vite": "^8.3.4"
     },
     "config": {
         "posts_per_page": 12,
@@ -85,11 +104,13 @@
             "sec_feed_api_url": {
                 "type": "text",
                 "default": "",
-                "description": "Origin of the security feed API, e.g. https://security-feed.sredevops.org. Empty hides the widget."
+                "group": "homepage",
+                "description": "Origin of the security feed API, e.g. https://security-feed.sredevops.org. Empty hides it."
             },
             "sec_feed_items": {
                 "type": "select",
                 "default": "3",
+                "group": "homepage",
                 "options": [
                     "3",
                     "5",
@@ -102,11 +123,13 @@
             "featured_tag": {
                 "type": "text",
                 "default": "",
+                "group": "homepage",
                 "description": "Extra tag slug added to the featured hero filter, e.g. news. Empty keeps only the language tag."
             },
             "featured_only": {
                 "type": "boolean",
                 "default": true,
+                "group": "homepage",
                 "description": "Require the Featured flag on the hero post. Off shows the newest post matching the tag filter."
             }
         },

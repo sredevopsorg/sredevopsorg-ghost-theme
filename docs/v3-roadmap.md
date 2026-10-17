@@ -1,14 +1,19 @@
 # v3 roadmap — React islands on a Vite pipeline
 
+> **Historical plan.** The v3 work described here has shipped (v3.0.0 and later; the current
+> release is 3.2.1). The branch model, phase checklist and "main is frozen" notes below
+> describe the build-out, not the current workflow. For current commands see
+> [README.md](../README.md) and [release-checklist.md](release-checklist.md).
+
 Companion to [ADR 0001](adr/0001-v3-react-islands-and-vite.md). This file is the working plan:
 branches, deliverables, gates.
 
-## Branch model
+## Branch model (historical)
 
-| Branch | Role |
+| Branch | Role at the time |
 | --- | --- |
-| `main` | **Frozen until release is approved.** No commits, no merges. v2.1.5 remains the deployable release. |
-| `v3-dev` | Integration branch. Every phase merges here. |
+| `main` | Frozen until the v3 release was approved; v2.1.5 was the deployable release. `main` is now the released line. |
+| `v3-dev` | Integration branch during the build-out. |
 | `v3/<phase>-<slug>` | One phase or one island per branch, PR'd into `v3-dev`. |
 
 Naming note: `v3-dev/<slug>` is impossible — git cannot keep `refs/heads/v3-dev` and
@@ -33,7 +38,7 @@ Flow per phase: branch from `v3-dev` → implement → `yarn verify` locally →
 | 4b | `v3/phase-4-locale-dedupe` | One shared shell/card/hero/author partial parameterised by `locale`; route-referenced filenames kept as thin wrappers; custom templates audited | Fixture diff per locale clean; GScan clean; no Admin routing change required | 1 d |
 | 5a | `v3/phase-5-fonts-icons` | Self-hosted Inter + Roboto Mono, Font Awesome replaced by an SVG sprite / tree-shaken imports | Zero CDN requests; Lighthouse ≥ target | 0.5 d |
 | 5b | `v3/phase-5-theming` | Palette → `@theme` tokens, `ThemeToggle` island behind `theme_toggle`, no-FOUC head script | Contrast unchanged in dark; toggle persists; dropable without blocking v3 | 0.5–1 d |
-| 6 | `v3/phase-6-release-prep` | README, deploy workflow (`npm ci`, exclude list), zip/verify scripts, `v3.0.0` changelog entry | Full release checklist passes; **then** ask before PR `v3-dev` → `main` | 0.5 d |
+| 6 | `v3/phase-6-release-prep` | README, deploy workflow (Yarn frozen install, archive packaging), zip/verify scripts, `v3.0.0` changelog entry | Full release checklist passes; **then** ask before PR `v3-dev` → `main` | 0.5 d |
 
 ≈ 7–9 focused days. Phases 3a–3d, 4a–4b and 5a–5b are independent branches and can be worked in
 any order once Phase 2 lands.
@@ -61,6 +66,9 @@ collections (`default-es.hbs`, `default-br.hbs`) and a locale custom template fo
 individual posts (23 of 26 posts use `custom-es`). `README.md` now states that a post in
 a locale collection must be assigned the locale template, otherwise it renders with the
 site locale.
+
+> **Update (3.2.1):** the Portuguese counterpart, `custom-br.hbs`, now exists. It is still
+> an editor-selected custom template; it does not apply to a post automatically.
 
 ### What a partial argument can and cannot do (measured, Phase 4b)
 
@@ -318,7 +326,8 @@ Implemented in Phase 2 by `assets/js/islands.js` (runtime) and
 
 ## Verification stack
 
-1. **GScan** — `npx gscan --fatal --verbose .` (baseline is clean; keep it clean).
+1. **GScan** — `yarn test:ci` (plain gscan; baseline is clean, keep it clean). Do not add
+   `--fatal`: it only fails on fatal issues, so error-level findings pass.
 1b. **Class coverage** — `yarn test:classes`: every class used in a template or in `assets/js`
    must have a rule in `assets/built/**` + `assets/vendor/**`. This is the guard against
    Tailwind's silent failure mode, where a renamed utility simply emits no CSS.
@@ -347,12 +356,15 @@ Never rename `show_search` or `show_login` (renaming drops the stored value — 
 Append only, with `snake_case` keys and ≤ 20 total: `development_mode`, `reading_progress`,
 `content_api_key` (text; Content API keys are public/read-only), `theme_toggle`.
 
-## Release checklist (Phase 6, requires explicit go-ahead)
+## Historical release checklist (Phase 6, retained for context)
 
-- [ ] `v3-dev` GScan fatal-clean and all fixtures reviewed.
+Current procedure: [release-checklist.md](release-checklist.md).
+
+- [ ] Release branch GScan-clean and all fixtures reviewed.
 - [ ] Budgets met; Lighthouse targets met in en/es/pt.
 - [ ] Local Ghost 6 install from the built zip renders every context.
-- [ ] Deploy workflow updated (`npm ci`, exclude `vite.config.js lib scripts tests docs`).
+- [ ] Deploy workflow uses `yarn install --frozen-lockfile` and `scripts/package-theme.mjs`
+      (no `npm ci` or hand-maintained exclude list).
 - [ ] `routes.yaml` drift checked against production Admin (routing is not deployed by CI).
-- [ ] `v3.0.0` tagged; v2.1.5 zip retained as the rollback artifact.
-- [ ] **Ask before** opening the `v3-dev` → `main` PR.
+- [ ] Version tagged; the previous `/dist` archive retained as the rollback artifact.
+- [ ] **Ask before** merging the release branch into `main`.

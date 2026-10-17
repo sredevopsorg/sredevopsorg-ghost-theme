@@ -11,8 +11,12 @@
  * validated the same way Ghost validates an upload — `gscan --zip` reads it back, which
  * makes a malformed archive fail loudly rather than at upload time.
  *
- *   node scripts/package-theme.mjs            # writes dist/<name>-<version>.zip
+ *   yarn package                              # writes dist/<name>-<version>.zip
  *   node scripts/package-theme.mjs --no-gscan # skip the read-back validation
+ *
+ * Previous archives in dist/ are deliberately left in place: the release checklist
+ * keeps the last known-good zip for rollback, and packaging a new version must not
+ * destroy it.
  */
 import { execFileSync } from "node:child_process";
 import { deflateRawSync } from "node:zlib";
@@ -139,8 +143,9 @@ const entries = listing.map((path) => ({
   mtime: statSync(join(ROOT, path)).mtime,
 }));
 
-rmSync(DIST, { recursive: true, force: true });
 mkdirSync(DIST, { recursive: true });
+// Replace only this version's archive; keep older zips for rollback.
+rmSync(archivePath, { force: true });
 const zip = createZip(entries);
 writeFileSync(archivePath, zip);
 
