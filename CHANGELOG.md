@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.2.2
+
+### Fixed
+
+- **The home page hero is no longer filtered by language.** `/` is the unfiltered mixed
+  feed, but its featured card was queried with `featured:true+tag:en`, so it could only ever
+  show an English post while the post grid below it mixed every locale. The root hero now
+  uses the existing `featured_only` / `featured_tag` settings without a language tag — it
+  shows the newest featured post wherever it was published — while `/en/`, `/es/` and
+  `/br/` keep their `tag:<locale>` and render exactly as before. No content, route or
+  setting change is required.
+
 ## 3.2.1
 
 ### Added

@@ -4,7 +4,7 @@
     "demo": "https://www.sredevops.org",
     "homepage": "https://www.sredevops.org",
     "docs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme#readme",
-    "version": "3.2.1",
+    "version": "3.2.2",
     "type": "module",
     "packageManager": "yarn@1.22.22",
     "engines": {
@@ -124,7 +124,7 @@
                 "type": "text",
                 "default": "",
                 "group": "homepage",
-                "description": "Extra tag slug added to the featured hero filter, e.g. news. Empty keeps only the language tag."
+                "description": "Extra tag slug ANDed into the featured hero filter, e.g. news. Empty adds no tag of its own."
             },
             "featured_only": {
                 "type": "boolean",
