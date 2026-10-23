@@ -22,20 +22,31 @@ document.documentElement.setAttribute("data-theme", stored);
 <script id="theme-config" type="application/json">
 {"secFeedAdvisoryMany":"% avisos","secFeedAdvisoryOne":"1 aviso","secFeedList":"Últimos avisos de seguridad","secFeedSources":"Algunas fuentes no están disponibles ahora.","secFeedSample":"Datos de ejemplo: no se puede alcanzar ninguna fuente en vivo.","secFeedStale":"Mostrando la última actualización: el feed no responde.","secFeedViewAll":"Ver el feed de seguridad completo","secFeedFilterLabel":"Filtrar por tema","secFeedFilterAll":"Todos","secFeedUpdated":"Actualizado","secFeedRetry":"Reintentar","secFeedError":"No se pudo cargar el feed de seguridad.","secFeedEmpty":"No hay avisos por ahora.","secFeedLoading":"Cargando los últimos avisos…","readingProgress":"Progreso de lectura","closeMenu":"Cerrar menú","openMenu":"Abrir menú","shareVia":"Compartir por correo","share":"Compartir","linkCopied":"¡Enlace copiado!","copyLink":"Copiar enlace","toc":"Índice de contenidos","locale":"es","siteUrl":"http://localhost:2368"}
 </script>
-<meta name="description" content="Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes">
 <link rel="icon" href="http://localhost:2368/content/images/size/w256h256/2024/07/Icon-App-76x76@2x.png" type="image/png">
 <link rel="canonical" href="http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/">
-<link rel="alternate" type="text/markdown" href="http://localhost:2368/es/como-desplegar-ghost-en-kubernetes.md">
 <meta name="referrer" content="no-referrer-when-downgrade">
-<meta property="og:site_name" content="Local Dev">
+<meta property="og:site_name" content="LocalDev">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Cómo desplegar Ghost (CMS/Blog) en Kubernetes">
-<meta property="og:description" content="Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes">
+<meta property="og:description" content="Ghost en Kubernetes por SREDevOps.Org
+
+
+
+Introducción
+
+Este repositorio implementa Ghost CMS v5.xx.x desde @TryGhost (upstream) en Kubernetes, con nuestra imagen personalizada, la cual tiene mejoras significativas para ser usada en Kubernetes (Dockerfile). Vea este README completo para más información.
+
+Características
+
+*
+
+Tanto los componentes de Ghost como los">
 <meta property="og:url" content="http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/">
-<meta property="og:image" content="http://localhost:2368/content/images/2025/12/ghost-on-kubernetes.png">
+<meta property="og:image" content="http://localhost:2368/content/images/size/w1200/2024/03/ghost.png">
 <meta property="article:published_time" content="TIMESTAMP">
 <meta property="article:modified_time" content="TIMESTAMP">
 <meta property="article:tag" content="Kubernetes">
+<meta property="article:tag" content="Opinion">
 <meta property="article:tag" content="Español">
 <meta property="article:tag" content="Apps">
 <meta property="article:tag" content="Open Source">
@@ -49,34 +60,68 @@ document.documentElement.setAttribute("data-theme", stored);
 <meta property="article:tag" content="Docker">
 <meta property="article:tag" content="Github">
 <meta property="article:publisher" content="https://www.facebook.com/sredevops">
+<meta property="article:author" content="https://www.facebook.com/sredevops">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Cómo desplegar Ghost (CMS/Blog) en Kubernetes">
-<meta name="twitter:description" content="Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes">
+<meta name="twitter:description" content="Ghost en Kubernetes por SREDevOps.Org
+
+
+
+Introducción
+
+Este repositorio implementa Ghost CMS v5.xx.x desde @TryGhost (upstream) en Kubernetes, con nuestra imagen personalizada, la cual tiene mejoras significativas para ser usada en Kubernetes (Dockerfile). Vea este README completo para más información.
+
+Características
+
+*
+
+Tanto los componentes de Ghost como los">
 <meta name="twitter:url" content="http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/">
-<meta name="twitter:image" content="http://localhost:2368/content/images/2025/12/ghost-on-kubernetes.png">
+<meta name="twitter:image" content="http://localhost:2368/content/images/size/w1200/2024/03/ghost.png">
 <meta name="twitter:label1" content="Written by">
-<meta name="twitter:data1" content="Local Dev">
+<meta name="twitter:data1" content="Nicolás Georger">
 <meta name="twitter:label2" content="Filed under">
-<meta name="twitter:data2" content="Kubernetes, Español, Apps, Open Source, SREDevOps, DevOps, Selected content, SRE, Cloud, Containers, Development, Docker, Github">
+<meta name="twitter:data2" content="Kubernetes, Opinion, Español, Apps, Open Source, SREDevOps, DevOps, Selected content, SRE, Cloud, Containers, Development, Docker, Github">
 <meta name="twitter:site" content="@sredevopsorg">
+<meta name="twitter:creator" content="@sredevopsorg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="600">
 <script type="application/ld+json">
 {
 "@context": "https://schema.org",
 "@type": "Article",
 "publisher": {
 "@type": "Organization",
-"name": "Local Dev",
+"name": "LocalDev",
 "url": "http://localhost:2368/",
 "logo": {
 "@type": "ImageObject",
-"url": "http://localhost:2368/content/images/2024/11/sredevopsorg.svg"
+"url": "http://localhost:2368/content/images/2024/11/sredevopsorg.svg",
+"width": 240,
+"height": 28
 }
 },
 "author": {
 "@type": "Person",
-"name": "Local Dev",
-"url": "http://localhost:2368/author/local/",
-"sameAs": []
+"name": "Nicolás Georger",
+"image": {
+"@type": "ImageObject",
+"url": "http://localhost:2368/content/images/2025/09/me.jpeg",
+"width": 800,
+"height": 800
+},
+"url": "http://localhost:2368/author/ngeorger/",
+"sameAs": [
+"https://www.sredevops.org",
+"https://www.facebook.com/sredevops",
+"https://x.com/sredevopsorg",
+"https://www.threads.net/@sredevopsorg",
+"https://bsky.app/profile/sredevopsorg.bsky.social",
+"https://mastodon.social/@sredevopsorg",
+"https://www.youtube.com/@sredevopsorg",
+"https://www.instagram.com/sredevopsorg",
+"https://www.linkedin.com/in/nicolas-georger"
+]
 },
 "headline": "Cómo desplegar Ghost (CMS/Blog) en Kubernetes",
 "url": "http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/",
@@ -84,16 +129,18 @@ document.documentElement.setAttribute("data-theme", stored);
 "dateModified": "TIMESTAMP",
 "image": {
 "@type": "ImageObject",
-"url": "http://localhost:2368/content/images/2025/12/ghost-on-kubernetes.png"
+"url": "http://localhost:2368/content/images/size/w1200/2024/03/ghost.png",
+"width": 1200,
+"height": 600
 },
-"keywords": "Kubernetes, Español, Apps, Open Source, SREDevOps, DevOps, Selected content, SRE, Cloud, Containers, Development, Docker, Github",
-"description": "Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes",
+"keywords": "Kubernetes, Opinion, Español, Apps, Open Source, SREDevOps, DevOps, Selected content, SRE, Cloud, Containers, Development, Docker, Github",
+"description": "Ghost en Kubernetes por SREDevOps.Org\n\n\n\n\n\n\nIntroducción\n\n\nEste repositorio implementa Ghost CMS v5.xx.x desde @TryGhost (upstream) en Kubernetes, con nuestra imagen personalizada, la cual tiene mejoras significativas para ser usada en Kubernetes (Dockerfile). Vea este README completo para más información.\n\n\n\nCaracterísticas\n\n\n * \n \n \n Tanto los componentes de Ghost como los de MySQL se ejecutan como usuario sin privilegios de root en Kubernetes, lo que mejora significativamente la segurid",
 "mainEntityOfPage": "http://localhost:2368/es/como-desplegar-ghost-en-kubernetes/"
 }
 </script>
-<meta name="generator" content="Ghost 6.67">
-<link rel="alternate" type="application/rss+xml" title="Local Dev" href="http://localhost:2368/es/rss/">
-<script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.71/umd/portal.min.js" data-i18n="true" data-ghost="http://localhost:2368/" data-key="7d4e0c71149feae71b36b6efca" data-api="http://localhost:2368/ghost/api/content/" data-locale="en" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
+<meta name="generator" content="Ghost 6.72">
+<link rel="alternate" type="application/rss+xml" title="LocalDev" href="http://localhost:2368/es/rss/">
+<script defer src="https://cdn.jsdelivr.net/ghost/portal@~2.72/umd/portal.min.js" data-i18n="true" data-ghost="http://localhost:2368/" data-key="5f063d295349fc562674c41255" data-api="http://localhost:2368/ghost/api/content/" data-locale="en" crossorigin="anonymous"></script><style id="gh-members-styles">.gh-post-upgrade-cta-content,
 .gh-post-upgrade-cta {
 display: flex;
 flex-direction: column;
@@ -149,18 +196,17 @@ font-weight: 600;
 .gh-post-upgrade-cta a.gh-btn:hover {
 opacity: 0.92;
 }</style>
-<script defer src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/sodo-search.min.js" data-key="7d4e0c71149feae71b36b6efca" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.8/umd/main.css" data-sodo-search="http://localhost:2368/" data-locale="en" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/ghost/sodo-search@~1.9/umd/sodo-search.min.js" data-key="5f063d295349fc562674c41255" data-styles="https://cdn.jsdelivr.net/ghost/sodo-search@~1.9/umd/main.css" data-sodo-search="http://localhost:2368/" data-locale="en" crossorigin="anonymous"></script>
 <link href="http://localhost:2368/webmentions/receive/" rel="webmention">
-<script defer src="/public/cards.min.js?v=HASH"></script>
+<script defer src="/public/cards.min.js?v=HASH"></script><style>:root {--ghost-accent-color: #aa3cfd;}</style>
 <link rel="stylesheet" type="text/css" href="/public/cards.min.css?v=HASH">
-<script defer src="/public/comment-counts.min.js?v=HASH" data-ghost-comments-counts-api="http://localhost:2368/members/api/comments/counts/"></script><style>:root {--ghost-accent-color: #aa3cfd;}</style>
 </head>
-<body class="post-template tag-kubernetes tag-hash-ngeorger tag-hash-home tag-es tag-hash-es tag-apps tag-opensource tag-sredevops tag-devops tag-selected tag-sre tag-cloud tag-containers tag-development tag-docker tag-github tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 bg-surface text-strong antialiased font-sans">
+<body class="post-template tag-kubernetes tag-hash-home tag-opinion tag-es tag-hash-es tag-apps tag-opensource tag-sredevops tag-devops tag-selected tag-sre tag-cloud tag-containers tag-development tag-docker tag-github bg-surface text-strong antialiased font-sans">
 <header class="sticky top-0 z-50 w-full bg-surface/80 backdrop-blur-md border-b border-inverse/10 py-3 min-h-[60px]">
 <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
 <div class="flex items-center">
-<a href="http://localhost:2368" rel="me" alt="Local Dev" aria-label="Local Dev">
-<img src="http://localhost:2368/content/images/2024/11/sredevopsorg.svg" alt="Local Dev" class="h-7 w-auto sm:h-8" />
+<a href="http://localhost:2368" rel="me" alt="LocalDev" aria-label="LocalDev">
+<img src="http://localhost:2368/content/images/2024/11/sredevopsorg.svg" alt="LocalDev" class="h-7 w-auto sm:h-8" />
 </a>
 <span class="mx-3 hidden h-6 w-px bg-inverse/15 sm:inline-block" aria-hidden="true"></span>
 <a href="http://localhost:2368" rel="me" aria-hidden="true" tabindex="-1"
@@ -170,17 +216,14 @@ class="hidden rounded-md sm:inline-flex">
 </div>
 <div class="hidden md:flex items-center">
 <ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
-<li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-<a href="http://localhost:2368/en/" class="block w-full text-muted transition-colors hover:text-strong">English</a>
-</li>
 <li class="nav-espanol nav-current-parent flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
 <a href="http://localhost:2368/es/" class="block w-full text-muted transition-colors hover:text-strong">Español</a>
 </li>
+<li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/en/" class="block w-full text-muted transition-colors hover:text-strong">English</a>
+</li>
 <li class="nav-brazil flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
 <a href="http://localhost:2368/br/" class="block w-full text-muted transition-colors hover:text-strong">Brazil</a>
-</li>
-<li class="nav-projects flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-<a href="http://localhost:2368/our-open-source-projects/" class="block w-full text-muted transition-colors hover:text-strong">Projects</a>
 </li>
 <li class="nav-categories flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
 <a href="http://localhost:2368/tags/" class="block w-full text-muted transition-colors hover:text-strong">Categories</a>
@@ -188,8 +231,11 @@ class="hidden rounded-md sm:inline-flex">
 <li class="nav-about-us flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
 <a href="http://localhost:2368/about-us/" class="block w-full text-muted transition-colors hover:text-strong">About Us</a>
 </li>
-<li class="nav-links flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-<a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
+<li class="nav-nosotros flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/que-es-sredevops/" class="block w-full text-muted transition-colors hover:text-strong">Nosotros</a>
+</li>
+<li class="nav-recommendations flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Recommendations</a>
 </li>
 </ul>
 </div>
@@ -221,17 +267,14 @@ aria-label="Abrir menú">
 <nav
 class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b border-inverse/10 p-6 flex flex-col gap-4 text-sm font-medium z-50">
 <ul class="nav flex flex-col gap-2 w-full md:flex-row md:items-center" role="menu">
-<li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-<a href="http://localhost:2368/en/" class="block w-full text-muted transition-colors hover:text-strong">English</a>
-</li>
 <li class="nav-espanol nav-current-parent flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
 <a href="http://localhost:2368/es/" class="block w-full text-muted transition-colors hover:text-strong">Español</a>
 </li>
+<li class="nav-english flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/en/" class="block w-full text-muted transition-colors hover:text-strong">English</a>
+</li>
 <li class="nav-brazil flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
 <a href="http://localhost:2368/br/" class="block w-full text-muted transition-colors hover:text-strong">Brazil</a>
-</li>
-<li class="nav-projects flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-<a href="http://localhost:2368/our-open-source-projects/" class="block w-full text-muted transition-colors hover:text-strong">Projects</a>
 </li>
 <li class="nav-categories flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
 <a href="http://localhost:2368/tags/" class="block w-full text-muted transition-colors hover:text-strong">Categories</a>
@@ -239,8 +282,11 @@ class="absolute top-full left-0 right-0 bg-surface/95 backdrop-blur-md border-b 
 <li class="nav-about-us flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
 <a href="http://localhost:2368/about-us/" class="block w-full text-muted transition-colors hover:text-strong">About Us</a>
 </li>
-<li class="nav-links flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
-<a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Links</a>
+<li class="nav-nosotros flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/que-es-sredevops/" class="block w-full text-muted transition-colors hover:text-strong">Nosotros</a>
+</li>
+<li class="nav-recommendations flex items-center rounded-lg px-0 py-2 text-left md:px-3 md:py-2" role="menuitem">
+<a href="http://localhost:2368/recommendations/" class="block w-full text-muted transition-colors hover:text-strong">Recommendations</a>
 </li>
 </ul>
 <button type="button" class="theme-toggle flex items-center gap-2 text-left text-muted transition-colors hover:text-strong"
@@ -268,27 +314,38 @@ Sign in
 <main id="main-wrapper" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative mt-4">
 <div data-island="ReadingProgress" data-target=".gh-content"></div>
 <div
-class="post tag-kubernetes tag-hash-ngeorger tag-hash-home tag-es tag-hash-es tag-apps tag-opensource tag-sredevops tag-devops tag-selected tag-sre tag-cloud tag-containers tag-development tag-docker tag-github tag-hash-import-2026-10-02-03-41 tag-hash-import-2026-10-02-06-36 featured grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-border-subtle pb-8">
+class="post tag-kubernetes tag-hash-home tag-opinion tag-es tag-hash-es tag-apps tag-opensource tag-sredevops tag-devops tag-selected tag-sre tag-cloud tag-containers tag-development tag-docker tag-github featured grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-border-subtle pb-8">
 <div class="lg:col-span-8 flex flex-col justify-center">
 <div class="flex items-center gap-3 mb-3">
 <span
 class="bg-brand-purple text-strong text-[10px] font-bold px-3 py-1 tracking-wide uppercase font-mono">Kubernetes</span>
 <span class="text-subtle-text text-xs"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4 mr-1" aria-hidden="true" focusable="false"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/></svg>
-Alrededor de 6 minutos para leer</span>
+Alrededor de 7 minutos para leer</span>
 </div>
 <h1 class="text-3xl md:text-5xl font-bold leading-tight tracking-tight text-strong mb-3">Cómo desplegar Ghost (CMS/Blog) en Kubernetes</h1>
-<p class="text-lg text-muted leading-relaxed max-w-3xl mb-4">Ghost CMS v6 @TryGhost en Kubernetes, usando nuestra imagen personalizada con mejoras significativas diseñadas para su uso en Kubernetes</p>
+<p class="text-lg text-muted leading-relaxed max-w-3xl mb-4">Ghost en Kubernetes por SREDevOps.Org
+
+
+
+Introducción
+
+Este repositorio implementa Ghost CMS v5.xx.x desde @TryGhost (upstream) en Kubernetes, con nuestra imagen personalizada, la cual tiene mejoras significativas para ser usada en Kubernetes (Dockerfile). Vea este README completo para más información.
+
+Características
+
+*
+
+Tanto los componentes de Ghost como los</p>
 <div class="flex items-center text-sm text-muted">
-<span
-class="h-6 w-6 bg-subtle rounded-full flex items-center justify-center text-[10px] text-body font-bold mr-2">Local Dev</span>
-<span class="mr-2 text-body font-medium"><a href="/author/local/">Local Dev</a></span>
+<img class="h-6 w-6 rounded-full mr-2 object-cover" src="/content/images/size/w100/2025/09/me.jpeg" alt="Nicolás Georger">
+<span class="mr-2 text-body font-medium"><a href="/author/ngeorger/">Nicolás Georger</a></span>
 <span class="mr-2 text-subtle-text">|</span>
 <span>11/06/2023</span>
 </div>
 </div>
 <div class="lg:col-span-4 mt-4 lg:mt-0">
 <figure>
-<img src="/content/images/size/w900/format/webp/2025/12/ghost-on-kubernetes.png"
+<img src="/content/images/size/w900/format/webp/2024/03/ghost.png"
 alt="Cómo desplegar Ghost (CMS/Blog) en Kubernetes"
 class="w-full h-auto object-cover rounded-xl border border-border-subtle shadow-2xl">
 </figure>
@@ -298,90 +355,239 @@ class="w-full h-auto object-cover rounded-xl border border-border-subtle shadow-
 <div class="lg:col-span-8 gh-content" data-island="CodeBlocks"
 data-prismjs-copy="Copiar"
 data-prismjs-copy-success="¡Copiado!">
-<h2 id="ghost-en-kubernetes-v6x-por-sredevopsorg">Ghost en Kubernetes (v6.x) por SREDevOps.Org</h2><p>Despliega la principal plataforma de publicación de código abierto, <strong>Ghost</strong>, en Kubernetes con la máxima <strong>seguridad</strong> y <strong>eficiencia</strong> utilizando una imagen de contenedor endurecida y multi-arquitectura.</p><p>Mantenido por <a href="http://localhost:2368/"><strong><em>SREDevOps.org</em></strong></a><em>: SRE, DevOps, Linux, Hacking Ético, IA, ML, Código Abierto, Cloud Native, Platform Engineering en Inglés, Español y Portugués (Brasil).</em></p><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/sredevopsorg/ghost-on-kubernetes"><div class="kg-bookmark-content"><div class="kg-bookmark-title">GitHub - sredevopsorg/ghost-on-kubernetes: Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image.</div><div class="kg-bookmark-description">Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image. - sredevopsorg/ghost-on-kubernetes</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="http://localhost:2368/content/images/icon/pinned-octocat-093da3e6fa40-22.svg" alt=""><span class="kg-bookmark-author">GitHub</span><span class="kg-bookmark-publisher">sredevopsorg</span></div></div><div class="kg-bookmark-thumbnail"><img src="http://localhost:2368/content/images/thumbnail/395b82c9-df81-4aee-95a5-4269616a550f" alt="" onerror="this.style.display = 'none'"></div></a></figure><h3 id="aspectos-destacados-seguridad-y-eficiencia"><strong>Aspectos Destacados: Seguridad y Eficiencia</strong></h3><p>Este repositorio implementa Ghost CMS v6.xx.x de <a href="https://github.com/TryGhost/Ghost">@TryGhost (Oficial)</a> en Kubernetes con una imagen personalizada, que ofrece mejoras significativas para el uso en producción y características de seguridad en Kubernetes.</p><h3 id="seguridad-mejorada"><strong>Seguridad Mejorada</strong></h3><ul><li><strong>Ejecución Sin Root:</strong> Tanto los componentes de Ghost como los de MySQL se ejecutan exclusivamente como un <strong>usuario sin privilegios (non-root)</strong> (UID/GID 65532) en Kubernetes, previniendo posibles ataques de escalada de privilegios.</li><li><strong>Tiempo de Ejecución Distroless:</strong> Utilizamos <strong>Google Container Tools Distroless Debian 13 - NodeJS 22</strong> como el entorno de tiempo de ejecución final. Las imágenes <strong>Distroless</strong> contienen solo las dependencias de la aplicación y el lenguaje requeridas, <strong>excluyendo shells y gestores de paquetes</strong>, lo que las hace sustancialmente más seguras y reduce la superficie de ataque.</li><li><strong>Reducción de Vulnerabilidades:</strong> Al reemplazar <code>gosu</code> con un flujo de ejecución de contenedor nativo y adoptar Distroless, eliminamos varias vulnerabilidades críticas reportadas en la imagen original de Ghost:<ul><li><strong>Resultado:</strong> Solo este cambio redujo <strong>6 vulnerabilidades críticas</strong> y <strong>34 vulnerabilidades altas</strong> reportadas por Docker Scout en la imagen oficial.</li></ul></li></ul><p><strong>Ejemplo de Reportes de Seguridad:</strong></p>
-<!--kg-card-begin: html-->
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Imagen Oficial de Ghost</th>
-<th style="text-align:left">Imagen de Ghost en Kubernetes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Escaneo de ejemplo para la <a href="https://hub.docker.com/_/ghost/tags">Imagen Oficial de Ghost</a>: <img src="https://raw.githubusercontent.com/sredevopsorg/ghost-on-kubernetes/main/docs/images/dockerhub-ghost.png" alt="Reporte de Docker Scout - Imagen Oficial de Ghost"></td>
-<td style="text-align:left">Ejemplo de nuestra <a href="https://hub.docker.com/r/ngeorger/ghost-on-kubernetes/tags">Imagen de Ghost en Kubernetes en Docker Hub</a>: <img src="https://raw.githubusercontent.com/sredevopsorg/ghost-on-kubernetes/main/docs/images/dockerhub-ngeorger.png" alt="Reporte de Docker Scout - Imagen de Ghost en Kubernetes"></td>
-</tr>
-</tbody>
-</table>
-<!--kg-card-end: html-->
-<h3 id="rendimiento-y-arquitectura"><strong>Rendimiento y Arquitectura</strong></h3><ul><li><strong>Artefactos de Build Personalizados:</strong> Mantenemos dos Dockerfiles distintos para producción y desarrollo:<ul><li><strong>Imagen de Producción:</strong> La imagen principal construida utilizando nuestro proceso de construcción endurecido y multi-etapa. Ver el <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/Dockerfile">Dockerfile</a>.</li><li><strong>Imagen de Desarrollo:</strong> Una variante adaptada para pruebas, que incluye soporte para SQLite. Ver el <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/Dockerfile-dev">Dockerfile-dev</a>.</li></ul></li><li><strong>Soporte Multi-Arquitectura:</strong> Las imágenes están construidas para las arquitecturas <strong>amd64</strong> y <strong>arm64</strong>.</li><li><strong>Build Multi-Etapa:</strong> Utilizamos la imagen oficial de Node 22 Jod LTS para la construcción, lo que reduce significativamente el tamaño final de la imagen y mejora la seguridad al eliminar componentes de construcción innecesarios.</li><li><strong>Ghost v6 y NodeJS 22 LTS Actualizados:</strong> Utilizando las últimas versiones estables para seguridad y rendimiento.</li><li><strong>Punto de Entrada Robusto (entrypoint.js):</strong> Un script de punto de entrada <strong>Node.js</strong> personalizado, ejecutado por el usuario sin privilegios, maneja las operaciones de tiempo de ejecución necesarias, como la actualización de temas predeterminados, antes de iniciar la aplicación Ghost. El script se puede revisar aquí: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/entrypoint.js">entrypoint.js</a>.</li><li><strong>Contenedor Init Dedicado:</strong> El despliegue incluye un <strong>initContainer</strong> para manejar la creación de directorios, la propiedad correcta (UID/GID 65532) y la configuración de permisos antes del lanzamiento del contenedor principal de Ghost, asegurando una operación fluida dentro del contenedor Distroless.</li></ul><h2 id="resumen-de-la-arquitectura-de-despliegue"><strong>Resumen de la Arquitectura de Despliegue</strong></h2><p>Este proyecto proporciona archivos manifest completos de Kubernetes (<code>deploy/</code>) para ejecutar una instancia de Ghost lista para producción, respaldada por una base de datos <strong>MySQL</strong>.</p>
-<!--kg-card-begin: html-->
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Recurso</th>
-<th style="text-align:left">Componentes</th>
-<th style="text-align:left">Detalles</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left"><strong>Namespace</strong></td>
-<td style="text-align:left">ghost-on-kubernetes</td>
-<td style="text-align:left">Proporciona aislamiento lógico para todos los componentes. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/00-namespace.yaml">00-namespace.yaml</a>)</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>StatefulSet</strong></td>
-<td style="text-align:left">ghost-on-kubernetes-mysql</td>
-<td style="text-align:left">Gestiona la base de datos MySQL 8, asegurando red estable y almacenamiento persistente. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/05-mysql.yaml">05-mysql.yaml</a>)</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Deployment</strong></td>
-<td style="text-align:left">ghost-on-kubernetes</td>
-<td style="text-align:left">Gestiona los pods de la aplicación Ghost v6. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/06-ghost-deployment.yaml">06-ghost-deployment.yaml</a>)</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Services</strong></td>
-<td style="text-align:left">ghost-on-kubernetes-service, ghost-on-kubernetes-mysql-service</td>
-<td style="text-align:left">Expone Ghost (2368) y MySQL (3306) internamente dentro del clúster. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/03-service.yaml">03-service.yaml</a>)</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>PersistentVolumeClaims (PVC)</strong></td>
-<td style="text-align:left">k8s-ghost-content, ghost-on-kubernetes-mysql-pvc</td>
-<td style="text-align:left">Solicita almacenamiento persistente para el contenido de Ghost (temas, imágenes) y los datos de MySQL. (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/02-pvc.yaml">02-pvc.yaml</a>)</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Secrets</strong></td>
-<td style="text-align:left">ghost-config-prod, ghost-on-kubernetes-mysql-env, tls-secret</td>
-<td style="text-align:left">Almacena de forma segura la configuración de Ghost, las credenciales de la base de datos y los certificados TLS (opcional). (Archivos: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/01-mysql-config.yaml">01-mysql-config.yaml</a>, <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/04-ghost-config.yaml">04-ghost-config.yaml</a>, <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/01-tls.yaml">01-tls.yaml</a>)</td>
-</tr>
-<tr>
-<td style="text-align:left"><strong>Ingress</strong></td>
-<td style="text-align:left">ghost-on-kubernetes-ingress</td>
-<td style="text-align:left">Expone la aplicación Ghost al mundo exterior a través de HTTP/HTTPS (requiere un TLD). (Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/07-ingress.yaml">07-ingress.yaml</a>)</td>
-</tr>
-</tbody>
-</table>
-<!--kg-card-end: html-->
-<p><em>Nota</em>: Puedes alojar múltiples instancias de Ghost reemplazando la especificación de Namespace en cada archivo manifest.</p><h2 id="instrucciones-de-instalaci%C3%B3n-producci%C3%B3n"><strong>Instrucciones de Instalación (Producción)</strong></h2><p>Sigue estos pasos para desplegar Ghost en tu clúster de Kubernetes.</p><h3 id="prerrequisitos"><strong>Prerrequisitos</strong></h3><ol><li>Un clúster de Kubernetes en funcionamiento (<code>kubectl</code> configurado).</li><li>Un StorageClass provisionado (requerido para los PVCs).</li></ol><h3 id="0-clonar-o-hacer-fork-del-repositorio"><strong>0. Clonar (o hacer fork) del Repositorio</strong></h3><pre><code class="language-bash">## Clonar el repositorio
+<h1 id="ghost-en-kubernetes-por-sredevopsorg">Ghost en Kubernetes por SREDevOps.Org</h1>
+<p><a href="https://github.com/sredevopsorg/ghost-on-kubernetes/actions/workflows/multi-build.yaml"><img src="https://github.com/sredevopsorg/ghost-on-kubernetes/actions/workflows/multi-build.yaml/badge.svg?branch=main" alt="Build Multiarch" loading="lazy"></a>
+<a href="https://github.com/sredevopsorg/ghost-on-kubernetes/pkgs/container/ghost-on-kubernetes"><img src="https://ghcr-badge.egpl.dev/sredevopsorg/ghost-on-kubernetes/size?color=%2344cc11&amp;tag=main&amp;label=main+image+size" alt="Image Size" loading="lazy"></a>
+<a href="https://securityscorecards.dev/viewer/?uri=github.com/sredevopsorg/ghost-on-kubernetes"><img src="https://api.securityscorecards.dev/projects/github.com/sredevopsorg/ghost-on-kubernetes/badge" alt="OpenSSF Scorecard" loading="lazy"></a>
+<a href="https://github.com/sredevopsorg/ghost-on-kubernetes/fork"><img src="https://img.shields.io/github/forks/sredevopsorg/ghost-on-kubernetes?style=social" alt="Fork this repository" loading="lazy"></a>
+<a href="https://github.com/sredevopsorg/ghost-on-kubernetes/stargazers"><img src="https://img.shields.io/github/stars/sredevopsorg/ghost-on-kubernetes?style=social" alt="Star this repository" loading="lazy"></a>
+<a href="https://www.bestpractices.dev/projects/8888"><img src="https://www.bestpractices.dev/projects/8888/badge" alt="OpenSSF Best Practices" loading="lazy"></a>
+<a href="https://artifacthub.io/packages/search?repo=ghost-on-kubernetes"><img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/ghost-on-kubernetes" alt="Artifact Hub" loading="lazy"></a></p>
+<h2 id="introducci%C3%B3n">Introducción</h2>
+<p>Este repositorio implementa Ghost CMS v5.xx.x desde <a href="https://github.com/TryGhost/Ghost">@TryGhost (upstream)</a> en Kubernetes, con nuestra imagen personalizada, la cual tiene mejoras significativas para ser usada en Kubernetes <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/Dockerfile">(Dockerfile)</a>. Vea este README completo para más información.</p>
+<h2 id="caracter%C3%ADsticas">Características</h2>
+<ul>
+<li>
+<p>Tanto los componentes de Ghost como los de MySQL se ejecutan como usuario sin privilegios de root en Kubernetes, lo que mejora significativamente la seguridad, además de las mejoras de nuestra imagen personalizada.</p>
+</li>
+<li>
+<p>Soporte multi-arquitectura (amd64 y arm64).</p>
+</li>
+<li>
+<p>Usamos la imagen oficial de Node 20 Iron Bookworm como nuestro entorno de construcción. <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/Dockerfile">Dockerfile</a>.</p>
+</li>
+<li>
+<p>Introducimos una <em>build multi-stage</em>, que reduce el tamaño final de la imagen y mejora la seguridad al eliminar componentes innecesarios de la imagen final.</p>
+</li>
+<li>
+<p><a href="https://github.com/GoogleContainerTools/distroless/blob/main/README.md">Distroless Node 20 Debian 12</a> como nuestro entorno de ejecución para la etapa final de la imagen.</p>
+</li>
+<li>
+<p>Se eliminó <em>gosu</em>, ahora todo se ejecuta como usuario sin privilegios de root (UID/GID 65532) dentro del contenedor Distroless. Este cambio por sí solo reduce 6 vulnerabilidades críticas y 34 vulnerabilidades altas reportadas por Docker Scout en la imagen original de Ghost. Referencias:</p>
+<ul>
+<li>
+<p><a href="https://hub.docker.com/_/ghost/tags">Imagen Oficial de Ghost</a></p>
+<p><img src="https://raw.githubusercontent.com/sredevopsorg/ghost-on-kubernetes/main/docs/images/dockerhub-ghost.png" alt="Docker Scout Report - Ghost Official Image" loading="lazy"></p>
+</li>
+<li>
+<p><a href="https://hub.docker.com/r/ngeorger/ghost-on-kubernetes/tags">Imagen de Ghost en Kubernetes en Docker Hub</a></p>
+<p><img src="https://raw.githubusercontent.com/sredevopsorg/ghost-on-kubernetes/main/docs/images/dockerhub-ngeorger.png" alt="Docker Scout Report - Ghost on Kubernetes Image" loading="lazy"></p>
+</li>
+</ul>
+</li>
+<li>
+<p>Nuevo flujo de <em>Entrypoint</em>, utilizando un script Node.js ejecutado por el usuario Node sin privilegios dentro del contenedor Distroless, que actualiza los temas predeterminados y inicia la aplicación Ghost, operación que se realiza dentro del contenedor Distroless en tiempo de ejecución.</p>
+</li>
+<li>
+<p>Usamos la última versión de Ghost 5 (al momento de construir la imagen).</p>
+</li>
+</ul>
+<h2 id="cambios-recientes">Cambios Recientes</h2>
+<p>Hemos realizado algunas actualizaciones significativas para mejorar la seguridad y eficiencia de nuestra implementación de Ghost en Kubernetes:</p>
+<ol>
+<li><strong>Soporte multi-arquitectura</strong>: Las imágenes ahora son multi-arquitectura, con soporte para amd64 y arm64.</li>
+<li><strong>Imagen Distroless</strong>: Usamos <a href="https://github.com/GoogleContainerTools/distroless/blob/main/examples/nodejs/Dockerfile">Distroless NodeJS</a> de <a href="https://github.com/GoogleContainerTools">@GoogleContainerTools</a> como entorno de ejecución para la imagen final. Las imágenes Distroless son imágenes mínimas que contienen solo los componentes necesarios para ejecutar la aplicación, haciéndolas más seguras y eficientes que las imágenes tradicionales.</li>
+<li><strong>MySQL StatefulSet</strong>: Hemos cambiado la implementación de MySQL a un StatefulSet. Esto proporciona identificadores de red estables y almacenamiento persistente, lo cual es importante para bases de datos como MySQL que necesitan mantener el estado.</li>
+<li><strong>Contenedor Init</strong>: Hemos agregado un contenedor init al <em>Deployment</em> de Ghost. Este contenedor se encarga de configurar los archivos y directorios necesarios antes de que se inicie el contenedor principal de Ghost, asegurando que se creen los directorios correctos, la propiedad correcta para el usuario <em>node</em> dentro del contenedor <em>distroless</em> UID/GID a 65532, y que se establezcan los permisos correctos. Revisar <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/06-ghost-deployment.yaml">deploy/06-ghost-deployment.yaml</a> para detalles sobre estos cambios.</li>
+<li><strong>Script de Entrypoint</strong>: Hemos introducido un nuevo script de <em>entrypoint</em> que se ejecuta como usuario sin privilegios dentro del contenedor <em>distroless</em>. Este script se encarga de actualizar los temas predeterminados y luego inicia la aplicación Ghost. Este script es ejecutado por el usuario sin privilegios dentro del contenedor Distroless, el cual actualiza los temas por defecto y arranca la aplicación Ghost, operación que se realiza dentro del contenedor distroless en tiempo de ejecución. <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/entrypoint.js">entrypoint.js</a></li>
+</ol>
+<h2 id="historial-de-estrellas">Historial de Estrellas</h2>
+<p><img src="https://api.star-history.com/svg?repos=sredevopsorg/ghost-on-kubernetes&amp;type=Date&amp;theme=dark" alt="Star History Chart" loading="lazy"></p>
+<h2 id="instalaci%C3%B3n">Instalación</h2>
+<h3 id="0-clonar-el-repositorio-o-hacerle-un-fork">0. Clonar el repositorio o hacerle un fork</h3>
+<pre><code class="language-bash"># Clonar el repositorio
 git clone https://github.com/sredevopsorg/ghost-on-kubernetes.git --depth 1 --branch main --single-branch --no-tags
-## Cambiar de directorio
+# Cambiar de directorio
 cd ghost-on-kubernetes
-</code></pre><h3 id="1-revisar-y-configurar"><strong>1. Revisar y Configurar</strong></h3><p>Revisa los archivos de configuración de ejemplo y modifica los manifests en la carpeta <code>deploy/</code> para adaptarlos a tu entorno (ej. clase de almacenamiento, nombre de dominio, valores de secretos).</p><ul><li><strong>Configuraciones:</strong> Revisa los archivos de configuración de ejemplo en el directorio <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/examples/">examples/</a>:<ul><li><code>config.production.sample.yaml</code>: Configuración recomendada usando MySQL 8. Requiere un <strong>dominio de nivel superior (TLD)</strong> válido para el campo <code>url</code> y la configuración de Ingress.</li><li><code>config.development.sample.yaml</code>: Utiliza SQLite para entornos de prueba.</li></ul></li><li><strong>Documentación Oficial de Ghost:</strong> Consulta la <a href="https://ghost.org/docs/config/#custom-configuration-files">documentación oficial de Ghost</a> para opciones de configuración detalladas.</li></ul><h3 id="2-secuencia-de-despliegue"><strong>2. Secuencia de Despliegue</strong></h3><p>Es <strong>crucial</strong> aplicar los manifests en el orden correcto para asegurar la resolución de dependencias (especialmente los componentes de la base de datos).</p><ol><li><strong>Crear el Namespace:</strong><code>kubectl apply -f deploy/00-namespace.yaml</code></li></ol><p><strong>Exponer Ghost con Ingress (Opcional/Recomendado):</strong></p><pre><code class="language-bash"># Enruta el tráfico externo al Service de Ghost
-kubectl apply -f deploy/07-ingress.yaml
-</code></pre><p><strong>Desplegar la Aplicación Ghost (Deployment):</strong></p><pre><code class="language-bash"># Espera a que MySQL esté listo antes de comenzar
-kubectl apply -f deploy/06-ghost-deployment.yaml
-</code></pre><p><strong>Desplegar la Base de Datos MySQL (StatefulSet):</strong></p><pre><code class="language-bash"># Espera a que el PVC de MySQL esté enlazado
-kubectl apply -f deploy/05-mysql.yaml
-</code></pre><p><strong>Crear Almacenamiento Persistente y Services:</strong></p><pre><code class="language-bash">kubectl apply -f deploy/02-pvc.yaml
-kubectl apply -f deploy/03-service.yaml
-</code></pre><p><strong>Crear Secrets (Credenciales y Configuración):</strong></p><pre><code class="language-bash"># IMPORTANTE: Personaliza estos secretos antes de aplicarlos
-kubectl apply -f deploy/01-mysql-config.yaml
+# Crear una nueva rama para tus cambios (opcional pero recomendado).
+git checkout -b my-branch --no-track --detach
+</code></pre>
+<h3 id="1-revisar-los-archivos-de-configuraci%C3%B3n-de-ejemplo">1. Revisar los archivos de configuración de ejemplo</h3>
+<ul>
+<li>Hay algunos archivos de configuración de ejemplo en el directorio <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/examples/">examples</a>. Usamos la configuración almacenada como un <code>kind: Secret</code> en el namespace <code>ghost-on-kubernetes</code> para la configuración de Ghost y MySQL. Hay dos ejemplos de archivos de configuración:
+<ul>
+<li><code>config.development.sample.yaml</code>: Este archivo de configuración es para el entorno de desarrollo de Ghost. Utiliza SQLite como base de datos. Puede ser útil si quieres probar la configuración de Ghost antes de implementarla en un entorno de producción.</li>
+<li><code>config.production.sample.yaml</code>: Este archivo de configuración es para el entorno de producción de Ghost. Utiliza MySQL 8, y es la configuración recomendada para entornos de producción. Requiere un dominio de nivel superior (TLD) válido y <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/07-ingress.yaml">configuración para Ingress para acceder a Ghost desde Internet</a>.</li>
+</ul>
+</li>
+<li>Si necesitas más información sobre la configuración, revisa la <a href="https://ghost.org/docs/config/#custom-configuration-files">documentación oficial de Ghost</a>.</li>
+</ul>
+<h3 id="2-revisar-los-valores-por-defecto-y-realizar-cambios-seg%C3%BAn-sea-necesario">2. Revisar los valores por defecto y realizar cambios según sea necesario</h3>
+<h3 id="entendiendo-la-arquitectura-del-deployment-de-ghost-en-kubernetes">Entendiendo la Arquitectura del Deployment de Ghost en Kubernetes</h3>
+<p>Implementar una aplicación sofisticada como Ghost en Kubernetes implica orquestar varios componentes. Desglosemos los recursos esenciales de Kubernetes que usaremos:</p>
+<h3 id="namespaces-aislando-nuestra-instancia-de-ghost">Namespaces: Aislando Nuestra Instancia de Ghost</h3>
+<p>Los namespaces en Kubernetes proporcionan una separación lógica de los recursos. Usaremos el namespace <code>ghost-on-kubernetes</code> para contener todos los recursos relacionados con nuestro deployment de Ghost. Este enfoque mejora la organización y previene conflictos de recursos con otras aplicaciones que se ejecutan en el mismo clúster.</p>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/00-namespace.yaml">deploy/00-namespace.yaml</a></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Namespace
+metadata:
+name: ghost-on-kubernetes
+labels:
+app: ghost-on-kubernetes
+# ... other labels
+</code></pre>
+<h3 id="secrets-almacenando-de-forma-segura-la-informaci%C3%B3n-sensible">Secrets: Almacenando de Forma Segura la Información Sensible</h3>
+<p>Los secrets en Kubernetes nos permiten almacenar y administrar datos sensibles, como credenciales de bases de datos y certificados TLS, de forma segura. Usaremos los siguientes Secrets:</p>
+<ul>
+<li><code>ghost-config-prod</code>: Almacena la configuración de Ghost, incluyendo los detalles de conexión a la base de datos y la configuración del servidor de correo.</li>
+<li><code>ghost-on-kubernetes-mysql-env</code>: Contiene variables de entorno para la base de datos MySQL, incluyendo el nombre de la base de datos, el nombre de usuario y la contraseña.</li>
+<li><code>tls-secret</code>: Contiene el certificado TLS y la clave para habilitar HTTPS en nuestro blog Ghost.</li>
+</ul>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/01-mysql-config.yaml">deploy/01-mysql-config.yaml</a></p>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/04-ghost-config.yaml">deploy/04-ghost-config.yaml</a></p>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/01-tls.yaml">deploy/01-tls.yaml</a></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Secret
+metadata:
+name: ghost-config-prod
+namespace: ghost-on-kubernetes
+# ... other metadata
+type: Opaque
+stringData:
+config.production.json: |-
+{
+# ... Ghost configuration
+}
+</code></pre>
+<h3 id="persistentvolumeclaims-almacenamiento-persistente-para-nuestro-blog">PersistentVolumeClaims: Almacenamiento Persistente para Nuestro Blog</h3>
+<p>Los PersistentVolumeClaims (PVCs) en Kubernetes nos permiten solicitar volúmenes de almacenamiento persistente. Usaremos dos PVCs:</p>
+<ul>
+<li><code>k8s-ghost-content</code>: Proporciona almacenamiento persistente para el contenido de Ghost, incluyendo imágenes, temas y archivos subidos.</li>
+<li><code>ghost-on-kubernetes-mysql-pvc</code>: Ofrece almacenamiento persistente para la base de datos MySQL, asegurando la persistencia de los datos a través de reinicios y reprogramaciones de pods.</li>
+</ul>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/02-pvc.yaml">deploy/02-pvc.yaml</a></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+name: k8s-ghost-content
+namespace: ghost-on-kubernetes
+# ... other metadata
+spec:
+# ... PVC specification
+</code></pre>
+<h3 id="services-exponiendo-ghost-y-mysql-dentro-del-cl%C3%BAster">Services: Exponiendo Ghost y MySQL Dentro del Clúster</h3>
+<p>Los Services en Kubernetes proporcionan una forma de exponer nuestras aplicaciones que se ejecutan en un conjunto de pods como un servicio de red. Definiremos dos services:</p>
+<ul>
+<li><code>ghost-on-kubernetes-service</code>: Expone la aplicación Ghost internamente dentro del clúster en el puerto 2368.</li>
+<li><code>ghost-on-kubernetes-mysql-service</code>: Expone la base de datos MySQL internamente en el puerto 3306, permitiendo que la aplicación Ghost se conecte a la base de datos.</li>
+</ul>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/03-service.yaml">deploy/03-service.yaml</a></p>
+<pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+name: ghost-on-kubernetes-service
+namespace: ghost-on-kubernetes
+# ... other metadata
+spec:
+# ... Service specification
+</code></pre>
+<h3 id="statefulset-administrando-la-base-de-datos-mysql">StatefulSet: Administrando la Base de Datos MySQL</h3>
+<p>Un StatefulSet en Kubernetes está diseñado para administrar aplicaciones con estado, como bases de datos, que requieren almacenamiento persistente e identidades de red estables. Usaremos un StatefulSet para implementar una única réplica de la base de datos MySQL.</p>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/05-mysql.yaml">deploy/05-mysql.yaml</a></p>
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+name: ghost-on-kubernetes-mysql
+namespace: ghost-on-kubernetes
+# ... other metadata
+spec:
+# ... StatefulSet specification
+</code></pre>
+<h3 id="deployment-administrando-la-aplicaci%C3%B3n-ghost">Deployment: Administrando la Aplicación Ghost</h3>
+<p>Los Deployments en Kubernetes administran la implementación y el escalado de aplicaciones sin estado. Usaremos un Deployment para implementar una única réplica de la aplicación Ghost.</p>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/06-ghost-deployment.yaml">deploy/06-ghost-deployment.yaml</a></p>
+<pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: ghost-on-kubernetes
+namespace: ghost-on-kubernetes
+# ... other metadata
+spec:
+# ... Deployment specification
+</code></pre>
+<h3 id="ingress-exponiendo-ghost-al-mundo-exterior">Ingress: Exponiendo Ghost al Mundo Exterior</h3>
+<p>Un recurso Ingress en Kubernetes actúa como un proxy inverso, enrutando el tráfico externo a los servicios dentro del clúster. Usaremos un Ingress para exponer nuestro blog Ghost a Internet utilizando un nombre de dominio.</p>
+<p>Archivo: <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/deploy/07-ingress.yaml">deploy/07-ingress.yaml</a></p>
+<pre><code class="language-yaml">apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+name: ghost-on-kubernetes-ingress
+namespace: ghost-on-kubernetes
+# ... other metadata
+spec:
+# ... Ingress specification
+</code></pre>
+<h2 id="uni%C3%A9ndolo-todo-implementando-ghost-en-kubernetes">Uniéndolo todo: Implementando Ghost en Kubernetes</h2>
+<p>Con nuestros recursos de Kubernetes definidos, ahora podemos implementar Ghost en nuestro clúster. Sigue estos pasos generales:</p>
+<ol>
+<li>
+<p><strong>Crear el Namespace:</strong></p>
+<pre><code class="language-bash">kubectl apply -f deploy/00-namespace.yaml
+</code></pre>
+</li>
+<li>
+<p><strong>Crear los Secrets:</strong></p>
+<pre><code class="language-bash">kubectl apply -f deploy/01-mysql-config.yaml
 kubectl apply -f deploy/04-ghost-config.yaml
 kubectl apply -f deploy/01-tls.yaml
-</code></pre><h2 id="%C2%A1tu-blog-ghost-est%C3%A1-desplegado"><strong>¡Tu Blog Ghost está Desplegado!</strong></h2><p>¡Felicidades! Has desplegado una instancia de Ghost v6 altamente segura y escalable en Kubernetes.</p><h3 id="acceso-sin-nombre-de-dominio-pruebas"><strong>Acceso Sin Nombre de Dominio (Pruebas)</strong></h3><p>Para previsualizar el sitio web sin configurar Ingress o un TLD, puedes usar el <em>port forwarding</em>:</p><ol><li>Configura temporalmente las URL <code>url</code> y <code>admin</code> en tu Secret <code>config.production.json</code> para usar <code>http://localhost:2368/</code>.</li><li>Reinicia el/los pod(s) de Ghost después de actualizar el Secret.</li><li>Ejecuta el comando de <em>port-forwarding</em>:</li></ol><pre><code class="language-bash">kubectl port-forward -n ghost-on-kubernetes services ghost-on-kubernetes-service 2368:2368
-</code></pre><h2 id="contribuciones">Contribuciones</h2><p>¡Damos la bienvenida a las contribuciones de la comunidad! Por favor, revisa el archivo <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> para obtener más información sobre cómo contribuir a este proyecto.</p><h2 id="licencia-y-cr%C3%A9ditos">Licencia y Créditos</h2><ul><li>Este proyecto está licenciado bajo la <strong>Licencia MIT</strong>. Por favor, revisa el archivo <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/LICENSE">LICENSE</a> para obtener más información.</li><li>Ghost CMS está licenciado bajo la <a href="https://github.com/TryGhost/Ghost/blob/main/LICENSE">Licencia MIT</a>.</li><li>La imagen de node y la imagen Distroless están licenciadas por sus respectivos propietarios.</li></ul><h2 id="historial-de-estrellas">Historial de Estrellas</h2><figure class="kg-card kg-image-card"><img src="https://api.star-history.com/svg?repos=sredevopsorg/ghost-on-kubernetes&amp;type=Date&amp;theme=dark" class="kg-image" alt="Star History Chart" loading="lazy" width="800" height="533"></figure><p></p><h3 id="enlaces">Enlaces</h3><figure class="kg-card kg-bookmark-card"><a class="kg-bookmark-container" href="https://github.com/sredevopsorg/ghost-on-kubernetes"><div class="kg-bookmark-content"><div class="kg-bookmark-title">GitHub - sredevopsorg/ghost-on-kubernetes: Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image.</div><div class="kg-bookmark-description">Ghost on Kubernetes by SREDevOps.org - Deploy Ghost v6 on Kubernetes (k8s, k3s, etc) with our hardened distroless non root custom image. - sredevopsorg/ghost-on-kubernetes</div><div class="kg-bookmark-metadata"><img class="kg-bookmark-icon" src="http://localhost:2368/content/images/icon/pinned-octocat-093da3e6fa40-23.svg" alt=""><span class="kg-bookmark-author">GitHub</span><span class="kg-bookmark-publisher">sredevopsorg</span></div></div><div class="kg-bookmark-thumbnail"><img src="http://localhost:2368/content/images/thumbnail/395b82c9-df81-4aee-95a5-4269616a550f-1" alt="" onerror="this.style.display = 'none'"></div></a></figure>
+</code></pre>
+</li>
+<li>
+<p><strong>Crear los PersistentVolumeClaims:</strong></p>
+<pre><code class="language-bash">kubectl apply -f deploy/02-pvc.yaml
+</code></pre>
+</li>
+<li>
+<p><strong>Crear los Services:</strong></p>
+<pre><code class="language-bash">kubectl apply -f deploy/03-service.yaml
+</code></pre>
+</li>
+<li>
+<p><strong>Implementar la base de datos MySQL:</strong></p>
+<pre><code class="language-bash">kubectl apply -f deploy/05-mysql.yaml
+</code></pre>
+</li>
+<li>
+<p><strong>Implementar la aplicación Ghost:</strong></p>
+<pre><code class="language-bash">kubectl apply -f deploy/06-ghost-deployment.yaml
+</code></pre>
+</li>
+<li>
+<p><strong>Exponer Ghost con Ingress (Opcional):</strong></p>
+<pre><code class="language-bash">kubectl apply -f deploy/07-ingress.yaml
+</code></pre>
+</li>
+</ol>
+<h2 id="%C2%A1tu-blog-ghost-est%C3%A1-en-vivo">¡Tu blog Ghost está en vivo!</h2>
+<p>¡Felicitaciones! Has implementado con éxito Ghost en un clúster de Kubernetes. Esta configuración proporciona una base sólida y escalable para tu plataforma de blogs. Recuerda personalizar las configuraciones, como la clase de almacenamiento, los límites de recursos y el nombre de dominio, para que se ajusten a tus requisitos específicos.</p>
+<h2 id="contribuyendo">Contribuyendo</h2>
+<p>¡Agradecemos las contribuciones de la comunidad! Por favor, revisa el archivo <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> para obtener más información sobre cómo contribuir a este proyecto.</p>
+<h2 id="licencia-y-cr%C3%A9ditos">Licencia y Créditos</h2>
+<ul>
+<li>Este proyecto está licenciado bajo la Licencia MIT. Por favor, revisa el archivo <a href="https://github.com/sredevopsorg/ghost-on-kubernetes/blob/main/LICENSE">LICENSE</a> para más información.</li>
+<li>El Ghost CMS está licenciado bajo la <a href="https://github.com/TryGhost/Ghost/blob/main/LICENSE">Licencia MIT</a>.</li>
+<li>La imagen de Node y la imagen de Distroless están licenciadas por sus respectivos propietarios.</li>
+</ul>
 </div>
 <aside class="lg:col-span-4 relative">
 <div class="sticky top-8 space-y-10">
@@ -447,60 +653,96 @@ Register with Email
 <article
 lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
-<a href="/es/que-es-platform-engineering-sre-devops-2/" class="block aspect-[16/9] overflow-hidden">
-<img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
-alt="Qué es Platform Engineering? SRE? DevOps?"
+<a href="/es/nos-integramos-al-fediverso-que-es-y-por-que-es-importante/" class="block aspect-[16/9] overflow-hidden">
+<img src="/content/images/size/w300/format/webp/2025/08/fediverse.png"
+alt="¡Nos integramos al Fediverso! (qué es y por qué es importante)"
 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
 </a>
 <div class="p-5 flex flex-col flex-grow">
 <h3 class="text-lg font-semibold text-strong group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
-href="/es/que-es-platform-engineering-sre-devops-2/">Qué es Platform Engineering? SRE? DevOps?</a></h3>
-<p class="text-sm text-muted flex-grow line-clamp-2">(O del por qué DevOps es sólo una parte...)
-Actualizado: Julio 2024
-En esta columna intentaré definir y explicar los</p>
+href="/es/nos-integramos-al-fediverso-que-es-y-por-que-es-importante/">¡Nos integramos al Fediverso! (qué es y por qué es importante)</a></h3>
+<p class="text-sm text-muted flex-grow line-clamp-2">¿Qué es el &quot;Fediverso&quot;? ¿Qué es el protocolo ActivityPub?
+ActivityPub es un protocolo de redes sociales abierto, descentralizado</p>
 <div class="flex items-center justify-between text-xs text-subtle-text mt-4 pt-3 border-t border-border-subtle">
-<span>01/07/2024</span>
-<span>4 minutos aprox.</span>
+<span>25/08/2025</span>
+<span>3 minutos aprox.</span>
 </div>
 </div>
 </article><article
 lang="es"
 class="bg-raised border border-border-strong rounded-xl overflow-hidden hover:border-border-strong transition-colors group flex flex-col h-full">
-<a href="/es/que-es-platform-engineering-sre-devops/" class="block aspect-[16/9] overflow-hidden">
-<img src="https://images.unsplash.com/photo-1667372335962-5fd503a8ae5b?crop&#x3D;entropy&amp;cs&#x3D;tinysrgb&amp;fit&#x3D;max&amp;fm&#x3D;webp&amp;ixid&#x3D;M3wxMTc3M3wwfDF8c2VhcmNofDExfHxkZXZvcHMlMjB8ZW58MHx8fHwxNjg0MTQyMTQ1fDA&amp;ixlib&#x3D;rb-4.0.3&amp;q&#x3D;80&amp;w&#x3D;300"
-alt="Qué es Platform Engineering? SRE? DevOps?"
+<a href="/es/el-nuevo-traefik-proxy-v3-5-te-permite-migrar-desde-ingress-nginx-sin-modificar-tus-actuales-recursos-e-incluye-soporte-post-quantum-secure-tls/" class="block aspect-[16/9] overflow-hidden">
+<img src="/content/images/size/w300/format/webp/2025/08/traefik-v3.5.jpg"
+alt="El nuevo Traefik Proxy v3.5 te permite migrar desde ingress-nginx sin modificar tus actuales recursos e incluye soporte Post-Quantum-Secure TLS"
 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
 </a>
 <div class="p-5 flex flex-col flex-grow">
 <h3 class="text-lg font-semibold text-strong group-hover:text-brand-purple transition-colors leading-tight mb-2"><a
-href="/es/que-es-platform-engineering-sre-devops/">Qué es Platform Engineering? SRE? DevOps?</a></h3>
-<p class="text-sm text-muted flex-grow line-clamp-2">(O del por qué DevOps es sólo una parte...)
-Actualizado: Julio 2024
-En esta columna intentaré definir y explicar los</p>
+href="/es/el-nuevo-traefik-proxy-v3-5-te-permite-migrar-desde-ingress-nginx-sin-modificar-tus-actuales-recursos-e-incluye-soporte-post-quantum-secure-tls/">El nuevo Traefik Proxy v3.5 te permite migrar desde ingress-nginx sin modificar tus actuales recursos e incluye soporte Post-Quantum-Secure TLS</a></h3>
+<p class="text-sm text-muted flex-grow line-clamp-2">Traefik Proxy v3.5 te permite equilibrar la innovación con el pragmatismo y la estabilidad, ya sea que estés migrando de sistemas legados, adoptando los nuevos standards en Kubernetes como API Gateway o preparándote para usar Post-Quantum-Secure TLS.</p>
 <div class="flex items-center justify-between text-xs text-subtle-text mt-4 pt-3 border-t border-border-subtle">
-<span>01/07/2024</span>
-<span>4 minutos aprox.</span>
+<span>05/08/2025</span>
+<span>3 minutos aprox.</span>
 </div>
 </div>
 </article>
 </section>
 </div>
 <section id="comments" class="mt-8 border-t border-border-subtle pt-8">
-<div class="gh-comments">
-<script defer src="https://cdn.jsdelivr.net/ghost/comments-ui@~1.6/umd/comments-ui.min.js" data-locale="en" data-ghost-comments="http://localhost:2368/" data-api="http://localhost:2368/ghost/api/content/" data-admin="http://localhost:2368/ghost/" data-key="7d4e0c71149feae71b36b6efca" data-title=" " data-count="false" data-post-id="6abf510248156c00014afcc0" data-color-scheme="auto" data-avatar-saturation="60" data-accent-color="#aa3cfd" data-comments-enabled="all" data-publication="Local Dev" crossorigin="anonymous"></script>
-</div>
 </section>
 <!-- Author Box -->
 <section class="mt-8 border-t border-border-subtle pt-8">
 <div class="flex flex-col w-full p-4">
 <div class="flex items-start gap-4 mb-4">
+<img src="/content/images/size/w100/format/webp/2025/09/me.jpeg" alt="Nicolás Georger" class="h-16 w-16 rounded-full object-cover border border-border-strong">
 <div class="flex-1">
-<p class="text-strong font-semibold">Local Dev</p>
-<p class="text-xs text-brand-blue hover:underline transition-colors"><a href="/author/local/">Ver más contenido por Local Dev</a></p>
+<p class="text-strong font-semibold">Nicolás Georger</p>
+<p class="text-xs text-brand-blue hover:underline transition-colors"><a href="/author/ngeorger/">Ver más contenido por Nicolás Georger</a></p>
+<p class="text-muted text-sm mt-1">Self-taught IT professional driving innovation &amp; social impact with cybernetics, open source (Linux, Kubernetes), AI &amp; ML. </p>
 </div>
 </div>
 <div class="flex flex-wrap gap-2 mb-4">
 <div class="flex flex-wrap gap-2 text-sm">
+<a href="https://www.sredevops.org" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"/><path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"/></svg>
+Website
+</a>
+<a href="https://x.com/sredevopsorg" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+Twitter
+</a>
+<a href="https://www.facebook.com/sredevops" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>
+Facebook
+</a>
+<a href="https://www.linkedin.com/in/nicolas-georger" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+LinkedIn
+</a>
+<a href="https://www.threads.net/@sredevopsorg" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/></svg>
+Threads
+</a>
+<a href="https://bsky.app/profile/sredevopsorg.bsky.social" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.206-.659-.298-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8Z"/></svg>
+Bluesky
+</a>
+<a href="https://mastodon.social/@sredevopsorg" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M23.268 5.313c-.35-2.578-2.617-4.61-5.304-5.004C17.51.242 15.792 0 11.813 0h-.03c-3.98 0-4.835.242-5.288.309C3.882.692 1.496 2.518.917 5.127.64 6.412.61 7.837.661 9.143c.074 1.874.088 3.745.26 5.611.118 1.24.325 2.47.62 3.68.55 2.237 2.777 4.098 4.96 4.857 2.336.792 4.849.923 7.256.38.265-.061.527-.132.786-.213.585-.184 1.27-.39 1.774-.753a.057.057 0 0 0 .023-.043v-1.809a.052.052 0 0 0-.02-.041.053.053 0 0 0-.046-.01 20.282 20.282 0 0 1-4.709.545c-2.73 0-3.463-1.284-3.674-1.818a5.593 5.593 0 0 1-.319-1.433.053.053 0 0 1 .066-.054c1.517.363 3.072.546 4.632.546.376 0 .75 0 1.125-.01 1.57-.044 3.224-.124 4.768-.422.038-.008.077-.015.11-.024 2.435-.464 4.753-1.92 4.989-5.604.008-.145.03-1.52.03-1.67.002-.512.167-3.63-.024-5.545zm-3.748 9.195h-2.561V8.29c0-1.309-.55-1.976-1.67-1.976-1.23 0-1.846.79-1.846 2.35v3.403h-2.546V8.663c0-1.56-.617-2.35-1.848-2.35-1.112 0-1.668.668-1.67 1.977v6.218H4.822V8.102c0-1.31.337-2.35 1.011-3.12.696-.77 1.608-1.164 2.74-1.164 1.311 0 2.302.5 2.962 1.498l.638 1.06.638-1.06c.66-.999 1.65-1.498 2.96-1.498 1.13 0 2.043.395 2.74 1.164.675.77 1.012 1.81 1.012 3.12z"/></svg>
+Mastodon
+</a>
+<a href="https://www.youtube.com/@sredevopsorg" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+YouTube
+</a>
+<a href="https://www.instagram.com/sredevopsorg" target="_blank" rel="noopener" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted hover:text-strong hover:bg-subtle text-sm transition-colors">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>
+Instagram
+</a>
+<span class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted text-sm">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="inline-block align-[-0.125em] w-4 h-4" aria-hidden="true" focusable="false"><path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10"/><path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/></svg>
+Chile
+</span>
 </div>
 </div>
 </div>
@@ -515,9 +757,6 @@ En esta columna intentaré definir y explicar los</p>
 </li>
 <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
 <a href="http://localhost:2368/que-es-sredevops/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Nosotros</a>
-</li>
-<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
-<a href="http://localhost:2368/our-open-source-projects/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Our Projects</a>
 </li>
 <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
 <a href="http://localhost:2368/contact-us/" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Contact us</a>
@@ -559,6 +798,9 @@ En esta columna intentaré definir y explicar los</p>
 <a href="https://discord.com/invite/bK9rXFTvpk" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Discord</a>
 </li>
 <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
+<a href="https://join.slack.com/t/sredevopsorg/shared_invite/zt-2m6bmgp86-zMKo8SMnM3j1_w9IE8BMeg" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">Slack</a>
+</li>
+<li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
 <a href="https://x.com/sredevopsorg" class="rounded-sm text-muted transition-colors hover:text-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-purple">X</a>
 </li>
 <li class="flex items-center px-4 first:pl-0 last:pr-0" role="menuitem">
@@ -577,7 +819,7 @@ En esta columna intentaré definir y explicar los</p>
 </nav>
 </div>
 <div class="text-center text-xs text-subtle-text pt-4 border-t border-border-subtle/50">
-&copy; 2026 Local Dev. Built with Ghost.
+&copy; 2026 LocalDev. Built with Ghost.
 </div>
 </footer>
 <script type="module" src="/assets/built/index-HASH.js?v=HASH"></script>
