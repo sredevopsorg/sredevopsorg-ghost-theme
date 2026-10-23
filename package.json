@@ -83,9 +83,9 @@
         "gscan": "6.6.1",
         "prismjs": "^1.30.0",
         "react": "^19.3.1",
-        "react-dom": "^19.3.0",
+        "react-dom": "^19.3.1",
         "tailwindcss": "^4.3.3",
-        "vite": "^8.3.4"
+        "vite": "^8.3.5SS"
     },
     "config": {
         "posts_per_page": 12,
