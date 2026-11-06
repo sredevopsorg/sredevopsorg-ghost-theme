@@ -78,7 +78,7 @@
         }
     ],
     "devDependencies": {
-        "@tailwindcss/vite": "^4.3.3",
+        "@tailwindcss/vite": "^4.3.4",
         "@vitejs/plugin-react": "^6.1.2",
         "gscan": "6.7.0",
         "prismjs": "^1.30.0",
