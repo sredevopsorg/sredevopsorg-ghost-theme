@@ -159,10 +159,34 @@ async function mountElement(el) {
   }
 }
 
+/**
+ * The element to watch for a lazy island: the mount point itself, unless it has no
+ * box of its own.
+ *
+ * A mount point can be laid out as `display: contents` so that the island's nodes
+ * become children of the *parent* flex/grid container instead of the mount point
+ * (ShareButtons does this to sit in the sidebar's share row without a wrapper box).
+ * Such an element generates no box: `getClientRects()` is empty and the
+ * IntersectionObserver reports it as never intersecting — it fires once with
+ * `isIntersecting: false` and then never again, so the island stayed "pending"
+ * forever and its buttons never rendered.
+ *
+ * Watching the parent instead restores the intended behaviour, since "is this part
+ * of the page near the viewport" is a question about where the content appears, not
+ * about which element holds it. The observer callback maps the watched element back
+ * to the island's own mount point, so a parent is never mistaken for the island.
+ */
+function lazyProbeFor(el) {
+  return el.getClientRects().length > 0 ? el : el.parentElement || el;
+}
+
 /** Mount every island in `scope` (default: the document). Returns the number scanned. */
 export function mountIslands(scope = document) {
   const elements = Array.from(scope.querySelectorAll(SELECTOR)).filter((el) => !handled.has(el));
   if (!elements.length) return 0;
+
+  /** probed element -> the island's mount point, which may be its child. */
+  const watched = new Map();
 
   let lazyObserver = null;
   const observeLazy = () => {
@@ -172,7 +196,9 @@ export function mountIslands(scope = document) {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           lazyObserver.unobserve(entry.target);
-          mountElement(entry.target);
+          const el = watched.get(entry.target);
+          watched.delete(entry.target);
+          if (el) mountElement(el);
         }
       },
       { rootMargin: "200px" },
@@ -184,8 +210,11 @@ export function mountIslands(scope = document) {
     // Mark before awaiting: mountElement is async, and a re-entrant scan would
     // otherwise start a second root on the same element.
     markHandled(el, "pending");
-    if (el.dataset.islandLazy !== undefined) observeLazy().observe(el);
-    else mountElement(el);
+    if (el.dataset.islandLazy !== undefined) {
+      const probe = lazyProbeFor(el);
+      watched.set(probe, el);
+      observeLazy().observe(probe);
+    } else mountElement(el);
   }
 
   return elements.length;
