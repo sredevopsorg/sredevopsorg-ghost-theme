@@ -4,7 +4,7 @@
     "demo": "https://www.sredevops.org",
     "homepage": "https://www.sredevops.org",
     "docs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme#readme",
-    "version": "3.3.1",
+    "version": "3.4.0",
     "type": "module",
     "packageManager": "yarn@1.22.22",
     "engines": {
@@ -52,7 +52,7 @@
             "Dark",
             "Light",
             "Magazine",
-            "Sidebar navigation"
+            "multilingual"
         ]
     },
     "keywords": [
@@ -78,14 +78,14 @@
         }
     ],
     "devDependencies": {
-        "@tailwindcss/vite": "^4.3.4",
-        "@vitejs/plugin-react": "^6.1.2",
-        "gscan": "6.7.0",
+        "@tailwindcss/vite": "^4.3.5",
+        "@vitejs/plugin-react": "^6.2.1",
+        "gscan": "^6.7.0",
         "prismjs": "^1.30.0",
         "react": "^19.3.1",
         "react-dom": "^19.3.1",
-        "tailwindcss": "^4.3.3",
-        "vite": "^8.3.5SS"
+        "tailwindcss": "^4.3.5",
+        "vite": "^8.3.6"
     },
     "config": {
         "posts_per_page": 12,
