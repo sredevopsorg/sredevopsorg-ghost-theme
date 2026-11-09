@@ -143,3 +143,32 @@ test("an unmounted island gives its element back, so a later scan can mount it a
 
   assert.equal(mountIslands(document), 1, "the element is mountable again after a teardown");
 });
+
+test("a lazily mounted island with no box of its own mounts when its parent scrolls in", async () => {
+  // ShareButtons is laid out `display: contents` so its buttons join the sidebar's flex
+  // row. Such an element has no box, so the IntersectionObserver reported it as never
+  // intersecting and the island stayed "pending" forever. The runtime must watch the
+  // parent but still mount the island's own element.
+  const parent = element("share-row");
+  const el = element("MobileMenu", { desktopMinWidth: "768", islandLazy: "" });
+  el.parentElement = parent;
+  // No box of its own, exactly like display: contents.
+  el.getClientRects = () => [];
+
+  const summary = { setAttribute() {}, focus() {}, addEventListener() {}, removeEventListener() {} };
+  el.querySelector = () => summary;
+  el.matches = () => false;
+
+  const { mounts, observers } = setup({ islands: [el] });
+  const { mountIslands } = await import(`../assets/js/islands.js?${Math.random()}`);
+
+  mountIslands(document);
+  assert.equal(el.dataset.islandState, "pending", "not mounted before it is near the viewport");
+  assert.equal(observers[0].target, parent, "the parent is observed, since the mount point has no box");
+
+  observers[0].fire();
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.equal(el.dataset.islandState, "enhanced", "the island mounted once its parent came into view");
+  assert.equal(parent.dataset.islandState, undefined, "the parent was only watched, never treated as an island");
+});
