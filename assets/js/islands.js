@@ -25,6 +25,17 @@
  *      element itself).
  *   4. Nothing may break without JavaScript: mount points are empty containers.
  *   5. One island failing must not affect the others or the page.
+ *   6. One element is mounted at most once, ever. A `mount` island renders into an
+ *      empty container and owns it from then on, so a second mount would put a second
+ *      copy of the UI next to the first. This is a defensive invariant, not the repair
+ *      of the TOC double render: the runtime was measured mounting that island exactly
+ *      once per load, and the duplicate came from React committing twice into the one
+ *      root the island created. It is enforced here with the `claimed` set below, and
+ *      nothing in this file imports a framework, so the runtime stays vanilla
+ *      (scripts/smoke-bundle.mjs enforces that).
+ *      React islands that want the same guarantee for their *root* — `createRoot` must
+ *      also run at most once per element — resolve it through `getRoot()` from
+ *      assets/js/lib/island-root.js, which is the documented companion to this rule.
  *
  * Modules are code-split through the registry thunks, so the island chunk (and
  * the framework chunk it pulls in) is fetched only when a mount point exists.
@@ -54,12 +65,38 @@ const SELECTOR = "[data-island]";
 /** Elements already handled, so a second scan cannot double-mount. */
 const handled = new WeakSet();
 
+/**
+ * Elements a `mount` island has been started on, for the whole life of the document.
+ *
+ * `handled` above is enough for scans started here, but it is a runtime detail an island
+ * cannot see: if `mount()` is reached twice for one element by any path, the second call
+ * would render a second copy of the island's UI next to the first. `claimed` is the
+ * documented "one mount per element, ever" invariant (see point 6 in the header) and is
+ * what refuses the second call. Kept separate from `handled` on purpose: `enhance` calls
+ * that threw may legitimately be retried after a fix, a `mount` may not be re-run.
+ */
+const claimed = new WeakSet();
+
 /** Cleanup functions returned by `enhance` islands, keyed by element. */
 const cleanups = new Map();
 
 function markHandled(el, state) {
   handled.add(el);
   el.dataset.islandState = state;
+}
+
+/** Report a refused second mount on the console and on the element's state attribute. */
+function reportRejectedMount(el, name, reason) {
+  console.warn(`[islands] "${name}" not mounted again on the same element: ${reason}`);
+  markHandled(el, "rejected");
+  if (el.childElementCount > 1) {
+    // The mount point is already wrong; leaving it on screen is better than hiding it,
+    // but say so loudly for whoever inspects the page.
+    console.warn(
+      `[islands] "${name}" mount point already has ${el.childElementCount} children — ` +
+        "an island rendered twice; see assets/js/lib/island-root.js",
+    );
+  }
 }
 
 async function mountElement(el) {
@@ -79,11 +116,27 @@ async function mountElement(el) {
 
     // `mount` renders into an empty element; `enhance` augments existing markup.
     if (typeof mod.mount === "function") {
+      // Invariant 6: a mount island owns its container for the life of the document.
+      // Checked after the `await` above, i.e. exactly where a re-entrant scan or a
+      // second observer delivery could get in, and before any island code runs.
+      if (claimed.has(el)) {
+        reportRejectedMount(el, name, "a mount island already owns this element");
+        return;
+      }
+      claimed.add(el);
       // A `mount` island may return a disposer (SecFeed does: it polls and holds an
       // AbortController). Ghost navigations are full page loads, so nothing calls it
       // today; storing it means the contract is symmetric and a future client-side
       // navigation can actually stop an island's work.
-      const dispose = mod.mount(el, props);
+      let dispose;
+      try {
+        dispose = mod.mount(el, props);
+      } catch (err) {
+        // The island never took ownership, so release the claim: a retry after a fix
+        // must be possible, and a failed mount must not look like a live one.
+        claimed.delete(el);
+        throw err;
+      }
       if (typeof dispose === "function") cleanups.set(el, dispose);
       markHandled(el, "mounted");
       return;
@@ -106,10 +159,34 @@ async function mountElement(el) {
   }
 }
 
+/**
+ * The element to watch for a lazy island: the mount point itself, unless it has no
+ * box of its own.
+ *
+ * A mount point can be laid out as `display: contents` so that the island's nodes
+ * become children of the *parent* flex/grid container instead of the mount point
+ * (ShareButtons does this to sit in the sidebar's share row without a wrapper box).
+ * Such an element generates no box: `getClientRects()` is empty and the
+ * IntersectionObserver reports it as never intersecting — it fires once with
+ * `isIntersecting: false` and then never again, so the island stayed "pending"
+ * forever and its buttons never rendered.
+ *
+ * Watching the parent instead restores the intended behaviour, since "is this part
+ * of the page near the viewport" is a question about where the content appears, not
+ * about which element holds it. The observer callback maps the watched element back
+ * to the island's own mount point, so a parent is never mistaken for the island.
+ */
+function lazyProbeFor(el) {
+  return el.getClientRects().length > 0 ? el : el.parentElement || el;
+}
+
 /** Mount every island in `scope` (default: the document). Returns the number scanned. */
 export function mountIslands(scope = document) {
   const elements = Array.from(scope.querySelectorAll(SELECTOR)).filter((el) => !handled.has(el));
   if (!elements.length) return 0;
+
+  /** probed element -> the island's mount point, which may be its child. */
+  const watched = new Map();
 
   let lazyObserver = null;
   const observeLazy = () => {
@@ -119,7 +196,9 @@ export function mountIslands(scope = document) {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
           lazyObserver.unobserve(entry.target);
-          mountElement(entry.target);
+          const el = watched.get(entry.target);
+          watched.delete(entry.target);
+          if (el) mountElement(el);
         }
       },
       { rootMargin: "200px" },
@@ -131,8 +210,11 @@ export function mountIslands(scope = document) {
     // Mark before awaiting: mountElement is async, and a re-entrant scan would
     // otherwise start a second root on the same element.
     markHandled(el, "pending");
-    if (el.dataset.islandLazy !== undefined) observeLazy().observe(el);
-    else mountElement(el);
+    if (el.dataset.islandLazy !== undefined) {
+      const probe = lazyProbeFor(el);
+      watched.set(probe, el);
+      observeLazy().observe(probe);
+    } else mountElement(el);
   }
 
   return elements.length;
@@ -144,6 +226,11 @@ export function mountIslands(scope = document) {
  * Ghost navigation is a full page load, so the runtime has no reason to call this
  * today; it exists so a client-side navigation, or a test, can stop an island's
  * timers and in-flight requests instead of leaving them to the page teardown.
+ *
+ * Disposing is the one thing that gives an element back: its `mount` claim is released
+ * and its `handled` mark cleared, so a later `mountIslands()` in the same document can
+ * mount it again. Without that, a client-side navigation that reuses a container would
+ * find every island permanently "handled" and render nothing.
  */
 export function unmountIslands(scope = document) {
   let disposed = 0;
@@ -155,13 +242,24 @@ export function unmountIslands(scope = document) {
       console.error("[islands] cleanup failed:", err);
     }
     cleanups.delete(el);
+    claimed.delete(el);
+    handled.delete(el);
+    delete el.dataset.islandState;
     disposed++;
   }
   return disposed;
 }
 
 /** Exposed for tests and for debugging in the browser console. */
-window.__themeIslands = { mountIslands, unmountIslands, cleanups, registry: Object.keys(registry) };
+window.__themeIslands = {
+  mountIslands,
+  unmountIslands,
+  cleanups,
+  registry: Object.keys(registry),
+  // Read-only views of the one-mount-per-element bookkeeping, for the browser console.
+  claimed,
+  handled,
+};
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => mountIslands());

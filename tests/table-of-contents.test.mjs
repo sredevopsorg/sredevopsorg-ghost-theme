@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
  * "current" while reading.
  */
 const { slugify, uniqueId, buildTree, activeIdFor } = await import("../assets/js/lib/toc-model.js");
+const { LISTENERS, listenOnce } = await import("../assets/js/lib/toc-runtime.js");
 
 test("slugify produces stable, link-safe ids", () => {
   assert.equal(slugify("Hello, World!"), "hello-world");
@@ -112,4 +113,53 @@ test("activeIdFor treats a heading exactly at the offset as reached", () => {
   ];
 
   assert.equal(activeIdFor(positions, 96), "exact");
+});
+
+/**
+ * The per-element state the island keeps: its scroll-spy, and the root it renders
+ * through (assets/js/lib/toc-runtime.js and assets/js/lib/island-root.js).
+ *
+ * The island rendered twice in Chromium because it committed `null` first and the <nav>
+ * second, and on a fraction of loads the second commit landed next to the first instead
+ * of over it. A browser is the only place that race is visible, so what is pinned here
+ * is the invariant that makes the double commit unable to double the UI: one listener
+ * pair per mount element however many times the effect runs. The "one root per element"
+ * half is tests/island-root.test.mjs; this file keeps no root store of its own.
+ */
+function fakeWindow() {
+  const handlers = [];
+  return {
+    handlers,
+    requestAnimationFrame: () => 1,
+    cancelAnimationFrame: () => {},
+    addEventListener(type, fn) {
+      handlers.push({ type, fn });
+    },
+    removeEventListener(type, fn) {
+      const index = handlers.findIndex((entry) => entry.type === type && entry.fn === fn);
+      if (index !== -1) handlers.splice(index, 1);
+    },
+  };
+}
+
+const scrollHandlers = (win) => win.handlers.filter((entry) => entry.type === "scroll").length;
+
+test("listenOnce registers one scroll-spy pair per element, not one per mount", () => {
+  const win = fakeWindow();
+  const doc = { getElementById: () => null };
+  const options = { items: [{ id: "a", text: "A", level: 2, children: [] }], threshold: 96, onChange() {} };
+  const element = {};
+
+  listenOnce(element, options, { window: win, document: doc });
+  listenOnce(element, options, { window: win, document: doc });
+
+  assert.equal(scrollHandlers(win), 1, "a second mount must not add a second scroll listener");
+  assert.equal(win.handlers.length, 2, "one scroll and one resize listener per element");
+
+  element[LISTENERS]();
+  assert.equal(win.handlers.length, 0, "the disposer removes the listeners it added");
+
+  // The disposer forgets itself, so the next mount starts a fresh pair.
+  listenOnce(element, options, { window: win, document: doc });
+  assert.equal(scrollHandlers(win), 1);
 });
