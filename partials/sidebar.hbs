@@ -4,8 +4,9 @@
      JavaScript the card is simply absent — previously it was an empty labelled card
      plus a tocbot CDN request and an inline setTimeout race.
      data-island-lazy: on mobile the sidebar sits far below the article, so the chunk
-     is only fetched when it comes near the viewport. --}}
-<div data-island="TableOfContents" data-island-lazy data-target=".gh-content" data-headings="h2, h3"></div>
+     is only fetched when it comes near the viewport. On mobile this mount is hidden
+     and the TOC appears before the content instead (via post-layout.hbs). --}}
+<div class="hidden lg:block" data-island="TableOfContents" data-island-lazy data-target=".gh-content" data-headings="h2, h3"></div>
 {{/is}}
 
 <div>
