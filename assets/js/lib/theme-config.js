@@ -19,6 +19,8 @@ const FALLBACKS = {
   readingProgress: "Reading progress",
   share: "Share",
   toc: "Table of Contents",
+  tocCollapse: "Collapse",
+  tocExpand: "Expand",
   secFeedLoading: "Loading the latest advisories…",
   secFeedEmpty: "No advisories right now.",
   secFeedError: "The security feed could not be loaded.",

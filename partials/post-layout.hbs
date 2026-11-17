@@ -48,6 +48,11 @@
 
   {{!-- Main Content Grid (Unchanged) --}}
   <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 mt-8 relative">
+    {{!-- Mobile TOC: appears before the main content on mobile, scrolls alongside it.
+         Hidden on desktop (the desktop TOC lives in the sticky sidebar via sidebar.hbs). --}}
+    <div class="lg:hidden lg:col-span-12 mb-4">
+      <div data-island="TableOfContents" data-island-lazy data-target=".gh-content" data-headings="h2, h3"></div>
+    </div>
     <div class="lg:col-span-8 gh-content" data-island="CodeBlocks"
       data-prismjs-copy="{{#match locale "=" "es"}}Copiar{{else match locale "=" "br"}}Copiar{{else}}{{t "Copy"}}{{/match}}"
       data-prismjs-copy-success="{{#match locale "=" "es"}}¡Copiado!{{else match locale "=" "br"}}Copiado!{{else}}{{t "Copied!"}}{{/match}}">

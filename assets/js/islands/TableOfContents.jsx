@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 import { t } from "../lib/theme-config.js";
 import { getRoot } from "../lib/island-root.js";
 import { DEFAULT_OFFSET, buildTree, slugify, uniqueId } from "../lib/toc-model.js";
@@ -110,6 +110,8 @@ function TableOfContents({ target = ".gh-content", headings: headingSelector = "
   // paint — there is no later `setItems` to commit a second child for.
   const [items] = useState(() => collectItems(target, headingSelector));
   const [activeId, setActiveId] = useState("");
+  const [collapsed, setCollapsed] = useState(false);
+  const tocId = useId();
   const threshold = Number(offset) || DEFAULT_OFFSET;
 
   // Scroll-spy, owned by the mount element rather than by this component instance, so
@@ -125,17 +127,31 @@ function TableOfContents({ target = ".gh-content", headings: headingSelector = "
 
   return (
     <nav
-      aria-labelledby="toc-title"
+      aria-label={t("toc")}
       className="rounded-lg border border-border-strong bg-raised p-5"
       data-island-state="mounted"
     >
-      <h4
-        id="toc-title"
-        className="mb-3 border-b border-border-strong pb-2 text-sm font-bold tracking-wider text-strong uppercase"
+      <div className="flex items-center justify-between mb-3 border-b border-border-strong pb-2">
+        <h4
+          id={`toc-title-${tocId}`}
+          className="text-sm font-bold tracking-wider text-strong uppercase"
+        >
+          {t("toc")}
+        </h4>
+        <button
+          type="button"
+          onClick={() => setCollapsed((c) => !c)}
+          aria-expanded={!collapsed}
+          aria-controls={`toc-list-${tocId}`}
+          className="text-xs text-muted hover:text-strong transition-colors"
+        >
+          {collapsed ? t("tocExpand") : t("tocCollapse")}
+        </button>
+      </div>
+      <ul
+        id={`toc-list-${tocId}`}
+        className={["list-none space-y-1", collapsed ? "hidden" : ""].join(" ")}
       >
-        {t("toc")}
-      </h4>
-      <ul className="list-none space-y-1">
         {items.map((item) => (
           <TocLink key={item.id} item={item} activeId={activeId} depth={0} />
         ))}
