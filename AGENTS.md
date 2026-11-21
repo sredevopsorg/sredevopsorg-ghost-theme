@@ -48,6 +48,7 @@ yarn install --frozen-lockfile   # exactly what CI installs; fails on a stale lo
 | `yarn test:bundle` | Loads the built entry and checks the island/code-splitting contract |
 | `yarn test:classes` | Every class in a template or island has CSS in the build |
 | `yarn package` | Writes and validates `dist/<name>-<version>.zip`; keeps older archives |
+| `node scripts/release-notes.mjs <version>` | Prints the `CHANGELOG.md` section for a release body |
 | `yarn ghost:up` / `ghost:down` / `ghost:restart` / `ghost:logs` | Local Ghost 6 + MySQL stack on port 2368 |
 | `yarn fixtures:capture` / `normalize` / `diff` / `promote` | Golden-HTML fixture workflow (needs a seeded Ghost) |
 | `yarn sync:fonts` / `sync:icons` | Regenerate committed fonts/icons and licence texts (network) |
@@ -205,8 +206,13 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 - Older archives in `dist/` are kept for rollback on purpose. Do not delete them.
 - Do not bump `version` or edit `CHANGELOG.md` unless the task is a release. When it is,
   follow `docs/release-checklist.md` exactly.
-- Do not trigger the `deploy-theme` workflow, create tags, or publish releases unless
-  explicitly asked. That workflow is `workflow_dispatch` and restricted to the
+- Releases go through `.github/workflows/release.yaml` (`gh workflow run release.yaml
+  --ref main -f version=X.Y.Z`): it creates the tag through GitHub's API — **signed by
+  GitHub**, because the `v*` ruleset requires signed tags and CI holds no key — runs
+  `yarn verify`, rebuilds the archive from the tagged commit and publishes the release
+  with the changelog section as notes. Do not push unsigned tags by hand.
+- Do not trigger the `release` or `deploy-theme` workflows, create tags, or publish
+  releases unless explicitly asked. That workflow is `workflow_dispatch` and restricted to the
   `ngeorger` account; it needs `GHOST_API_URL` and `GHOST_ADMIN_API_KEY` secrets.
 - `main` is protected. Work on a feature branch and open a PR; never force-push or bypass
   branch protection.

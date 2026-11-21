@@ -1,0 +1,136 @@
+# Release — creates and signs the `v<version>` tag, then publishes the GitHub release.
+#
+# Why this workflow exists instead of tagging locally: the `v*` ruleset on this repository
+# requires signed tags, and a local checkout has no signing key for the release identity.
+# A tag created here is signed by GitHub itself (the API `create a tag object` endpoint
+# signs it with the repository's key), so the release meets the rule without anyone
+# holding a private key in CI.
+#
+# It is dispatched from an up-to-date `main` — a tag can only be created for a commit
+# that is already on the default branch — and it refuses to run anywhere else:
+#
+#   gh workflow run release.yaml --ref main -f version=3.6.0
+#
+# What it does, in order:
+#   1. checks out the dispatch ref and fails unless it is the default branch and clean
+#   2. checks `package.json` declares the version being released (no second source of
+#      truth, no "tagged 3.6.1, shipped 3.6.0" mistakes)
+#   3. fails if the tag already exists — releases are not quietly overwritten
+#   4. builds and verifies exactly what a user installs: `yarn verify`, then
+#      `yarn package` (which runs the ship manifest and reads the archive back with GScan)
+#   5. creates the tag through the API, which signs it, and verifies the signature
+#   6. publishes the release with that archive attached and the CHANGELOG entry as the
+#      notes (`scripts/release-notes.mjs`)
+#
+# The archive attached to the release is the one built here, from the tagged commit, so
+# it cannot be a stale local `dist/` leftover.
+name: release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Theme version to release, e.g. 3.6.0 (must match package.json)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: sign tag + publish release
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ inputs.version }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Validate the version and the ref
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          case "$VERSION" in
+            v*) echo "Give the version without the leading v (e.g. 3.6.0)."; exit 1 ;;
+          esac
+          if [ "$GITHUB_REF_NAME" != "${{ github.event.repository.default_branch }}" ]; then
+            echo "Release from the default branch: got $GITHUB_REF_NAME."
+            exit 1
+          fi
+          if gh api "repos/$REPO/git/ref/tags/v$VERSION" >/dev/null 2>&1; then
+            echo "Tag v$VERSION already exists — pick the next version instead of moving a release."
+            exit 1
+          fi
+          echo "releasing v$VERSION from $GITHUB_REF_NAME at $GITHUB_SHA"
+
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check the version being released
+        run: |
+          set -eu
+          declared=$(node -p 'require("./package.json").version')
+          if [ "$declared" != "$VERSION" ]; then
+            echo "package.json says $declared but the release asks for $VERSION."
+            echo "Bump package.json on main (and CHANGELOG.md) first."
+            exit 1
+          fi
+          node scripts/release-notes.mjs "$VERSION" > /tmp/release-notes.md
+          echo "notes: $(wc -c < /tmp/release-notes.md) bytes"
+
+      # Same gate as CI: a release must not carry a GScan error, a reference to a missing
+      # asset, or an island/bundle regression into the zip.
+      - name: Verify the theme
+        run: yarn verify
+
+      - name: Package the theme
+        run: |
+          set -eu
+          yarn package
+          archive=$(ls "dist/sredevopsorg-ghost-theme-$VERSION.zip")
+          echo "ARCHIVE=$archive" >> "$GITHUB_ENV"
+          ls -l "$archive"
+
+      # The API creates (and signs) the tag object; the tag itself is created by GitHub,
+      # so `verification.verified` comes back true without any key in this workflow.
+      - name: Create and sign the tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          sha=$(gh api "repos/$REPO/commits/$GITHUB_REF_NAME" -q .sha)
+          gh api -X POST "repos/$REPO/git/tags" \
+            -f tag="v$VERSION" \
+            -f message="v$VERSION" \
+            -f object="$sha" \
+            -f type=commit > /tmp/tag.json
+          tag_object=$(node -p 'require("/tmp/tag.json").sha')
+          gh api -X POST "repos/$REPO/git/refs" \
+            -f ref="refs/tags/v$VERSION" \
+            -f sha="$tag_object" >/dev/null
+          gh api "repos/$REPO/git/ref/tags/v$VERSION" >/dev/null
+          echo "verification: $(gh api "repos/$REPO/git/tags/$tag_object" -q .verification.reason)"
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          gh release create "v$VERSION" "$ARCHIVE" \
+            --repo "$REPO" \
+            --title "v$VERSION" \
+            --notes-file /tmp/release-notes.md \
+            --verify-tag
+          echo "release: $(gh release view "v$VERSION" --repo "$REPO" -q .url)"
