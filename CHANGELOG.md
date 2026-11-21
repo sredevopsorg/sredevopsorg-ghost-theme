@@ -23,6 +23,57 @@
 - **Line numbers on code blocks.** The Prism line-numbers plugin, the gutter styling and the
   test that added the `line-numbers` class were removed.
 
+## 3.5.1
+
+### Removed
+
+- **Security feed widget.** The `SecFeed` island, its model, the `sec-feed` partial, the
+  `page-secfeed.hbs` template, the `sec_feed_api_url` and `sec_feed_items` theme settings,
+  the related translation strings and the ADR were removed. Sites that enabled the feed
+  lose the widget; no content, route or other setting changes are needed.
+
+## 3.5.0
+
+### Added
+
+- **Collapsible table of contents on mobile.** Posts show a collapsible TOC above the
+  content on small screens, while desktop keeps the sticky sidebar TOC. Adds Collapse and
+  Expand strings in `en`, `es` and `pt`; no configuration is needed.
+
+## 3.4.1
+
+### Changed
+
+- **Version-only release.** No functional changes.
+
+## 3.4.0
+
+### Fixed
+
+- **The post table of contents could render twice.** On some loads React committed the
+  final `<nav>` beside the earlier empty render, producing two TOC cards, a duplicate
+  `toc-title` id and two scroll-spy listeners. The island now collects its headings during
+  render, reuses one React root per container through a WeakMap root store, and owns one
+  scroll-spy pair per mount element; the runtime also enforces one mount per element.
+- **Share buttons did not render on posts.** The ShareButtons mount point is laid out with
+  `display: contents` and therefore generates no box, so the lazy `IntersectionObserver`
+  never reported it as intersecting. The runtime now observes the mount point's parent when
+  the mount point has no box, and the copy-link and native-share controls appear.
+
+## 3.3.1
+
+### Changed
+
+- **Maintenance release.** GScan 6.7.0 for the validation gate and regenerated manifest
+  partials; no user-facing changes.
+
+## 3.3.0
+
+### Changed
+
+- **Dependency updates.** `@vitejs/plugin-react` 6, React 19.3.1 and the CodeQL workflow
+  actions; no theme behavior changes.
+
 ## 3.2.2
 
 ### Fixed
