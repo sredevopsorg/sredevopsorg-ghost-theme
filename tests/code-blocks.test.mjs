@@ -17,37 +17,35 @@ import { readFileSync } from "node:fs";
 const { enhance } = await import("../assets/js/islands/CodeBlocks.js");
 
 function stubContent({ codeBlocks = 0 } = {}) {
-  const added = [];
-  const parents = Array.from({ length: codeBlocks }, () => ({
-    classList: {
-      add(name) {
-        added.push(name);
+  const codes = Array.from({ length: codeBlocks }, () => ({
+    parentElement: {
+      classList: {
+        add() {
+          throw new Error("the island must not annotate code blocks");
+        },
       },
     },
   }));
-  const codes = parents.map((parent) => ({ parentElement: parent }));
 
-  return {
-    added,
-    element: { querySelectorAll: () => codes },
-  };
+  return { element: { querySelectorAll: () => codes } };
 }
 
 test("does nothing, and loads nothing, when the page has no code", () => {
-  const { element, added } = stubContent({ codeBlocks: 0 });
+  const { element } = stubContent({ codeBlocks: 0 });
 
   const result = enhance(element);
 
   assert.equal(result, undefined, "no highlighting pass is started");
-  assert.deepEqual(added, [], "no classes are applied");
 });
 
-test("marks every code block for line numbers", () => {
-  const { element, added } = stubContent({ codeBlocks: 3 });
+test("line numbers are not enabled", () => {
+  const island = readFileSync("assets/js/islands/CodeBlocks.js", "utf8");
+  const setup = readFileSync("assets/js/islands/prism-setup.js", "utf8");
+  const css = readFileSync("assets/vendor/prism-window.css", "utf8");
 
-  enhance(element);
-
-  assert.deepEqual(added, ["line-numbers", "line-numbers", "line-numbers"]);
+  assert.doesNotMatch(island, /classList\.add\(\s*["']line-numbers["']\s*\)/);
+  assert.doesNotMatch(setup, /plugins\/line-numbers/);
+  assert.doesNotMatch(css, /\.line-numbers/);
 });
 
 test("every Prism component and plugin specifier is extension-explicit", () => {
@@ -56,7 +54,8 @@ test("every Prism component and plugin specifier is extension-explicit", () => {
     .map((match) => match[1])
     .filter((spec) => spec.startsWith("prismjs/"));
 
-  assert.ok(specifiers.length >= 15, `expected the full Prism set, found ${specifiers.length}`);
+  // 13 grammars + the toolbar, show-language and copy-to-clipboard plugins.
+  assert.ok(specifiers.length >= 16, `expected the full Prism set, found ${specifiers.length}`);
   for (const specifier of specifiers) {
     assert.match(specifier, /\.js$/, `${specifier} must end in .js so Node ESM can resolve it`);
   }

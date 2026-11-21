@@ -13,18 +13,14 @@
  * This replaces assets/vendor/prism.js — a 61 kB bundle of 13 languages and 6
  * plugins, loaded as a separate classic script on every post.
  *
- * The line-numbers class is added here rather than in assets/js/main.js, so all
- * code-block behaviour lives in one place and disappears with the island.
+ * Line numbers are deliberately not enabled: Prism's line-numbers plugin needs a
+ * second gutter and a sizer next to every block, and the window chrome already
+ * carries the toolbar. All code-block behaviour lives here so it disappears with
+ * the island.
  */
 export function enhance(element) {
   const blocks = element.querySelectorAll("pre > code[class*='language-']");
   if (!blocks.length) return; // no code on this page: never fetch Prism
-
-  // Toolbar buttons and the line-number gutter need the counter to start after
-  // highlighting, and Prism's plugins hook into highlightAllUnder.
-  for (const block of blocks) {
-    block.parentElement.classList.add("line-numbers");
-  }
 
   // Dynamic so Prism is not part of any chunk a page without code would download.
   import("./prism-setup.js")
