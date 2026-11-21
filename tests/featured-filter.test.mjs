@@ -163,7 +163,7 @@ test("the root channel hero is the mixed feed: the language tag is never forward
   );
   const row = readFileSync("partials/featured-row.hbs", "utf8");
   const forwarded = row.match(/\{\{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed\}\}/g) ?? [];
-  assert.equal(forwarded.length, 2, "both featured-row layouts must forward mixedFeed");
+  assert.equal(forwarded.length, 1, "featured-row must forward mixedFeed");
 
   // Locale wrappers must not opt in: their collections rely on the tag.
   for (const file of ["home-en.hbs", "home-es.hbs", "home-br.hbs"]) {
@@ -211,9 +211,9 @@ test("the dispatch partial covers all three locale heroes and is what featured-r
   // the one scope where Ghost keeps it — see docs/v3-roadmap.md.
   assert.match(heroLocale, /featuredFilter=\(concat /, "each hero must be handed a computed filter");
 
-  // Both row layouts — with and without the security feed — must go through the same
-  // dispatch, or the settings would apply to only one of them.
+  // The featured row must go through the shared dispatch, or the settings would apply
+  // to only some channels.
   const calls = row.match(/\{\{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed\}\}/g) ?? [];
-  assert.equal(calls.length, 2, "the hero dispatch must be shared by the feed-on and feed-off branches");
+  assert.equal(calls.length, 1, "featured-row must use the shared hero dispatch");
   assert.doesNotMatch(row, /\{\{> "featured-hero(?!-locale)/, "featured-row must not pick a hero directly");
 });

@@ -4,7 +4,6 @@
 - **Date**: 2026-10-14
 - **Amended**: 2026-10-17 — the root channel is exempt from the language tag (see the update at the end)
 - **Deciders**: sredevopsorg theme maintainers
-- **Relates to**: [0003 — The security feed widget is an island](0003-security-feed-widget.md)
 
 ## Context
 
@@ -63,10 +62,6 @@ dropped (measured; see [docs/v3-roadmap.md](../v3-roadmap.md), "What a partial a
 and cannot do"), which is the reason the three locale heroes still exist at all: their label,
 date format and reading-time strings are rendered *inside* those blocks.
 
-Consolidating the dispatch also removed the duplicated `{{#match}}` chain that
-[ADR 0003](0003-security-feed-widget.md) recorded as the cost of the feed row: both the
-feed-on and feed-off layouts now call the same partial.
-
 ## Verification
 
 Against a local Ghost 6.70 (theme mounted, `node_modules/.bin/gscan` clean), with the settings
@@ -85,10 +80,6 @@ as before the change (`/` and `/en/`: the QEMU/GitHub-runners post; `/es/`: DevO
 Each row moves the hero for the reason it should and leaves the others alone; dropping
 `featured_only` moves every channel to its newest post, and adding `docker` moves only the
 channels that have a `docker` post.
-
-An empty match renders an empty 2/3 column rather than an error, which is already the
-documented behaviour of the row when a channel has no featured post
-([ADR 0003](0003-security-feed-widget.md)).
 
 ## Update (2026-10-17) — the root channel is exempt from the language tag
 

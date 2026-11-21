@@ -1,78 +1,8 @@
-{{!-- The featured post and the security feed, side by side.
-
-     Why one partial that branches on the setting, instead of putting the grid in
-     collection-layout.hbs: the hero must stay *exactly* where it is, full width, when
-     no feed is configured — which is the default for every site that has not set
-     `sec_feed_api_url`. A grid that is always present would reserve a 1/3 column for
-     an absent widget and shrink the hero, and it would change the HTML of every
-     collection page for no visible reason. So the grid exists only when the feed does.
-
-     The duplicate `{{#match}}` below is the cost of that: a Handlebars partial cannot
-     take an argument conditionally, and the alternative — always emitting the grid —
-     costs every site a layout change it did not ask for. One line, one reason.
-
-     The featured post owns the row's height, and the feed is stretched to it. The
-     class this replaces, `items-start`, did the opposite: each column sat at the top
-     of the row at its own height, so the 1/3 column was content-sized, and `{{> "sec-feed"}}`
-     grew it or shrank it with every poll. That is the "island of variable height" this
-     layout used to have.
-
-     Two mechanisms, and both are needed. Grid's default `align-items: stretch` gives
-     the columns the row's height rather than their own, and taking the feed panel out
-     of the row's intrinsic sizing (below) is what stops the larger column from deciding
-     that height. `items-start` defeated the first, and an in-flow grid item defeats the
-     second on its own.
-
-     Why not a fixed row height, or `h-full` on an in-flow column: the hero's
-     max-content height is not a constant. It is 552.5px at 1024x900 (the 16:9 image box
-     is taller there than the text beside it) and 515px at 1280 and above, and it is
-     467px of hero card plus the card's `mb-12`. So any declared height is wrong at one
-     end, and `height: 100%` cannot help either: an auto-sized grid track is indefinite,
-     a percentage against an indefinite height resolves to `auto`, and the panel would
-     size to its content and grow the track it was measuring against. See
-     docs/adr/0003-security-feed-widget.md.
+{{!-- The featured post at the top of a channel collection.
 
      `locale` only selects which hero partial renders and which language tag the hero
      filters on; `mixedFeed` is forwarded untouched so the root channel can drop that tag
-     (see partials/featured-hero-locale.hbs). The feed gets its own strings from the page
-     language. The hero dispatch (and the `featured_only` / `featured_tag` filter it
-     builds) lives in one partial, `partials/featured-hero-locale.hbs`, so both branches
-     below share it. --}}
-{{#if @custom.sec_feed_api_url}}
-<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-    {{!-- 2/3: the featured post. --}}
-    <div class="lg:col-span-2">
-        {{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed}}
-    </div>
-
-    {{!-- 1/3: the security feed, as a column beside the hero. Its bottom margin matches
-         the featured card's, so both blocks leave the same space before the post grid;
-         it stacks below the hero on mobile, where the hero stays first.
-
-         On lg the panel is positioned rather than laid out in the column: the column is
-         the containing block (`lg:relative`) and `partials/sec-feed.hbs` is pinned to it
-         (`lg:absolute lg:inset-0`). That is not decoration, it is what makes the hero own
-         the row height. An in-flow grid item contributes its content height to an
-         auto-sized row track, so a feed of twenty advisories would size the track no
-         matter how the column was clamped, because `min-h-0` bounds a flex item, not a grid
-         track, which is why the earlier `h-full min-h-0` column still measured 752.5
-         instead of the hero's 515. Out of flow, the feed contributes nothing, the track
-         is the hero's max-content height, and the panel is then stretched back onto the
-         column it was taken out of. Below lg nothing is positioned, so the stack is the
-         plain one: hero first, gap-8, feed under it.
-
-         `mb-12` is the featured card's own bottom margin, repeated here. It does two
-         things and both are visible at a glance: on lg the panel is pinned to this
-         column's padding box, so the margin shortens the panel to the *card's* height
-         (515 minus 48 is the card's 467) and its bottom edge lines up with the card's;
-         on every width the margin is the space the row needs before the post grid, which
-         an un-margined panel would otherwise sit flush against. Change it here only
-         together with the `mb-12` on the hero card in partials/featured-hero*.hbs, or
-         the two columns stop matching. --}}
-    <div class="lg:col-span-1 lg:relative lg:min-h-0 mb-12">
-        {{> "sec-feed" locale=locale}}
-    </div>
-</div>
-{{else}}
+     (see partials/featured-hero-locale.hbs). The hero dispatch (and the `featured_only` /
+     `featured_tag` filter it builds) lives in one partial, so every channel goes through
+     the same code path. --}}
 {{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed}}
-{{/if}}

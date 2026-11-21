@@ -27,7 +27,7 @@ error-level findings pass.
 
 The local Ghost 6 + MySQL stack is available with `yarn ghost:up`; `yarn ghost:restart`
 is required after editing `.hbs` files because Ghost caches compiled templates. The
-fixture and browser-layout checks are local-only and need a seeded Ghost/Chromium.
+fixture checks are local-only and need a seeded Ghost.
 
 ## Boundaries
 
@@ -68,7 +68,7 @@ fixture and browser-layout checks are local-only and need a seeded Ghost/Chromiu
 3. **Partial arguments do not survive `{{#post}}`, `{{#page}}`, `{{#get}}` or
    `{{#foreach}}`.** Pass `locale` at the partial's top level or as a literal.
 4. **Custom settings are append-only.** Keys are `snake_case`; never rename
-   `show_search`, `show_login`, the `sec_feed_*` keys or the `featured_*` keys. Keep
+   `show_search`, `show_login` or the `featured_*` keys. Keep
    every setting used and descriptions under 100 characters.
 5. **Image sizes are theme-defined.** A `{{img_url size="..."}}` must match a key in
    `config.image_sizes`.
@@ -96,5 +96,4 @@ fixture and browser-layout checks are local-only and need a seeded Ghost/Chromiu
 
 Before opening a PR, run `yarn verify` and `git diff --check`. If the change touches
 templates, also run `yarn fixtures:capture && yarn fixtures:normalize && yarn fixtures:diff`
-against a seeded local Ghost and explain any diff. If it touches the security-feed layout,
-run `yarn test:sec-feed-layout` in the Playwright image.
+against a seeded local Ghost and explain any diff.

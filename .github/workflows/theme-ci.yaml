@@ -5,8 +5,7 @@
 #   2. GScan (the same validator Ghost runs on upload) must find no errors
 #   3. the package must be self-contained: no dev/test files, no missing assets
 #
-# Golden-HTML fixtures, browser layout checks (yarn test:sec-feed-layout) and Playwright
-# are local-only: they need a seeded Ghost and, for the layout script, Chromium.
+# Golden-HTML fixtures are local-only: they need a seeded Ghost.
 name: theme-ci
 
 on:
