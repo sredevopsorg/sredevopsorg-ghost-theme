@@ -108,6 +108,20 @@ sign-in, pagination, the subscribe form) follow the **site** language, and Ghost
 per-page alternative — see `docs/v3-roadmap.md`, Phase 6 notes. There is no Portuguese page
 custom template yet. The light palette's contrast has still never been measured by a human.
 
+## 6b. Retire the release candidate
+
+Once the final release exists and the live site runs it, the pre-release tied to the
+candidate is not needed:
+
+```bash
+gh release delete v3.6.0-rc1 --yes --cleanup-tag   # e.g. for the 3.6.0 candidate
+```
+
+`--cleanup-tag` is enough: deleting a `v*` tag is allowed under the tag ruleset even
+though creating one requires a signature (verified), and both the `release delete` and a
+plain `git push --delete origin <tag>` work. Do not do this before the final release is
+published — the RC is the only tagged copy of the candidate.
+
 ## 7. Rollback
 
 Keep the previous archive. Re-uploading it in Ghost admin restores the old theme in a few
