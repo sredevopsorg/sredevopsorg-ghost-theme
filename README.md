@@ -445,7 +445,8 @@ Key partials:
 | `partials/collection-layout.hbs` | Channel heading, featured row, post grid, pagination |
 | `partials/post-layout.hbs` | Article, sidebar/ToC, related content, comments, author box, sharing |
 | `partials/page-body.hbs` | Page title/feature image toggle and page content |
-| `partials/featured-row.hbs` | Featured hero |
+| `partials/featured-row.hbs` | Picks the locale's featured hero (`featured-hero[-es|-br].hbs`) |
+| `partials/listing-grid.hbs` | Post grid; page 1 starts at the second post, because the hero is the first |
 
 > 🔄 **Inheritance syntax**: `{{!< filename}}` at the top of a template tells Ghost to render the file inside the `{{{body}}}` placeholder of `filename`. Partial hash arguments such as `locale` are dropped inside `{{#post}}`, `{{#page}}`, `{{#get}}` and `{{#foreach}}`, so pass them at the partial's own top level or as a literal at the call site.
 
@@ -460,44 +461,35 @@ authoritative settings table.
 |--------|------|---------|-------|-------------|
 | `show_search` | Boolean | `true` | site-wide | Show a search icon in the main navigation |
 | `show_login` | Boolean | `true` | site-wide | Show a sign-in link in the main navigation |
-| `featured_tag` | Text | *(empty)* | Homepage | Extra tag slug ANDed into the featured hero filter, on top of the collection's language tag (none on `/`) |
-| `featured_only` | Boolean | `true` | Homepage | Require the `featured` flag on the hero post |
 
-### Featured hero filtering
+### Featured hero
 
-The hero at the top of every channel (`/`, `/en/`, `/es/`, `/br/`) is chosen by
-`partials/featured-hero-locale.hbs`. Two settings shape its NQL filter, and there are two
-kinds of channel. The **locale collections** keep their language tag (`tag:en`, `tag:es`,
-`tag:br`) in the filter, so they can never borrow another locale's post. The root channel
-`/` is deliberately the unfiltered, mixed feed ([routes.yaml](routes.yaml) gives it no
-collection filter), so its hero carries **no** language tag — the newest featured post wins,
-whichever locale it is:
+The hero at the top of every channel (`/`, `/en/`, `/es/`, `/br/`) is **the first post
+Ghost returns for that channel** — `posts`[0], normally the newest post:
 
-| Channel | `featured_only` | `featured_tag` | filter |
-|---------|-----------------|----------------|--------|
-| `/en/` `/es/` `/br/` | `true` (default) | *(empty)* | `featured:true+tag:<locale>` |
-| `/en/` `/es/` `/br/` | `true` | `news` | `featured:true+tag:<locale>+tag:news` |
-| `/en/` `/es/` `/br/` | `false` | *(empty)* | `tag:<locale>` |
-| `/en/` `/es/` `/br/` | `false` | `news` | `tag:<locale>+tag:news` |
-| `/` | `true` (default) | *(empty)* | `featured:true` |
-| `/` | `true` | `news` | `featured:true+tag:news` |
-| `/` | `false` | *(empty)* | *(no filter — the newest post)* |
-| `/` | `false` | `news` | `tag:news` |
+- **`/`** is the unfiltered, mixed feed ([routes.yaml](routes.yaml) gives it no collection
+  filter), so its hero is the newest post of any locale.
+- **`/en/`, `/es/` and `/br/`** keep their own collection filters from `routes.yaml`
+  (`tag:en+tag:-es+tag:-br` and so on), so each locale home only ever shows its own
+  posts. The theme does not add, change or re-apply that filter.
+- The theme adds **no** filter of its own: there is no `featured_tag`/`featured_only`
+  setting any more, and Ghost's `featured` flag does not move the hero. Promoting a
+  flagged post from further down the list would take a card out of the grid, so the hero
+  stays on the lead post.
 
-- **AND, never a replacement.** On a locale collection `featured_tag` is *added* to the
-  language tag; it cannot replace it, because that would let an English post become the
-  Spanish hero. The tag is a **slug** (the same value that appears in the tag's URL) and must
-  exist, or the hero renders empty rather than erroring.
-- **The root feed is the exception.** `/` has no language tag to add `featured_tag` to, so
-  the setting is the only tag in its filter. `home.hbs` passes `mixedFeed=true` through
-  the listing partials to drop the locale clause. This changes the root hero by design: a
-  locale collection's output is byte-identical to a theme without these settings, while
-  `/` now shows the globally newest featured post instead of the newest English one.
-  `tests/featured-filter.test.mjs` pins both contracts.
-- **Eight combinations, verified end to end.** Changing only `featured_tag` moves the hero to
-  a different tagged post and changing only `featured_only` moves it to the newest post on the
-  channel, which is what distinguishes the rows. See
-  [docs/adr/0004](docs/adr/0004-featured-hero-filter.md) for the measurements.
+**The hero is never displayed twice.** The grid below (`partials/listing-grid.hbs`) renders
+the *same* `posts` list starting at the second item (`{{#foreach from="2"}}`), and the
+hero is its first item, so there is nothing to compare or filter — page 1 shows the hero
+plus `posts_per_page - 1` cards, and every other page lists its posts in full.
+
+The hero's label, date format and reading-time strings live in one file per locale
+(`partials/featured-hero.hbs`, `-es.hbs`, `-br.hbs`) because they are printed inside
+`{{#foreach}}`, where a partial argument does not survive. `partials/featured-row.hbs`
+only picks the file.
+
+> Fixtures still hold a golden from the previous design, where the hero was chosen by a
+> separate query. Re-capture against a seeded Ghost (`yarn fixtures:capture`,
+> `yarn fixtures:normalize`) and review the diff before promoting.
 
 ### Image Size Presets
 
@@ -640,6 +632,12 @@ Configure secrets:
 
 - **The root `/` feed is intentionally mixed.** It has no locale filter; only the
   `/en/`, `/es/` and `/br/` collections are segregated.
+- **Page 1 of every channel shows one card fewer.** The hero is the channel's first post
+  and is never repeated in the grid; Ghost has no card-level offset, so the slot is not
+  refilled. Pages 2 and later are untouched.
+- **The hero is always the newest post of the channel.** Ghost's `featured` flag does not
+  promote a post to the hero, and the old `featured_only`/`featured_tag` settings are
+  gone: promoting a flagged post would pull one card out of the grid.
 - **The document language is chosen by the template, not the tags.** A Spanish or
   Portuguese post keeps the site language until an editor selects `custom-es` or
   `custom-br`.
@@ -714,8 +712,9 @@ Two values are easy to confuse, so choose both explicitly:
 
    - `partials/post-card.hbs` (card `lang`, date and reading-time strings)
    - `partials/post-layout.hbs` (related-content filters, reading time, date, comments)
-   - `partials/collection-layout.hbs` (card loop)
-   - `partials/featured-hero-locale.hbs` and the three `featured-hero*.hbs` partials
+   - `partials/listing-grid.hbs` (card loop, one branch per locale)
+   - `partials/featured-row.hbs` (hero dispatch) plus a new `partials/featured-hero-<locale>.hbs`
+     copy whose label, date format and reading-time strings are that locale's
    - `partials/theme-toggle.hbs`, `partials/header.hbs`, `partials/island-config.hbs`
    - `partials/page-body.hbs`
 

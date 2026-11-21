@@ -1,10 +1,8 @@
-{{!-- Portuguese (BR) Featured Post Hero — shown at the top of page 1 only.
-     `featuredFilter` comes from partials/featured-hero-locale.hbs and is read at this
-     partial's own top level (the `{{#get}}` call), where a partial hash argument survives. --}}
-{{^is "paged"}}
-{{#get "posts" filter=featuredFilter limit="1" include="authors,tags" as |featuredPosts|}}
-{{#foreach featuredPosts}}
-<a href="{{url}}"
+{{!-- Portuguese (BR) hero. Same markup and the same "the hero is posts[0]" contract as
+     partials/featured-hero.hbs; only the label, the date format and the reading-time
+     strings differ, as literals, because they are printed inside {{#foreach}} where a
+     partial hash argument does not survive. Keep the three heroes in step. --}}
+{{^is "paged"}}{{#foreach posts from="1" to="1"}}<a href="{{url}}"
     class="group block mb-12 rounded-2xl overflow-hidden border border-border-subtle bg-raised hover:border-brand-purple transition-colors">
     <div class="grid grid-cols-1 lg:grid-cols-2">
         {{#if feature_image}}
@@ -27,7 +25,7 @@
                 {{title}}</h2>
             <p class="text-sm text-muted line-clamp-3 mb-4">{{excerpt words="30"}}</p>
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-subtle-text">
-                {{#foreach authors limit="1"}}<span>{{name}}</span>{{/foreach}}
+                <span>{{#foreach authors limit="1"}}{{name}}{{/foreach}}</span>
                 <span>&middot;</span>
                 <span>{{date published_at format="DD/MM/YYYY"}}</span>
                 <span>&middot;</span>
@@ -35,7 +33,4 @@
             </div>
         </div>
     </div>
-</a>
-{{/foreach}}
-{{/get}}
-{{/is}}
+</a>{{/foreach}}{{/is}}

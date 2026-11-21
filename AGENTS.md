@@ -94,6 +94,13 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 - Root `/` is intentionally an unfiltered, mixed feed, so its featured hero is chosen
   without a language tag too (`home.hbs` passes `mixedFeed=true` through the listing
   partials). The locale collections keep their `tag:<locale>`; never re-add it to `/`.
+- The hero is `posts`[0] of the page, never a query of its own: page 1 renders
+  `partials/featured-hero[-es|-br].hbs` (the lead post) and `partials/listing-grid.hbs`
+  from `{{#foreach from="2"}}` on the **same** `posts` list, so the featured post cannot
+  appear twice. Do not reintroduce a `{{#get}}` hero, a `featured`-flag promotion or a
+  `featured_*` custom setting: promoting a flagged post would pull a card out of the grid
+  and split hero and grid into two windows. Locale wording lives in the three hero files
+  as literals, because `{{#foreach}}` drops partial hash arguments.
 - Two different values, do not conflate them:
   - `documentLang` — BCP-47 value for `<html lang>` (`en`, `es`, `pt`).
   - `locale` — the theme's content key used in filters and partial arguments
@@ -169,10 +176,10 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 
 - `package.json` is also the Ghost theme manifest. Keep `config`, `image_sizes`, `gpm`
   and the `engines` fields valid.
-- Custom settings are append-only. Keys are `snake_case`; never rename the existing
-  `show_search`, `show_login` or `featured_*` keys, because Ghost stores
-  values by key. Descriptions must stay under 100 characters. Homepage options use
-  `group: "homepage"`.
+- Custom settings: `show_search` and `show_login` only. Keys are `snake_case`; never rename
+  an existing key, because Ghost stores values by key. Descriptions must stay under 100
+  characters. The former `featured_only` / `featured_tag` settings were removed with the
+  separate hero query — do not bring them back.
 - `{{img_url size="..."}}` values must match a key in `config.image_sizes`.
 - Theme images outside the header must be emitted as
   `{{img_url value size="..." format="webp"}}`; `format` requires `size`. Do not emit a

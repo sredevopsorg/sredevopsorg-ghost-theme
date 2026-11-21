@@ -1,8 +1,13 @@
-{{!-- The featured post at the top of a channel collection.
+{{!-- Which locale's hero renders at the top of a channel, and nothing else.
 
-     `locale` only selects which hero partial renders and which language tag the hero
-     filters on; `mixedFeed` is forwarded untouched so the root channel can drop that tag
-     (see partials/featured-hero-locale.hbs). The hero dispatch (and the `featured_only` /
-     `featured_tag` filter it builds) lives in one partial, so every channel goes through
-     the same code path. --}}
-{{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed}}
+     The hero is `posts`[0] (partials/featured-hero*.hbs): no query, no filter, no theme
+     setting. `locale` picks the wording — the three heroes are separate files because
+     their label/date/reading-time strings are literals printed inside `{{#foreach}}`,
+     where Ghost drops partial hash arguments.
+
+     `/` passes `locale="en"`: the root channel is the mixed feed, and it renders inside
+     default.hbs, so its hero speaks English regardless of which post is newest.
+     The page guard lives in the hero partials; page 2 renders no hero at all. --}}
+{{#match locale "=" "es"}}{{> "featured-hero-es"}}
+{{else match locale "=" "br"}}{{> "featured-hero-br"}}
+{{else}}{{> "featured-hero"}}{{/match}}
