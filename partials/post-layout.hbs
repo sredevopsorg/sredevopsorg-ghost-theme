@@ -25,7 +25,7 @@
     <div class="flex items-center text-sm text-muted">
       {{#foreach authors}}
       {{#if profile_image}}
-      <img class="h-6 w-6 rounded-full mr-2 object-cover" src="{{img_url profile_image size="xs"}}" alt="{{name}}">
+      <img class="h-6 w-6 rounded-full mr-2 object-cover" src="{{img_url profile_image size="xs" format="webp"}}" alt="{{name}}">
       {{else}}
       <span
         class="h-6 w-6 bg-subtle rounded-full flex items-center justify-center text-[10px] text-body font-bold mr-2">{{name}}</span>

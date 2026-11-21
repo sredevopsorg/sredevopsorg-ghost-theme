@@ -167,6 +167,14 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
   values by key. Descriptions must stay under 100 characters. Homepage options use
   `group: "homepage"`.
 - `{{img_url size="..."}}` values must match a key in `config.image_sizes`.
+- Theme images outside the header must be emitted as
+  `{{img_url value size="..." format="webp"}}`; `format` requires `size`. Do not emit a
+  raw `feature_image` or `profile_image` URL. The header logo and icon are the exception:
+  they are rendered as uploaded, so an SVG logo stays vector and the icon keeps its source
+  format. Images inside `{{{content}}}` are rendered by Ghost from stored post HTML and
+  cannot be rewritten by the theme, so they keep their original format; externally
+  hosted images and recommendation favicons are also outside Ghost's image pipeline.
+  `tests/image-format.test.mjs` enforces the template side.
 - `{{ghost_head}}` stays before `</head>` and `{{ghost_foot}}` before `</body>` in
   `partials/shell.hbs`; templates are wrappers and must not duplicate them.
 - Translation keys live in `locales/*.json`. Keep the three files aligned.

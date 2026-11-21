@@ -501,7 +501,11 @@ Configured in `package.json` → `config.image_sizes`:
 }
 ```
 
-Use in templates: `{{img_url feature_image size="l"}}`
+Use in templates: `{{img_url feature_image size="l" format="webp"}}`. The `format`
+parameter requires `size`; it makes Ghost serve a WebP copy, so it is used for every
+theme image outside the header (feature images, post cards, heroes and author avatars).
+The header logo and icon are intentionally rendered as uploaded, so an SVG logo stays
+vector and the site icon keeps its source format.
 
 ---
 
