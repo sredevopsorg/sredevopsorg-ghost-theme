@@ -1,4 +1,5 @@
 {{!< default}}
-{{!-- `/` is the unfiltered, mixed feed, not a locale collection: its featured hero must not
-     filter on a language tag. `mixedFeed` tells partials/featured-hero-locale.hbs to drop it. --}}
+{{!-- `/` is the unfiltered, mixed feed, not a locale collection: the hero and the grid read
+     the page's own `posts`, so neither filters by a language tag. `mixedFeed` records
+     that for the listing partials; `locale="en"` only sets the wording and card strings. --}}
 {{> "collection-layout" locale="en" header="site" mixedFeed=true}}

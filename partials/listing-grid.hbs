@@ -1,0 +1,17 @@
+{{!-- The post grid of a channel listing (partials/collection-layout.hbs).
+
+     The page's own `posts` list is the source: no second query, so the grid can never
+     disagree with the hero about ordering or windowing.
+
+     Page 1: the hero is `posts`[0], so the grid starts at position 2. The hero and the
+     grid slice the same list with `{{#foreach}}`, which is why the same post cannot be
+     displayed twice — the hero is not rendered from the list at all, it simply *is* the
+     first card's predecessor.
+
+     Pages 2+ have no hero, so the whole list is the grid.
+     `locale` picks the card's date/reading-time strings; it is never used to filter.
+     `class="contents"` keeps the wrapper transparent to the `<section>`'s grid layout,
+     so the cards stay direct grid items. --}}
+{{#is "paged"}}<div class="contents">{{#match locale "=" "es"}}{{#foreach posts}}{{> "post-card" locale="es"}}{{/foreach}}{{else match locale "=" "br"}}{{#foreach posts}}{{> "post-card" locale="br"}}{{/foreach}}{{else}}{{#foreach posts}}{{> "post-card" locale="en"}}{{/foreach}}{{/match}}</div>
+{{else}}<div class="contents">{{#match locale "=" "es"}}{{#foreach posts from="2"}}{{> "post-card" locale="es"}}{{/foreach}}{{else match locale "=" "br"}}{{#foreach posts from="2"}}{{> "post-card" locale="br"}}{{/foreach}}{{else}}{{#foreach posts from="2"}}{{> "post-card" locale="en"}}{{/foreach}}{{/match}}</div>
+{{/is}}
