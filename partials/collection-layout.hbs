@@ -32,9 +32,9 @@
 
     {{!-- Post Grid --}}
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {{#match locale "=" "es"}}{{#foreach posts}}{{> "post-card" locale="es"}}{{/foreach}}
-        {{else match locale "=" "br"}}{{#foreach posts}}{{> "post-card" locale="br"}}{{/foreach}}
-        {{else}}{{#foreach posts}}{{> "post-card" locale="en"}}{{/foreach}}{{/match}}
+        {{#match locale "=" "es"}}{{#foreach posts}}{{#if featured}}{{else}}{{> "post-card" locale="es"}}{{/if}}{{/foreach}}
+        {{else match locale "=" "br"}}{{#foreach posts}}{{#if featured}}{{else}}{{> "post-card" locale="br"}}{{/if}}{{/foreach}}
+        {{else}}{{#foreach posts}}{{#if featured}}{{else}}{{> "post-card" locale="en"}}{{/if}}{{/foreach}}{{/match}}
     </section>
 
     {{!-- Pagination --}}
