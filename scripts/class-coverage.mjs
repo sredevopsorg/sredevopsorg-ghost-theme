@@ -74,11 +74,11 @@ export const ALLOWLIST_PATTERNS = [
   /^nav-/, // Dynamic Handlebars output: link_class builds `nav-<slug>` from a runtime slug.
   /^page-/, // Dynamic Handlebars output: pagination/label classes built from runtime values.
   // Prism markup generated at runtime by the highlighter (assets/js/islands/
-  // prism-setup.js): the toolbar wrapper, its items (language label, copy button)
-  // and the line-number sizer. prism-window.css styles the toolbar, the button and
-  // the gutter — these names never appear in template or island source, so the guard
-  // would otherwise have nothing to match them against.
-  /^(?:code-toolbar|toolbar-item|line-numbers-sizer|copy-to-clipboard-button)$/,
+  // prism-setup.js): the toolbar wrapper, its items (language label, copy button).
+  // prism-window.css styles the toolbar and the button — these names never appear
+  // in template or island source, so the guard would otherwise have nothing to
+  // match them against.
+  /^(?:code-toolbar|toolbar-item|copy-to-clipboard-button)$/,
 ];
 
 /**

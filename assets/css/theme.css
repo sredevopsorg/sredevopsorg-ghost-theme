@@ -176,6 +176,20 @@
   @apply mb-0;
 }
 
+/* Code typography follows the article's own scale instead of a hard 1rem with
+   !important. Block code is the body size with a tighter line-height; inline
+   code stays relative to the text around it, so a <code> inside a small table
+   cell or a caption no longer renders larger than its row. */
+.gh-content pre,
+.gh-content pre > code {
+  font-size: 1em;
+  line-height: 1.6;
+}
+
+.gh-content :not(pre) > code {
+  font-size: 1em;
+}
+
 /* Koenig Image Overrides */
 .kg-image-card,
 .kg-gallery-card {

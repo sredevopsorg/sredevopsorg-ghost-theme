@@ -34,10 +34,11 @@ import "prismjs/components/prism-sql.js";
 import "prismjs/components/prism-yaml.js";
 import "prismjs/components/prism-json.js";
 
-// Plugins: line numbers, and the toolbar that carries the language label and the
-// copy button. `line-highlight` and `command-line` are deliberately absent — they
-// need markup Ghost's code card does not emit, and the theme never styled them.
-import "prismjs/plugins/line-numbers/prism-line-numbers.js";
+// Plugins: only the toolbar that carries the language label and the copy button.
+// `line-numbers`, `line-highlight` and `command-line` are deliberately absent:
+// line numbers are not part of the design, and the other two need markup Ghost's
+// code card does not emit. The toolbar is the only plugin-generated UI the theme
+// styles.
 import "prismjs/plugins/toolbar/prism-toolbar.js";
 import "prismjs/plugins/show-language/prism-show-language.js";
 import "prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.js";

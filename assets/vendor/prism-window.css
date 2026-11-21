@@ -8,9 +8,26 @@
 .token.function, .token.class-name, .token.tag, .token.namespace { color: #e06c75; }
 .token.regex, .token.important, .token.variable { color: #f08d49; }
 
-/* --- macOS Window Styling for Code Blocks --- */
+/* --- macOS Window Styling for Code Blocks ---
+   The window frame and its header are painted as background layers on the <pre>
+   itself, not as an absolutely positioned ::before. A scroll container's
+   background is fixed to the element box (`background-attachment: scroll`), so
+   the traffic-light header stays where it is while `overflow-x: auto` scrolls
+   only the code inside. An absolutely positioned header would scroll with the
+   code, and its z-index would paint over Prism's toolbar. */
 pre[class*="language-"] {
-    background: #1e1e1e !important;
+    background-color: #1e1e1e !important;
+    background-image:
+        radial-gradient(circle, #ff5f57 6px, transparent 6px),
+        radial-gradient(circle, #ffbd2e 6px, transparent 6px),
+        radial-gradient(circle, #28ca41 6px, transparent 6px),
+        linear-gradient(#3a3c42, #3a3c42),
+        linear-gradient(#2d2f34, #2d2f34) !important;
+    background-repeat: no-repeat !important;
+    background-size: 12px 12px, 12px 12px, 12px 12px, 100% 1px, 100% 39px !important;
+    background-position: 16px 14px, 36px 14px, 56px 14px, 0 39px, 0 0 !important;
+    background-origin: padding-box !important;
+    background-attachment: scroll !important;
     border-radius: 8px !important;
     border: 1px solid #2a2c35 !important;
     position: relative !important;
@@ -21,31 +38,11 @@ pre[class*="language-"] {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* The macOS Window Header with Red, Yellow, Green dots */
-pre[class*="language-"]::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 40px !important;
-    background: #2d2f34 !important;
-    border-bottom: 1px solid #3a3c42 !important;
-    border-radius: 8px 8px 0 0 !important;
-    /* Three dots via radial gradients */
-    background-image: 
-        radial-gradient(circle, #ff5f57 6px, transparent 6px), 
-        radial-gradient(circle, #ffbd2e 6px, transparent 6px), 
-        radial-gradient(circle, #28ca41 6px, transparent 6px) !important;
-    background-size: 12px 12px, 12px 12px, 12px 12px !important;
-    background-repeat: no-repeat !important;
-    background-position: 16px 14px, 36px 14px, 56px 14px !important;
-    z-index: 10 !important;
-}
-
 /* Language label + copy button, sitting in the right of the window header.
-   Previously hidden with `display: none !important`, which made the toolbar, the
-   language label and the copy button unreachable. */
+   The toolbar lives in Prism's `.code-toolbar` wrapper, outside the scrolling
+   <pre>, so it stays in the header while the code scrolls. It sits above the
+   frame with a low z-index; the frame header itself is only a background now,
+   so nothing paints over the label or the button. */
 .code-toolbar { position: relative !important; }
 
 .code-toolbar > .toolbar {
@@ -58,7 +55,7 @@ pre[class*="language-"]::before {
     gap: 10px !important;
     opacity: .75;
     transition: opacity .15s ease;
-    z-index: 6 !important;
+    z-index: 2 !important;
 }
 
 .code-toolbar:hover > .toolbar { opacity: 1; }
@@ -68,6 +65,7 @@ pre[class*="language-"]::before {
     font-size: 11px !important;
     letter-spacing: .04em;
     color: #9ca3af !important;
+    white-space: nowrap !important;
 }
 
 .copy-to-clipboard-button {
@@ -93,26 +91,10 @@ pre[class*="language-"]::before {
     color: #34d399 !important;
 }
 
-/* --- Fix Line Numbers (Offset for the header) --- */
-pre.line-numbers {
-    padding-left: 4.2em !important;
-}
-pre.line-numbers .line-numbers-rows {
-    border-right: 1px solid #36393f !important;
-    left: -4.2em !important;
-    top: 48px !important; /* Push down under the header */
-    padding-right: 8px !important;
-}
-.line-numbers-rows > span::before { color: #858585 !important; }
-
 /* --- Fix Line Highlights (Offset for the header) --- */
 .line-highlight {
     margin-top: 48px !important;
     background: rgba(45, 75, 56, 0.6) !important; /* Dark green highlight */
     pointer-events: none !important;
     z-index: 5 !important;
-}
-
-code,kbd,pre,samp {
-    font-size: 1rem !important;
 }

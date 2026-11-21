@@ -307,6 +307,18 @@ than Tailwind v4 already asks for. Adding a locale or a palette means editing th
 block in `assets/css/index.css`, not the templates. See
 [docs/adr/0002](docs/adr/0002-theming-semantic-tokens.md).
 
+### Code blocks
+
+Code blocks in posts are highlighted with Prism and rendered inside a macOS-style window:
+traffic-light header, the language name and a copy button. Line numbers are not used. The
+code follows the article's type scale, and only the code scrolls horizontally — the window
+header stays in place.
+
+The Prism stylesheet (`assets/vendor/prism-window.css`) is linked on posts only. Pages and
+other templates that render the `CodeBlocks` island still run the same highlighter and
+share the code typography, but tokens keep the default text colour and there is no
+macOS-style window.
+
 ## ✍️ Locale Content Authoring
 
 ### Tagging posts
