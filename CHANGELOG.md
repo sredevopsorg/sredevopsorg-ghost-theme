@@ -1,5 +1,34 @@
 # Changelog
 
+## 3.6.0-rc1
+
+Release candidate: the featured post rendered twice is fixed. Nothing to do on upgrade
+unless you used the two hero settings (see Removed).
+
+### Fixed
+
+- **The featured post no longer appears twice on a home page.** The hero used to be
+  fetched with a separate query while the grid below looped the page's posts, so the same
+  post could render as both the big hero and a card. The hero is now the channel's first
+  post and the grid starts with the second one, so a post can only appear once. Home
+  pages show `posts_per_page - 1` cards for that reason.
+
+### Changed
+
+- **The hero is the newest post of the channel.** Ghost's *Featured* flag no longer moves
+  a post to the hero: promoting a flagged post from further down the list would take a
+  card out of the grid.
+- **English home pages use the English hero wording** (`/en/`), while `/` keeps the mixed
+  feed; `/es/` and `/br/` keep their Spanish and Portuguese label, date and reading-time
+  formats. The language filter of each home page is unchanged and still comes from
+  `routes.yaml`.
+
+### Removed
+
+- **The `featured_only` and `featured_tag` theme settings.** There is no separate hero
+  query left to filter. Sites that used `featured_tag` to pin a tag to the hero now get
+  the newest post of the channel instead; no content or route changes are needed.
+
 ## 3.5.2
 
 ### Changed
