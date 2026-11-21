@@ -21,9 +21,9 @@
   Spanish one: a Portuguese post still needs its Template setting changed to `custom-br`
   before it declares `<html lang="pt">`.
 - **Package scripts and metadata** — `test` (alias for `verify`), `test:gscan`,
-  `test:sec-feed-layout`, `sync:fonts`, `sync:icons` and `ghost:logs`; a pinned
+  `sync:fonts`, `sync:icons` and `ghost:logs`; a pinned
   `packageManager: yarn@1.22.22`; homepage/docs/keywords metadata; and Homepage grouping
-  for the feed and featured-hero settings.
+  for the featured-hero settings.
 - **Regression tests** for the locale template wrappers and for explicit `.js` Prism
   import specifiers.
 
@@ -34,8 +34,8 @@
   new content hashes. `@vitejs/plugin-react` 5.2 already supports Vite 8.
 - **README and supporting docs** now describe the real architecture: root `/` is an
   unfiltered mixed feed, `hash-*` tags are legacy and not required, locale posts need
-  `custom-es`/`custom-br` selected in the editor, `sec_feed_items` defaults to 3, and the
-  release archive is built with `yarn package`.
+  `custom-es`/`custom-br` selected in the editor, and the release archive is built with
+  `yarn package`.
 
 ### Fixed
 
@@ -96,51 +96,9 @@
 
 ### Added
 
-- **A full-page security feed**, `page-secfeed.hbs`: the same block partials/featured-row.hbs
-  puts beside the featured post, rendered as a destination. Ghost resolves it automatically for
-  a page whose slug is `secfeed`, so no template setting is needed. The frame becomes an
-  ordinary in-flow card and the *document* scrolls (instead of the list scrolling inside the
-  panel), and the island is asked for 25 advisories — the API maximum — rather than the
-  `sec_feed_items` setting. Both layouts are one partial and one island; only the box around
-  the mount point differs. See [README](README.md#full-page-feed-page-secfeedhbs).
-- **Security feed widget** — the newest advisories from
-  [SREDevOps Sec Feed](https://github.com/sredevopsorg/sredevopsorg-sec-feed) (Ubuntu, Debian,
-  Red Hat, NVD, CISA, AWS, Kubernetes and OpenSSF, enriched with CISA KEV, EPSS and OSV.dev)
-  rendered in a 1/3 column beside the featured post on every channel collection:
-  relative timestamps, severity badges, KEV and CVE markers, client-side tag filters,
-  and a link to the full live feed.
-  **Off by default** — set `sec_feed_api_url` in Admin → Design → Theme to enable it. See
-  [README](README.md#-security-feed-widget) for the `CORS_ORIGINS` entry the service needs,
-  since it fails CORS closed, and [docs/adr/0003](docs/adr/0003-security-feed-widget.md) for
-  why it is an island and why it is vanilla.
 - **`unmountIslands()`**, and the island runtime now collects a disposer returned by `mount`
   as well as by `enhance`, so an island owning timers or in-flight requests can be stopped.
   Ghost navigation is still a full page load, so nothing calls it yet.
-
-### Changed
-
-- **The security feed's "Linux · Cloud · Kubernetes" caption is gone.** It sat beside the
-  "Security feed" heading and restated what the page already is; removing it leaves the heading
-  alone in the panel header and gives the embedded panel a little more room for rows. The now
-  unused translation key was dropped from `locales/en|es|pt.json`.
-- **The security feed now sits beside the featured post** instead of above it: the
-  featured post takes 2/3 of the row and the feed 1/3, stacking below it on mobile
-  (the post stays first in the DOM). With `sec_feed_api_url` unset, `featured-row.hbs`
-  renders the bare full-width featured post and no grid — an unconfigured site's HTML
-  is byte-identical, and all eight golden fixtures still match. See
-  [docs/adr/0003](docs/adr/0003-security-feed-widget.md).
-- **The feed panel is now exactly as tall as the featured post, and the advisory list
-  scrolls inside it.** The feed column no longer sizes the row: the featured post owns
-  the row height, the panel matches it, and the heading, status line and tag chips stay
-  pinned above a scrolling list. The panel also repeats the card's own `mb-12`, so the two
-  visible blocks end on the same line and leave the same 48px before the post grid. The
-  panel is 467.0px at 1440 whether the feed holds 5 advisories or 20 — before this, the
-  island's height grew with every advisory, resized the whole block on each poll, and sat
-  flush against the next block. Fixes the reported "island of SecFeed gets variable height
-  which breaks the block" and the follow-up "make them the same height and the same bottom
-  spacing". See
-  [README](README.md#height-and-scrolling) for the two mechanisms this needs and why the
-  obvious one-class fix does not work, and [docs/adr/0003](docs/adr/0003-security-feed-widget.md).
 
 ## 3.0.0
 

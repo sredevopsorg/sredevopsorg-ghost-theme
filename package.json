@@ -4,7 +4,7 @@
     "demo": "https://www.sredevops.org",
     "homepage": "https://www.sredevops.org",
     "docs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme#readme",
-    "version": "3.5.0",
+    "version": "3.5.1",
     "type": "module",
     "packageManager": "yarn@1.22.22",
     "engines": {
@@ -27,7 +27,6 @@
         "test:unit": "node --test \"tests/*.test.mjs\"",
         "test:bundle": "node scripts/smoke-bundle.mjs",
         "test:classes": "node scripts/class-coverage.mjs --css assets/built --css assets/vendor",
-        "test:sec-feed-layout": "node scripts/verify-sec-feed-layout.mjs",
         "verify": "yarn build && yarn test:ci && yarn test:ship && yarn test:unit && yarn test:bundle && yarn test:classes",
         "ghost:up": "docker compose -f docker-compose.dev.yml up -d",
         "ghost:down": "docker compose -f docker-compose.dev.yml down",
@@ -100,25 +99,6 @@
                 "type": "boolean",
                 "default": true,
                 "description": "Show a sign-in link in the main navigation"
-            },
-            "sec_feed_api_url": {
-                "type": "text",
-                "default": "",
-                "group": "homepage",
-                "description": "Origin of the security feed API, e.g. https://security-feed.sredevops.org. Empty hides it."
-            },
-            "sec_feed_items": {
-                "type": "select",
-                "default": "3",
-                "group": "homepage",
-                "options": [
-                    "3",
-                    "5",
-                    "10",
-                    "15",
-                    "20"
-                ],
-                "description": "How many advisories the security feed widget shows"
             },
             "featured_tag": {
                 "type": "text",

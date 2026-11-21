@@ -86,8 +86,6 @@ With the new theme active, on a real browser:
 - [ ] light and dark, and the toggle: choose one, navigate away, come back — no flash
 - [ ] mobile: the menu opens, closes on Escape and on an outside tap
 - [ ] search, the copy button on a code block, and the share buttons
-- [ ] the optional security feed (if configured): the CORS requirement is met, the panel
-      matches the hero height at `lg+`, and its list scrolls
 - [ ] with JavaScript disabled: text, links, images and the mobile menu still work
 
 Known gaps, so they are not re-reported as new: the theme's *interface* strings (search,

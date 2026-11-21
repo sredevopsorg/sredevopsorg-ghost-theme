@@ -55,7 +55,6 @@ const registry = {
   ThemeToggle: () => import("./islands/ThemeToggle.js"),
   MobileMenu: () => import("./islands/MobileMenu.js"),
   ReadingProgress: () => import("./islands/ReadingProgress.jsx"),
-  SecFeed: () => import("./islands/SecFeed.js"),
   ShareButtons: () => import("./islands/ShareButtons.jsx"),
   TableOfContents: () => import("./islands/TableOfContents.jsx"),
 };
@@ -124,10 +123,6 @@ async function mountElement(el) {
         return;
       }
       claimed.add(el);
-      // A `mount` island may return a disposer (SecFeed does: it polls and holds an
-      // AbortController). Ghost navigations are full page loads, so nothing calls it
-      // today; storing it means the contract is symmetric and a future client-side
-      // navigation can actually stop an island's work.
       let dispose;
       try {
         dispose = mod.mount(el, props);

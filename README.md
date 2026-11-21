@@ -1,6 +1,6 @@
 # SREDevOps.org Ghost Theme (v3)
 
-> **Ghost 6 theme** for [SREDevOps.org](https://www.sredevops.org) — multi-locale, Tailwind CSS v4 built with Vite, React islands where interactivity is needed, light and dark palettes, and tag-based language filtering. No third-party requests by default; the optional security feed adds cross-origin requests.
+> **Ghost 6 theme** for [SREDevOps.org](https://www.sredevops.org) — multi-locale, Tailwind CSS v4 built with Vite, React islands where interactivity is needed, light and dark palettes, and tag-based language filtering. No third-party requests.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Ghost Compatibility](https://img.shields.io/badge/Ghost-%3E%3D6.0.0-lightgrey)](https://ghost.org)
@@ -98,7 +98,6 @@ The locale collections carry `data: tag.<locale>`, so their templates get the ta
 - [Installation](#-installation)
 - [Islands](#-islands-client-interactivity)
 - [Package scripts](#-package-scripts)
-- [Security feed widget](#-security-feed-widget)
 - [Locale Content Authoring](#-locale-content-authoring)
 - [Template Architecture Reference](#-template-architecture-reference)
 - [Theme Configuration](#-theme-configuration)
@@ -241,200 +240,19 @@ All commands run from the theme root. The default `yarn test` is the full gate a
 | `yarn test:bundle` | evaluates the built entry and checks code-splitting/island contracts | a build |
 | `yarn test:classes` | proves every class in a template or island has CSS | a build |
 | `yarn test:ship` | asserts the package contents and every `{{asset}}` reference | a build |
-| `yarn test:sec-feed-layout` | Chromium layout checks for the security-feed panel | Ghost + Playwright image |
 | `yarn package` | writes `dist/<name>-<version>.zip` and validates it with `gscan --zip`; older archives are preserved | a build |
 | `yarn ghost:up` / `ghost:down` / `ghost:restart` / `ghost:logs` | the local Ghost 6 + MySQL compose stack | Docker + `.env` |
 | `yarn fixtures:capture` / `normalize` / `diff` / `promote` | golden HTML regression workflow | a seeded Ghost |
 | `yarn sync:fonts` / `sync:icons` | regenerate committed fonts/icons and licence texts | network |
 
-`yarn verify` is the offline CI gate. The fixture and browser-layout checks are deliberately local-only because they need a populated Ghost instance and Chromium.
-
----
-
-## 🛡️ Security feed widget
-
-The theme can render the newest advisories from
-[SREDevOps Sec Feed](https://github.com/sredevopsorg/sredevopsorg-sec-feed) — Ubuntu, Debian,
-Red Hat, NVD, CISA, AWS, the Kubernetes blog and OpenSSF, enriched with CISA KEV, EPSS and
-OSV.dev — as a block **inside** a page, above the post grid on every collection.
-
-It is a *minified* frontend on purpose. The service already ships a full single-page
-frontend with search, SSE and its own filters; this is the small half of it, and the
-widget's footer links to the real thing.
-
-```
-Ghost renders                         the island fetches
-─────────────                         ────────────────
-partials/featured-row.hbs             assets/js/islands/SecFeed.js
-  ┌─ 2/3 ────────────┬─ 1/3 ─────┐     status line, tag chips, rows
-  │ featured post    │ sec feed   │ ──► poll every 5 min while visible
-  │                 │ <section>  │ ──► GET {base}/api/feed?limit=<n>
-  └──────────────────┴────────────┘     <noscript> link if JavaScript is off
-```
-
-### Turning it on
-
-**Admin → Settings → Design → Theme** (the feed settings are grouped under “Homepage”)
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `sec_feed_api_url` | Text | *(empty)* | Origin of the feed API, e.g. `https://security-feed.sredevops.org`. Empty hides the widget entirely. |
-| `sec_feed_items` | Select | `3` | How many advisories the widget shows (3 / 5 / 10 / 15 / 20). |
-
-With `sec_feed_api_url` empty the partial renders **nothing**: no markup, no island chunk,
-no request. That keeps "no third-party requests" true for an unmodified site, and it is what
-`tests/sec-feed.test.mjs` guards — the API origin appears in no source file, only as this setting.
-
-### ⚠️ CORS is required — and it is not configured yet
-
-The widget calls the feed **cross-origin**, and the sec-feed fails CORS closed: with
-`CORS_ORIGINS` unset, no cross-origin caller is allowed. Add the publication's origin to
-the service:
-
-```
-CORS_ORIGINS=https://www.sredevops.org
-```
-
-Checked against the live service on 2026-10-03: `GET /api/feed` sent with an `Origin`
-header returns `200` and `Vary: Origin`, but **no `Access-Control-Allow-Origin`** — so until
-`CORS_ORIGINS` includes the publication, the browser blocks the response and the widget
-shows its error state (correctly: it degrades, it does not break the page). To avoid CORS
-entirely, reverse-proxy the feed onto the publication's own domain and set
-`sec_feed_api_url` to that path, e.g. `/feed`.
-
-### Behaviour worth knowing
-
-- **Polling, not SSE.** `/api/events` is rate-limited and caps concurrent subscribers, so a
-  widget on a public homepage should not hold one connection per open tab. It polls every 5
-  minutes while the tab is visible and refreshes when the tab returns or the browser
-  reconnects.
-- **Failures degrade.** A failed first load renders a message and a retry button; a failed
-  later poll keeps the rows and marks them stale instead of blanking the page.
-- **Sample rows are labelled.** When no upstream source is reachable the service serves
-  realistic sample items; the widget says so rather than passing it off as live data.
-- **No-JS** shows a link to the full feed (`<noscript>`, outside the mount point).
-- **Tag chips filter the rows already fetched** — no request per click, no rate limit spent.
-
-### Where it appears
-
-Included by `partials/featured-row.hbs`, which the four **channel** templates reach through
-`collection-layout.hbs`: `/` (or `/en/`), `/es/` and `/br/`. It sits in a **1/3 column beside
-the featured post, which takes the other 2/3**, and stacks below it on mobile (the post is
-first in the DOM, so it also reads first without CSS).
-
-When `sec_feed_api_url` is empty, `featured-row.hbs` renders the bare full-width featured post
-and no grid at all — an unconfigured site's HTML is byte-identical to a theme without this
-feature. If a channel has **no** featured post configured, the 2/3 column is empty and the feed
-sits beside it; a site with no featured post on a channel would want the feed moved.
-
-### Height and scrolling
-
-**The feed panel is the same height as the featured card, and leaves the same space below it.**
-The advisory list is the scroll region — the heading, the status line and the tag chips stay
-pinned above it — so a channel with twenty advisories is exactly as tall as one with three.
-
-The featured card carries `mb-12`, so the row's rhythm is *card + 48px*. The feed column repeats
-that same `mb-12` (`partials/featured-row.hbs`), and the panel is pinned to what is left. That is
-what makes the two visible surfaces line up: the panel is shortened by the margin to the card's
-height, and the margin is the space the row needs before the post grid. Two mechanisms are at
-work, and both matter:
-
-| Mechanism | Where | Why |
-| --- | --- | --- |
-| `align-items: stretch` (the grid default) | `partials/featured-row.hbs` row | gives both columns the row's height instead of their own |
-| `lg:relative` column + `lg:absolute lg:inset-0` panel | row / `partials/sec-feed.hbs` | takes the feed out of the row's intrinsic sizing, so the *hero card* decides the height |
-| `mb-12` on the feed column | `partials/featured-row.hbs` | matches the card's own bottom margin, so the panel is the card's height and the next block keeps the same gap |
-
-Without the second row of that table the height is merely *equal*, not stable: an in-flow grid
-item still contributes its content height to an auto-sized row track, so a feed of twenty
-advisories sized the track no matter how the column was clamped (`min-h-0` bounds a flex item,
-not a grid track). Without the third, the panel is one card-margin taller than the card and sits
-flush against the post grid. A hardcoded row height cannot replace any of it: the card measures
-504.5px at 1024x900 and 467px at every width from 1280 up, so any constant is wrong at one end.
-
-Measured in Chromium against a live feed:
-
-| Viewport | Featured card | Feed panel | Gap below card | Gap below panel | List scrollable |
-| --- | --- | --- | --- | --- | --- |
-| 1024×900 | 504.5 | 504.5 | 48px | 48px | 272px |
-| 1280×900 | 467.0 | 467.0 | 48px | 48px | 235px |
-| 1440×900 | 467.0 | 467.0 | 48px | 48px | 235px |
-| 1920×1080 | 467.0 | 467.0 | 48px | 48px | 235px |
-
-With **20** advisories the panel is still 467.0px and only the list grows — before this change
-the block grew with every advisory added.
-
-**On mobile the columns stack and are deliberately not equalised.** Below `lg` the panel is an
-ordinary in-flow block, so the feed sits *below* the hero at its own height (measured: 615.8px of
-hero, then 764.5px of feed). Bounding it there would nest a scrollbar inside the page's own and
-trap touch scrolling, so it is left alone. "Same height as the 2/3 element" is a side-by-side
-property; there is no 2/3 element once the columns stack.
-
-It is *not* on post templates and *not* on `/tag/…` or `/author/…` — `tag.hbs` and `author.hbs`
-carry their own markup rather than sharing `collection-layout.hbs`.
-
-The block is one partial, so anywhere else it goes where you put it:
-
-```handlebars
-{{> "sec-feed" locale=locale}}
-```
-
-Verified against a local Ghost 6: the block renders with the expected `data-*` attributes,
-`/es/` gets the Spanish heading and no-JS link from the locale passed through, and no post,
-page, tag or author template gains any widget markup.
-
-### Full-page feed (`page-secfeed.hbs`)
-
-`page-secfeed.hbs` renders the same block as a page rather than a sidebar. Ghost resolves a
-page's template as `page-:slug.hbs` → `custom-*.hbs` → `page.hbs`, so it applies automatically
-to a page whose **slug is `secfeed`** — create one and the feed is there, no template setting to
-change. The page's own title and excerpt render above it, respecting the editor's
-"show title and feature image" toggle.
-
-```handlebars
-{{> "sec-feed" locale="en" full=true}}
-```
-
-`full=true` changes three things, and they are not cosmetic:
-
-| | Embedded (default) | Full page (`full=true`) |
-| --- | --- | --- |
-| Frame | `lg:absolute lg:inset-0 h-full min-h-0 flex flex-col overflow-hidden` | an ordinary in-flow card |
-| What scrolls | the list, inside the panel | the document |
-| How many advisories | the `sec_feed_items` setting | 25, the API maximum (`MAX_LIMIT`) |
-
-The mode exists because the embedded layout's contract is *relative to a bounded box*: the list
-is `flex: 1 1 0%` with `min-height: 0`, which resolves against the panel the partial is pinned
-into. In an auto-height box the zero basis would win and the list would collapse to nothing while
-scrolling inside its own frame. So `full=true` also sets `data-fill="page"` on the mount point,
-and `assets/js/islands/SecFeed.js` skips the flex/overflow layout entirely — the status line, the
-filter chips and the rows stay in normal flow and the page scrolls.
-
-Measured in Chromium (`/secfeed/`, 25 advisories): the panel is 2634.5px tall, the list has
-`overflow-y: visible` and `clientHeight == scrollHeight` (no nested scrollbar), and the document
-scrolls. The embedded homepage panel on the same run is still 467px with `overflow-y: auto` and
-a `clientHeight` of 255 against a 532px list — the two modes do not interfere.
-
-For a Spanish or Portuguese feed page, add a file like this one extending `default-es.hbs` /
-`default-br.hbs` and pass the matching `locale`, the same remedy `custom-page-es.hbs` documents.
-
-### Weight
-
-The island is **3.78 kB gzip and loads no framework**, versus ~68 kB gzip for the React runtime
-the other islands share. That is why this one is vanilla while `ReadingProgress` and
-`TableOfContents` are React: there is no server-rendered content here to hydrate, and this is
-likely to sit on the homepage. The decisions worth testing live in
-`assets/js/lib/sec-feed-model.js` and are unit-tested there; see
-[docs/adr/0003](docs/adr/0003-security-feed-widget.md) for the reasoning.
+`yarn verify` is the offline CI gate. The fixture checks are deliberately local-only because they need a populated Ghost instance.
 
 ---
 
 ### Self-hosted assets (no third-party requests)
 
-The theme makes **no third-party requests by default**. Fonts and icons ship with it, so
-there is no extra DNS lookup, no second TLS handshake and nothing render-blocking from
-another origin. The optional security feed is the only exception, and only when
-`sec_feed_api_url` is set.
+The theme makes **no third-party requests**. Fonts and icons ship with it, so there is no
+extra DNS lookup, no second TLS handshake and nothing render-blocking from another origin.
 
 | Asset | Where it comes from | How to refresh |
 | --- | --- | --- |
@@ -578,7 +396,7 @@ Locale templates are thin wrappers, not copies of the shell:
 
 Adding a locale means adding these wrappers, a collection in `routes.yaml`, a
 `locales/<lang>.json` file, and the locale branches used by the post card, related
-content, hero, author box, island config and security feed. See “Adding a New Locale”
+content, hero, author box and island config. See “Adding a New Locale”
 below.
 
 ---
@@ -605,7 +423,6 @@ below.
 | `error.hbs` | Standalone error template | none (inline CSS, no helpers) | site |
 | `error-404.hbs` | 404 page | `default.hbs` | site |
 | `page-tags.hbs` | Tag index page | `default.hbs` | site |
-| `page-secfeed.hbs` | `/secfeed/` page | `default.hbs` + `sec-feed` `full=true` | en |
 | `page-recommendations.hbs` | `/recommendations/` page | `default.hbs` + recommendations | en |
 
 Key partials:
@@ -616,8 +433,7 @@ Key partials:
 | `partials/collection-layout.hbs` | Channel heading, featured row, post grid, pagination |
 | `partials/post-layout.hbs` | Article, sidebar/ToC, related content, comments, author box, sharing |
 | `partials/page-body.hbs` | Page title/feature image toggle and page content |
-| `partials/featured-row.hbs` | Featured hero, with the optional security feed column |
-| `partials/sec-feed.hbs` | Security-feed block and mount point, in embedded or full-page mode |
+| `partials/featured-row.hbs` | Featured hero |
 
 > 🔄 **Inheritance syntax**: `{{!< filename}}` at the top of a template tells Ghost to render the file inside the `{{{body}}}` placeholder of `filename`. Partial hash arguments such as `locale` are dropped inside `{{#post}}`, `{{#page}}`, `{{#get}}` and `{{#foreach}}`, so pass them at the partial's own top level or as a literal at the call site.
 
@@ -626,14 +442,12 @@ Key partials:
 ## ⚙️ Theme Configuration
 
 Customize behavior via **Ghost Admin → Settings → Design → Theme**. This is the
-authoritative settings table; the [security feed section](#-security-feed-widget) links back here.
+authoritative settings table.
 
 | Option | Type | Default | Group | Description |
 |--------|------|---------|-------|-------------|
 | `show_search` | Boolean | `true` | site-wide | Show a search icon in the main navigation |
 | `show_login` | Boolean | `true` | site-wide | Show a sign-in link in the main navigation |
-| `sec_feed_api_url` | Text | *(empty)* | Homepage | Origin of the security feed API. Empty hides the [security feed widget](#-security-feed-widget) |
-| `sec_feed_items` | Select | `3` | Homepage | How many advisories the widget shows (3 / 5 / 10 / 15 / 20) |
 | `featured_tag` | Text | *(empty)* | Homepage | Extra tag slug ANDed into the featured hero filter, on top of the collection's language tag (none on `/`) |
 | `featured_only` | Boolean | `true` | Homepage | Require the `featured` flag on the hero post |
 
@@ -661,8 +475,7 @@ whichever locale it is:
 - **AND, never a replacement.** On a locale collection `featured_tag` is *added* to the
   language tag; it cannot replace it, because that would let an English post become the
   Spanish hero. The tag is a **slug** (the same value that appears in the tag's URL) and must
-  exist, or the hero renders empty rather than erroring — the row's
-  [1/3 column caveat](docs/adr/0003-security-feed-widget.md) applies.
+  exist, or the hero renders empty rather than erroring.
 - **The root feed is the exception.** `/` has no language tag to add `featured_tag` to, so
   the setting is the only tag in its filter. `home.hbs` passes `mixedFeed=true` through
   the listing partials to drop the locale clause. This changes the root hero by design: a
@@ -731,7 +544,7 @@ curl -s http://localhost:2368/br/some-post/ | grep -o '<html[^>]*>'
 # Expected: <html lang="pt">
 ```
 
-### Fixtures and browser layout checks
+### Fixtures
 
 These need a running Ghost and are intentionally local-only:
 
@@ -742,8 +555,6 @@ yarn fixtures:normalize
 yarn fixtures:diff
 ```
 
-`yarn test:sec-feed-layout` additionally needs Chromium through the Playwright image; see
-[docs/adr/0003](docs/adr/0003-security-feed-widget.md).
 
 ### Packaging a release
 
@@ -824,14 +635,9 @@ Configure secrets:
 - **Tag and author archives use the English card locale.** Their dates and reading-time
   strings are English because the route has no locale context; each card still declares
   the post's own `lang` from its URL.
-- **The security feed is client-rendered and CORS-dependent.** With
-  `sec_feed_api_url` set, the browser fetches the feed cross-origin; the service must
-  allow the publication origin (see the CORS note above). The widget content is not in
-  the server HTML.
 - **The light palette's contrast is unverified by a human.** The token layer is tested
   functionally, but the light colours have not been measured.
-- **Fixture and browser-layout checks are local-only.** They need a seeded Ghost and,
-  for the layout script, Chromium.
+- **Fixture checks are local-only.** They need a seeded Ghost.
 - **`yarn dev` watches assets, not Ghost.** Ghost caches compiled templates; restart it
   after editing `.hbs` files.
 
@@ -895,7 +701,7 @@ Two values are easy to confuse, so choose both explicitly:
    - `partials/collection-layout.hbs` (card loop)
    - `partials/featured-hero-locale.hbs` and the three `featured-hero*.hbs` partials
    - `partials/theme-toggle.hbs`, `partials/header.hbs`, `partials/island-config.hbs`
-   - `partials/sec-feed.hbs` and `partials/page-body.hbs`
+   - `partials/page-body.hbs`
 
 4. **Add or update the Ghost translation file** `locales/<lang>.json`. This is the
    publication's site language, separate from the content-locale key above.

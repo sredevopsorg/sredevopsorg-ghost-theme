@@ -110,8 +110,6 @@ Content image filenames are not normalised: the asset-hash rule is anchored to
   the offline gate.
 - **Template or build change:** capture, normalise, diff. Explain every remaining
   difference before promoting.
-- **Browser checks:** `yarn test:sec-feed-layout` covers the feed panel in Chromium;
-  Playwright is not part of the default CI gate.
 
 ## Known gap
 
