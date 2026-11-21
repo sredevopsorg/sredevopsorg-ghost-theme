@@ -1,5 +1,28 @@
 # Changelog
 
+## 3.5.2
+
+### Changed
+
+- **Code blocks follow the article's type scale.** Block code uses the body size with a
+  tighter line-height, and inline code inherits the size of the text around it instead of
+  being pinned to 16px — so `<code>` inside a small table cell or a caption no longer
+  renders larger than its row.
+- **Only the code scrolls inside the macOS-style window.** The traffic-light header is now
+  painted as background layers on the block, so it stays in place when a long line scrolls
+  horizontally instead of sliding away with the code.
+
+### Fixed
+
+- **The language label and copy button are visible again.** The window header used to paint
+  over Prism's toolbar; the label and button now sit in the header and remain clickable
+  while the code scrolls beneath them.
+
+### Removed
+
+- **Line numbers on code blocks.** The Prism line-numbers plugin, the gutter styling and the
+  test that added the `line-numbers` class were removed.
+
 ## 3.2.2
 
 ### Fixed

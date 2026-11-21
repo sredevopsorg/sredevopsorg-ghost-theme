@@ -7,7 +7,7 @@ the multi-locale model, and deployment. This file records the commands, invarian
 pitfalls an agent needs in order to change the code safely. If the two disagree, prefer
 `README.md` and the code, then fix this file in the same change.
 
-Last verified: 2026-10-17 against theme version 3.2.1.
+Last verified: 2026-11-21 against theme version 3.5.2.
 
 ## What this repository is
 
