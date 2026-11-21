@@ -1,9 +1,10 @@
 # Changelog
 
-## 3.6.0-rc1
+## 3.6.0
 
-Release candidate: the featured post rendered twice is fixed. Nothing to do on upgrade
-unless you used the two hero settings (see Removed).
+The featured post could be displayed twice on a home page; it cannot any more. Upgrading
+needs no content, route or settings change, unless you used `featured_tag` or
+`featured_only` (see Removed).
 
 ### Fixed
 

@@ -540,6 +540,26 @@ yarn test:ship    # package contents and asset references
 `yarn test:bundle`, `yarn test:classes` and `yarn test:ship` need a build; `yarn verify`
 does it for you. Running them directly after a source change will fail on stale output.
 
+### Checking the deployed hero
+
+The live site runs a published archive, so the check is done on the rendered HTML: the
+hero must appear **once** in `<main>`, and never among the cards of the grid below it.
+
+```bash
+# the hero on page 1 is the <a class="group block mb-12 …">; expect 1 per home page,
+# and its href must not also appear among the cards of <section class="grid">
+for p in / /en/ /es/ /br/ /page/2/; do
+  printf '%s: hero occurrences = %s\n' "$p" \
+    "$(curl -sL "https://www.sredevops.org$p" | grep -c 'class="group block mb-12 rounded-2xl')"
+done   # / /en/ /es/ /br/ -> 1     /page/2/ -> 0 (later pages have no hero)
+```
+
+Also worth confirming, on any build that changes the hero:
+
+- each home page shows `posts_per_page - 1` cards on page 1 and a full list from page 2;
+- `/` mixes several locales while `/en/`, `/es/` and `/br/` only list their own posts;
+- `<html lang>` is `en`, `es` and `pt` on `/`, `/es/` and `/br/` respectively.
+
 ### Locale-specific validation
 
 ```bash
