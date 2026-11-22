@@ -111,6 +111,18 @@
                 "default": true,
                 "group": "homepage",
                 "description": "Require the Featured flag on the hero post. Off shows the newest post matching the tag filter."
+            },
+            "tts_enabled": {
+                "type": "boolean",
+                "default": true,
+                "group": "post",
+                "description": "Show a text-to-speech player on posts"
+            },
+            "tts_api_key": {
+                "type": "text",
+                "default": "",
+                "group": "post",
+                "description": "ElevenLabs API key for text-to-speech on posts"
             }
         },
         "image_sizes": {

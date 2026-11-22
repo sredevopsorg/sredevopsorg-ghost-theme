@@ -462,6 +462,8 @@ authoritative settings table.
 | `show_login` | Boolean | `true` | site-wide | Show a sign-in link in the main navigation |
 | `featured_tag` | Text | *(empty)* | Homepage | Extra tag slug ANDed into the featured hero filter, on top of the collection's language tag (none on `/`) |
 | `featured_only` | Boolean | `true` | Homepage | Require the `featured` flag on the hero post |
+| `tts_enabled` | Boolean | `true` | Post | Show a text-to-speech player on posts |
+| `tts_api_key` | Text | *(empty)* | Post | ElevenLabs API key for text-to-speech on posts |
 
 ### Featured hero filtering
 
@@ -498,6 +500,20 @@ whichever locale it is:
   a different tagged post and changing only `featured_only` moves it to the newest post on the
   channel, which is what distinguishes the rows. See
   [docs/adr/0004](docs/adr/0004-featured-hero-filter.md) for the measurements.
+
+### Text-to-speech player (ElevenLabs)
+
+With `tts_enabled` on (the default), posts render a `TtsPlayer` island above the
+article. It reads the article text from `.gh-content` (skipping code blocks, tables
+and navigation) and calls the ElevenLabs text-to-speech API from the reader's browser
+with `tts_api_key`, the `eleven_multilingual_v2` model and the Rachel voice. The
+controls cover play/pause, stop and 0.5×–2× speed; their labels and status messages
+come from `locales/*.json`. Pages do not get a player.
+
+**The API key is embedded in the post HTML and sent to every visitor** — a Ghost theme
+has no server-side runtime to proxy the call. Use a key with restricted permissions
+and a quota you accept being public, or leave `tts_api_key` empty: the island then
+renders a single disabled "unavailable" button instead.
 
 ### Image Size Presets
 

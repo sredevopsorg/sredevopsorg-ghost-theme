@@ -5,6 +5,17 @@
   {{!-- Island: fixed 2px reading-progress bar; renders into this empty div. --}}
   <div data-island="ReadingProgress" data-target=".gh-content"></div>
 
+  {{!-- Island: ElevenLabs text-to-speech player. Posts only; the API key is a Ghost
+        custom setting and is sent to the browser, so treat it as a public value. --}}
+  {{#if @custom.tts_enabled}}
+  <div data-island="TtsPlayer"
+       data-target=".gh-content"
+       data-api-key="{{@custom.tts_api_key}}"
+       data-voice="EXAVITQu4vr4xnSDxMaL"
+       data-model="eleven_multilingual_v2">
+  </div>
+  {{/if}}
+
   {{!-- Header Grid: 2/3 Text, 1/3 Image --}} <div
   class="{{post_class}} grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 lg:mb-12 border-b border-border-subtle pb-8">
 

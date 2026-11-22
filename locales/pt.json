@@ -58,5 +58,12 @@
   "Copied!": "Copiado!",
   "Switch to light theme": "Mudar para tema claro",
   "Switch to dark theme": "Mudar para tema escuro",
-  "Toggle theme": "Alternar tema"
+  "Toggle theme": "Alternar tema",
+  "Play": "Reproduzir",
+  "Pause": "Pausar",
+  "Stop": "Parar",
+  "Speed": "Velocidade",
+  "TTS unavailable": "Texto para fala indisponível — adicione uma chave API da ElevenLabs nas configurações do tema",
+  "TTS error": "Erro de TTS — não foi possível gerar o áudio",
+  "Generating audio…": "Gerando áudio…"
 }

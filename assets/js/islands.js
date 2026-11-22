@@ -57,6 +57,7 @@ const registry = {
   ReadingProgress: () => import("./islands/ReadingProgress.jsx"),
   ShareButtons: () => import("./islands/ShareButtons.jsx"),
   TableOfContents: () => import("./islands/TableOfContents.jsx"),
+  TtsPlayer: () => import("./islands/TtsPlayer.jsx"),
 };
 
 const SELECTOR = "[data-island]";

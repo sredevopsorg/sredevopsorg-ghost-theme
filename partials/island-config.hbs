@@ -34,6 +34,13 @@
     openMenu="Abrir menú"
     closeMenu="Cerrar menú"
     readingProgress="Progreso de lectura"
+    ttsPlay="Reproducir"
+    ttsPause="Pausar"
+    ttsStop="Detener"
+    ttsSpeed="Velocidad"
+    ttsUnavailable="Texto a voz no disponible — agregue una clave API de ElevenLabs en la configuración del tema"
+    ttsError="Error de TTS — no se pudo generar el audio"
+    ttsGenerating="Generando audio…"
 }}
 {{else match locale "=" "br"}}
 {{json
@@ -49,6 +56,13 @@
     openMenu="Abrir menu"
     closeMenu="Fechar menu"
     readingProgress="Progresso de leitura"
+    ttsPlay="Reproduzir"
+    ttsPause="Pausar"
+    ttsStop="Parar"
+    ttsSpeed="Velocidade"
+    ttsUnavailable="Texto para fala indisponível — adicione uma chave API da ElevenLabs nas configurações do tema"
+    ttsError="Erro de TTS — não foi possível gerar o áudio"
+    ttsGenerating="Gerando áudio…"
 }}
 {{else}}
 {{json
@@ -64,6 +78,13 @@
     openMenu=(t "Open menu")
     closeMenu=(t "Close menu")
     readingProgress=(t "Reading progress")
+    ttsPlay=(t "Play")
+    ttsPause=(t "Pause")
+    ttsStop=(t "Stop")
+    ttsSpeed=(t "Speed")
+    ttsUnavailable=(t "TTS unavailable")
+    ttsError=(t "TTS error")
+    ttsGenerating=(t "Generating audio…")
 }}
 {{/match}}
 </script>
