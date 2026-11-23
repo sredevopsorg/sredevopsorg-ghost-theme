@@ -7,7 +7,7 @@ the multi-locale model, and deployment. This file records the commands, invarian
 pitfalls an agent needs in order to change the code safely. If the two disagree, prefer
 `README.md` and the code, then fix this file in the same change.
 
-Last verified: 2026-11-21 against theme version 3.5.2.
+Last verified: 2026-11-21 against theme version 3.6.0.
 
 ## What this repository is
 
@@ -48,6 +48,7 @@ yarn install --frozen-lockfile   # exactly what CI installs; fails on a stale lo
 | `yarn test:bundle` | Loads the built entry and checks the island/code-splitting contract |
 | `yarn test:classes` | Every class in a template or island has CSS in the build |
 | `yarn package` | Writes and validates `dist/<name>-<version>.zip`; keeps older archives |
+| `node scripts/release-notes.mjs <version>` | Prints the `CHANGELOG.md` section for a release body |
 | `yarn ghost:up` / `ghost:down` / `ghost:restart` / `ghost:logs` | Local Ghost 6 + MySQL stack on port 2368 |
 | `yarn fixtures:capture` / `normalize` / `diff` / `promote` | Golden-HTML fixture workflow (needs a seeded Ghost) |
 | `yarn sync:fonts` / `sync:icons` | Regenerate committed fonts/icons and licence texts (network) |
@@ -94,6 +95,13 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 - Root `/` is intentionally an unfiltered, mixed feed, so its featured hero is chosen
   without a language tag too (`home.hbs` passes `mixedFeed=true` through the listing
   partials). The locale collections keep their `tag:<locale>`; never re-add it to `/`.
+- The hero is `posts`[0] of the page, never a query of its own: page 1 renders
+  `partials/featured-hero[-es|-br].hbs` (the lead post) and `partials/listing-grid.hbs`
+  from `{{#foreach from="2"}}` on the **same** `posts` list, so the featured post cannot
+  appear twice. Do not reintroduce a `{{#get}}` hero, a `featured`-flag promotion or a
+  `featured_*` custom setting: promoting a flagged post would pull a card out of the grid
+  and split hero and grid into two windows. Locale wording lives in the three hero files
+  as literals, because `{{#foreach}}` drops partial hash arguments.
 - Two different values, do not conflate them:
   - `documentLang` — BCP-47 value for `<html lang>` (`en`, `es`, `pt`).
   - `locale` — the theme's content key used in filters and partial arguments
@@ -169,10 +177,11 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 
 - `package.json` is also the Ghost theme manifest. Keep `config`, `image_sizes`, `gpm`
   and the `engines` fields valid.
-- Custom settings are append-only. Keys are `snake_case`; never rename the existing
-  `show_search`, `show_login` or `featured_*` keys, because Ghost stores
-  values by key. Descriptions must stay under 100 characters. Homepage options use
-  `group: "homepage"`.
+- Custom settings are append-only: `show_search`, `show_login`, `tts_enabled` and
+  `tts_api_key`. Keys are `snake_case`; never rename
+  an existing key, because Ghost stores values by key. Descriptions must stay under 100
+  characters. The former `featured_only` / `featured_tag` settings were removed with the
+  separate hero query — do not bring them back.
 - `{{img_url size="..."}}` values must match a key in `config.image_sizes`.
 - Theme images outside the header must be emitted as
   `{{img_url value size="..." format="webp"}}`; `format` requires `size`. Do not emit a
@@ -198,8 +207,13 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 - Older archives in `dist/` are kept for rollback on purpose. Do not delete them.
 - Do not bump `version` or edit `CHANGELOG.md` unless the task is a release. When it is,
   follow `docs/release-checklist.md` exactly.
-- Do not trigger the `deploy-theme` workflow, create tags, or publish releases unless
-  explicitly asked. That workflow is `workflow_dispatch` and restricted to the
+- Releases go through `.github/workflows/release.yaml` (`gh workflow run release.yaml
+  --ref main -f version=X.Y.Z`): it creates the tag through GitHub's API — **signed by
+  GitHub**, because the `v*` ruleset requires signed tags and CI holds no key — runs
+  `yarn verify`, rebuilds the archive from the tagged commit and publishes the release
+  with the changelog section as notes. Do not push unsigned tags by hand.
+- Do not trigger the `release` or `deploy-theme` workflows, create tags, or publish
+  releases unless explicitly asked. That workflow is `workflow_dispatch` and restricted to the
   `ngeorger` account; it needs `GHOST_API_URL` and `GHOST_ADMIN_API_KEY` secrets.
 - `main` is protected. Work on a feature branch and open a PR; never force-push or bypass
   branch protection.

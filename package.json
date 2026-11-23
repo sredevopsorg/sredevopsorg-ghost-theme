@@ -4,7 +4,7 @@
     "demo": "https://www.sredevops.org",
     "homepage": "https://www.sredevops.org",
     "docs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme#readme",
-    "version": "3.5.2",
+    "version": "3.6.0",
     "type": "module",
     "packageManager": "yarn@1.22.22",
     "engines": {
@@ -99,18 +99,6 @@
                 "type": "boolean",
                 "default": true,
                 "description": "Show a sign-in link in the main navigation"
-            },
-            "featured_tag": {
-                "type": "text",
-                "default": "",
-                "group": "homepage",
-                "description": "Extra tag slug ANDed into the featured hero filter, e.g. news. Empty adds no tag of its own."
-            },
-            "featured_only": {
-                "type": "boolean",
-                "default": true,
-                "group": "homepage",
-                "description": "Require the Featured flag on the hero post. Off shows the newest post matching the tag filter."
             },
             "tts_enabled": {
                 "type": "boolean",

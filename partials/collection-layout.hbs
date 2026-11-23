@@ -1,11 +1,13 @@
 {{!-- Shared listing layout for the root channel and the locale collections.
 {{!--
-     `locale` selects the featured post, the cards' date format and reading time.
+     `locale` selects the hero's wording and the cards' date format and reading time.
      `header` is "site" for the root channel (title + description) or "tag" for a
      collection that carries tag data (routes.yaml `data: tag.<slug>`), which is what
      /es/ and /br/ use.
-     `mixedFeed` is set by home.hbs only: the root channel has no collection filter, so
-     its featured hero must not be language-filtered either (featured-hero-locale). --}}
+     `mixedFeed` is set by home.hbs only and is informational: the hero and the grid read
+     the page's own `posts` list, which Ghost already produced with the channel's filter
+     (none on `/`), so neither of them re-filters by language. `locale` still selects the
+     cards' date/reading-time strings. --}}
 <div class="max-w-6xl mx-auto pb-12">
     {{#match header "=" "site"}}
     {{!-- Page Title & Description --}}
@@ -28,13 +30,13 @@
     {{/match}}
 
     {{!-- Featured post --}}
-    {{> "featured-row" locale=locale mixedFeed=mixedFeed}}
+    {{> "featured-row" locale=locale}}
 
-    {{!-- Post Grid --}}
+    {{!-- Post Grid. Both the hero and the grid come from the page's own `posts` list:
+         the hero is its first post and the grid starts after it, so the hero is never
+         displayed twice. --}}
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {{#match locale "=" "es"}}{{#foreach posts}}{{#if featured}}{{else}}{{> "post-card" locale="es"}}{{/if}}{{/foreach}}
-        {{else match locale "=" "br"}}{{#foreach posts}}{{#if featured}}{{else}}{{> "post-card" locale="br"}}{{/if}}{{/foreach}}
-        {{else}}{{#foreach posts}}{{#if featured}}{{else}}{{> "post-card" locale="en"}}{{/if}}{{/foreach}}{{/match}}
+        {{> "listing-grid" locale=locale}}
     </section>
 
     {{!-- Pagination --}}

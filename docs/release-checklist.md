@@ -57,10 +57,25 @@ Previous archives in `dist/` are deliberately preserved for rollback.
 ## 5. Release
 
 1. Merge the release branch into `main`.
-2. Tag it: `git tag v3.2.1 && git push origin v3.2.1`.
-3. Attach `dist/<name>-<version>.zip` to a GitHub release, with the changelog entry.
-4. Upload it in Ghost admin (**Settings → Design → Change theme → Upload**), or to the
-   marketplace. The `deploy-theme` workflow does the same thing on demand
+2. Tag it **and publish the release** with the [`release` workflow](../.github/workflows/release.yaml):
+
+   ```bash
+   gh workflow run release.yaml --ref main -f version=3.6.0
+   gh run watch        # or: gh run list --workflow=release.yaml
+   ```
+
+   The `v*` tag ruleset requires **signed** tags, and a local checkout has no signing key
+   for the release identity — so the tag is created through GitHub's API, which signs it
+   with the repository key. The workflow also refuses a version that `package.json` does
+   not declare, refuses an existing tag, runs `yarn verify`, rebuilds the archive from the
+   tagged commit with `yarn package`, and attaches it to the release with the
+   `CHANGELOG.md` section as the notes. Nothing in `dist/` is published by accident.
+
+   Signing the tag locally instead is fine if your machine has the key: `git tag -s
+   v<version> -m "v<version>" && git push origin v<version>`, then attach the archive to
+   the release by hand.
+3. Upload the archive in Ghost admin (**Settings → Design → Change theme → Upload**), or
+   to the marketplace. The `deploy-theme` workflow does the same thing on demand
    (`workflow_dispatch`): it builds, checks, packages, and hands that archive to the
    deploy action — the same file, not a second packaging path.
 

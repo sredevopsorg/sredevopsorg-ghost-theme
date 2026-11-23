@@ -1,219 +1,258 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 
 /**
- * Tests for the featured-hero filter settings (`featured_tag`, `featured_only`).
+ * Tests for the featured hero and its relationship with the listing grid.
  *
  * What can actually break, in order of likelihood:
  *
- *   1. the settings stop being declared or stop being read, so the Admin pane shows
- *      a control that does nothing (or GScan fails on an unused setting);
- *   2. a hero partial goes back to a hard-coded `filter="featured:true+tag:en"`, which
- *      would silently ignore the settings for that locale only;
- *   3. the filter string is assembled for the wrong combination — the eight modes are
- *      built by hand, and a copy-paste error in one branch is invisible on the default
- *      path, which is the one everyone tests;
- *   4. the root channel `/` starts filtering its hero by a language tag again (or a
- *      locale collection drops it) — the root route is the intentionally unfiltered,
- *      mixed feed, while /en/, /es/ and /br/ must stay locale-only.
+ *   1. a `featured_*` theme setting comes back, so the Admin pane shows a control that
+ *      the templates no longer read (or GScan rejects an unused setting);
+ *   2. the hero and the grid stop coming from the same `posts` list, which is the only
+ *      property that makes "displayed once" true by construction;
+ *   3. the hero starts filtering by a language tag on `/` (it must stay the mixed feed)
+ *      or a locale home starts rendering posts from another locale;
+ *   4. Ghost's `featured` flag creeps back in as a hero rule, so a post flagged further
+ *      down is promoted and its card vanishes from the grid (or is rendered twice);
+ *   5. the hero grows a query of its own, or the grid starts at position 1, and page 1
+ *      shows the same post twice;
+ *   6. the three per-locale heroes drift apart, or a hero string turns back into a hash
+ *      argument that `{{#foreach}}` would drop.
  *
- * Ghost renders the templates server-side, so the honest end-to-end check is the HTML
- * goldens (tests/fixtures/README.md). These tests are the fast, offline half: they pin
- * the contract that makes the combinations correct, and a live Ghost run is what
- * proves the rendering (see the PR notes).
+ * Ghost renders server-side, so the honest end-to-end check is the HTML goldens
+ * (tests/fixtures/README.md). These tests are the fast, offline half, including a render
+ * of the real partials with Ghost-shaped helpers.
  */
+const require = createRequire(import.meta.url);
 const packageJson = JSON.parse(readFileSync("package.json", "utf8"));
 const custom = packageJson.config.custom;
 
-const heroLocale = readFileSync("partials/featured-hero-locale.hbs", "utf8");
-const row = readFileSync("partials/featured-row.hbs", "utf8");
 const heroes = {
   en: readFileSync("partials/featured-hero.hbs", "utf8"),
   es: readFileSync("partials/featured-hero-es.hbs", "utf8"),
   br: readFileSync("partials/featured-hero-br.hbs", "utf8"),
 };
+const hero = heroes.en;
+const row = readFileSync("partials/featured-row.hbs", "utf8");
+const grid = readFileSync("partials/listing-grid.hbs", "utf8");
+const layout = readFileSync("partials/collection-layout.hbs", "utf8");
+const home = readFileSync("home.hbs", "utf8");
 
 /**
- * Body of a top-level block, cut at its first sibling `{{else}}`.
- *
- * The dispatch has one top-level `{{#if mixedFeed}}` whose alternate branch holds the
- * locale filters, and both branches contain nested `{{#if}}`/`{{else}}`; a plain split on
- * "{{else}}" would therefore truncate the mixed-feed body at a nested else.
+ * A minimal Handlebars standing in for Ghost's: `{{#foreach}}` honours `from`/`to` and
+ * sets `@index`/`@number`, and `{{#is}}` answers the page context the caller passes.
+ * Only the helpers the partials under test actually use are implemented, so an
+ * accidental dependency on something new fails loudly.
  */
-function blockBody(source, opener) {
-  const start = source.indexOf(opener);
-  assert.notEqual(start, -1, `missing ${opener}`);
-  const token = /\{\{([#/])?(?:if|match|foreach|unless|is|has)\b[^}]*\}\}|\{\{else\}\}/g;
-  token.lastIndex = start;
-  let depth = 0;
-  let bodyEnd = null;
-  let match;
-  while ((match = token.exec(source))) {
-    if (match[0] === "{{else}}") {
-      if (depth === 1) bodyEnd = match.index;
-      continue;
-    }
-    if (match[1] === "/") {
-      depth -= 1;
-      if (depth === 0) return source.slice(start + opener.length, bodyEnd ?? match.index);
-    } else {
-      depth += 1;
-    }
-  }
-  assert.fail(`unclosed ${opener}`);
+function ghostHandlebars({ page = 1 }) {
+  const hbs = require("handlebars").create();
+  hbs.registerPartial("post-card", `<card>{{url}}</card>`);
+  for (const [name, source] of Object.entries(heroes)) hbs.registerPartial(`featured-hero${name === "en" ? "" : `-${name}`}`, source);
+
+  // Ghost's block helpers forward `options.data`; so must these. A pass that selects no
+  // items (an unset `to`, a non-existent `from`) must run `options.inverse` so the
+  // template's `{{else}}` still happens, exactly as Ghost renders it.
+  const run = function (options, fn) {
+    return typeof fn === "function" ? fn(this, { data: options.data }) : "";
+  };
+
+  // Ghost's archive-wide `foreach`: one helper for every collection (posts and authors
+  // alike), so wrapping the array case in a ghost-handler is not necessary — but it must
+  // never throw on a post that has no authors.
+  hbs.registerHelper("foreach", function (collection, options) {
+    const list = collection ?? [];
+    const from = options.hash.from === undefined ? 1 : Number(options.hash.from);
+    const to = options.hash.to === undefined ? list.length : Number(options.hash.to);
+    // A position that is not a number selects nothing (Ghost renders nothing), and a
+    // pass with no items still runs `{{else}}`.
+    const items = Number.isFinite(from) && Number.isFinite(to) ? list.slice(from - 1, to) : [];
+    if (!items.length) return run.call(this, options, options.inverse);
+    return items
+      .map((item, i) =>
+        options.fn(item, {
+          data: { ...(options.data || {}), index: i, number: i + 1, first: i === 0, last: i === items.length - 1 },
+        }),
+      )
+      .join("");
+  });
+  hbs.registerHelper("if", function (condition, options) {
+    return run.call(this, options, condition ? options.fn : options.inverse);
+  });
+  hbs.registerHelper("match", function (...args) {
+    const options = args.pop();
+    const [left, operator, right] = args;
+    const ok = operator === "=" ? left === right : operator === ">" ? left > right : false;
+    return run.call(this, options, ok ? options.fn : options.inverse);
+  });
+  // `{{#is}}` / `{{^is}}`: true when the page context is among the named ones.
+  const inContext = (context) =>
+    context
+      .split(",")
+      .map((part) => part.trim())
+      .some((want) => (page === 1 ? want === "home" || want === "index" : true) && want !== "nowhere");
+  hbs.registerHelper("is", function (context, options) {
+    return run.call(this, options, inContext(context) ? options.fn : options.inverse);
+  });
+  hbs.registerHelper("t", (value) => value);
+  hbs.registerHelper("date", (value, options) => `[${options.hash.format}]`);
+  hbs.registerHelper("reading_time", () => "[read]");
+  hbs.registerHelper("excerpt", () => "[excerpt]");
+  hbs.registerHelper("img_url", () => "/img.png");
+  return hbs;
 }
 
-// --- the settings contract -------------------------------------------------------
+/** Renders the row + grid exactly as partials/collection-layout.hbs places them. */
+function renderListing({ posts, locale = "en", page = 1 }) {
+  const hbs = ghostHandlebars({ page });
+  const rowOut = hbs.compile(row)({ locale, posts });
+  const gridOut = hbs.compile(grid)({ locale, posts });
+  // The hero is the only anchor carrying the `mb-12 rounded-2xl` block classes, so a
+  // card link or an HTML comment in the partials cannot be mistaken for it.
+  const heroUrls = [...rowOut.matchAll(/<a href="([^"]+)"[^>]*class="[^"]*rounded-2xl\b/g)].map((m) => m[1]);
+  const cards = [...gridOut.matchAll(/<card>([^<]+)<\/card>/g)].map((m) => m[1]);
+  return { rowOut, gridOut, heroUrls, cards };
+}
 
-test("featured_tag and featured_only are declared with the defaults the docs promise", () => {
-  assert.equal(custom.featured_tag?.type, "text");
-  assert.equal(custom.featured_tag?.default, "", "empty must mean 'keep the locale tag only'");
-  assert.equal(custom.featured_only?.type, "boolean");
-  assert.equal(custom.featured_only?.default, true, "the shipped default must keep today's output");
+// `url` and `authors` are what the hero partial prints (link target, author name).
+const LISTING = [
+  ["newest", false],
+  ["second", false],
+  ["flagged-third", true],
+  ["fourth", false],
+  ["fifth", false],
+].map(([slug, featured]) => ({ slug, featured, url: `/${slug}/`, authors: [{ name: "Ana" }] }));
+
+// --- the settings are gone ---------------------------------------------------------
+
+test("the featured_* theme settings no longer exist", () => {
+  assert.equal(custom.featured_only, undefined, "the hero no longer has a themed flag switch");
+  assert.equal(custom.featured_tag, undefined, "the hero no longer has a themed tag filter");
+  // Comments are prose about the old design; only real expressions count.
+  const strip = (source) => source.replace(/\{\{!--[\s\S]*?--\}\}/g, "");
+  const sources = [hero, row, grid, layout, home].map(strip).join("\n");
+  assert.doesNotMatch(sources, /@custom\.featured/, "no template may read a removed setting");
+  assert.doesNotMatch(sources, /featured_only|featured_tag/, "no template may mention the removed settings");
 });
 
-test("every custom setting description stays inside GScan's 100-character limit", () => {
+test("the shipped custom settings keep their keys and GScan's limits", () => {
+  // Append-only list: a new feature adds its keys here, and a removed setting must not
+  // come back. `featured_*` stays out (see the test above).
+  assert.deepEqual(Object.keys(custom).sort(), ["show_login", "show_search", "tts_api_key", "tts_enabled"]);
   for (const [key, setting] of Object.entries(custom)) {
-    if (!setting.description) continue;
-    assert.ok(
-      setting.description.length < 100,
-      `${key}: description is ${setting.description.length} chars, GScan warns at 100`,
-    );
-  }
-});
-
-test("both settings are read, so neither is an unused setting GScan would reject", () => {
-  assert.match(heroLocale, /@custom\.featured_tag/);
-  assert.match(heroLocale, /@custom\.featured_only/);
-});
-
-// --- the filter combinations, per channel kind ------------------------------------
-
-test("the four locale featured/tag combinations produce the documented NQL", () => {
-  // on + custom tag → featured:true+tag:<locale>+tag:<custom>
-  assert.match(
-    heroLocale,
-    /concat\s+"featured:true\+tag:"\s+locale\s+"\+tag:"\s+@custom\.featured_tag/,
-    "featured-only + custom tag must AND the custom tag onto the locale tag",
-  );
-  // on + no custom tag → featured:true+tag:<locale>
-  assert.match(
-    heroLocale,
-    /concat\s+"featured:true\+tag:"\s+locale\s*\)/,
-    "featured-only with no custom tag must reproduce today's filter",
-  );
-  // off + custom tag → tag:<locale>+tag:<custom>
-  assert.match(
-    heroLocale,
-    /concat\s+"tag:"\s+locale\s+"\+tag:"\s+@custom\.featured_tag/,
-    "tag-only + custom tag must drop featured:true but keep the locale tag",
-  );
-  // off + no custom tag → tag:<locale>
-  assert.match(
-    heroLocale,
-    /concat\s+"tag:"\s+locale\s*\)/,
-    "tag-only with no custom tag must keep the collection's language tag",
-  );
-});
-
-test("every locale branch keeps the language tag, and only the root branch drops it", () => {
-  // The language tag is what keeps /es/ Spanish-only; dropping it would let an English
-  // post become the Spanish hero. Every `tag:` prefix in a locale branch must therefore be
-  // followed by `locale`, never by `@custom.featured_tag` alone. The mixed-feed branch has
-  // no language tag by design (the root route is the unfiltered feed), so its only tag is
-  // the optional custom one.
-  const concats = [...heroLocale.matchAll(/concat\s+[^\n)]*?\)/g)].map((m) => m[0]);
-  assert.ok(concats.length >= 14, "expected twelve locale concat filters and two root ones");
-
-  let localeBranches = 0;
-  let rootBranches = 0;
-  for (const expr of concats) {
-    if (/\blocale\b/.test(expr)) {
-      localeBranches += 1;
-      assert.match(expr, /"tag:"\s*locale|"featured:true\+tag:"\s*locale/, `locale tag missing in: ${expr}`);
-      assert.doesNotMatch(
-        expr,
-        /"(?:featured:true\+)?tag:"\s*@custom\.featured_tag/,
-        `custom tag must not replace the locale tag in: ${expr}`,
-      );
-    } else {
-      rootBranches += 1;
-      assert.match(
-        expr,
-        /"(?:featured:true\+)?tag:"\s*@custom\.featured_tag/,
-        `root-channel concat must use the custom tag alone: ${expr}`,
-      );
+    if (setting.description) {
+      assert.ok(setting.description.length < 100, `${key}: description is ${setting.description.length} chars`);
     }
   }
-  assert.equal(localeBranches, 12, "three heroes for each of the four locale combinations");
-  assert.equal(rootBranches, 2, "featured_tag is the only tag a root-channel filter can carry");
 });
 
-test("the root channel hero is the mixed feed: the language tag is never forwarded", () => {
-  assert.match(
-    readFileSync("home.hbs", "utf8"),
-    /\{\{> "collection-layout" locale="en" header="site" mixedFeed=true\}\}/,
-    "home.hbs must mark the root channel as the mixed feed",
-  );
-  assert.match(
-    readFileSync("partials/collection-layout.hbs", "utf8"),
-    /\{\{> "featured-row" locale=locale mixedFeed=mixedFeed\}\}/,
-    "collection-layout must forward mixedFeed to the featured row",
-  );
-  const row = readFileSync("partials/featured-row.hbs", "utf8");
-  const forwarded = row.match(/\{\{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed\}\}/g) ?? [];
-  assert.equal(forwarded.length, 1, "featured-row must forward mixedFeed");
+// --- one query: the hero and the grid share the page's posts -----------------------
 
-  // Locale wrappers must not opt in: their collections rely on the tag.
+test("only the page's own posts feed the hero and the grid", () => {
+  for (const [name, source] of [["hero", hero], ["grid", grid], ["row", row]]) {
+    assert.doesNotMatch(source, /\{\{#get\b/, `${name} must not run its own query`);
+  }
+  assert.match(hero, /\{\{#foreach posts from="1" to="1"\}\}/, "the hero is exactly the lead post");
+  const heroMarkup = hero.replace(/\{\{!--[\s\S]*?--\}\}/g, "");
+  assert.doesNotMatch(heroMarkup, /featured/, "the hero must not test Ghost's featured flag");
+  assert.match(grid, /\{\{#foreach posts from="2"\}\}/, "the page-1 grid starts after the hero");
+  assert.match(grid, /\{\{#foreach posts\b/, "the grid walks the page's posts");
+  assert.match(layout, /\{\{> "listing-grid" locale=locale\}\}/, "the layout renders the shared grid");
+  assert.match(layout, /\{\{> "featured-row" locale=locale\}\}/, "the layout renders the shared hero row");
+});
+
+test("no listing partial filters by language: / stays the mixed feed", () => {
+  // The channel's filter lives in routes.yaml; a `tag:` inside the templates would
+  // re-index `/` by language and duplicate the collections' job.
+  for (const [name, source] of [["hero", hero], ["grid", grid], ["row", row]]) {
+    assert.doesNotMatch(source, /tag:/, `${name} must not carry a tag filter`);
+    assert.doesNotMatch(source, /filter=/, `${name} must not build a query filter`);
+  }
+  assert.match(home, /mixedFeed=true/, "home.hbs still declares the root channel as mixed");
   for (const file of ["home-en.hbs", "home-es.hbs", "home-br.hbs"]) {
-    assert.doesNotMatch(readFileSync(file, "utf8"), /mixedFeed/, `${file} must keep filtering by its locale tag`);
+    assert.doesNotMatch(readFileSync(file, "utf8"), /mixedFeed/, `${file} is a locale collection`);
   }
 });
 
-test("the mixed-feed branch filters on the two settings only, using the English hero", () => {
-  const mixed = blockBody(heroLocale, "{{#if mixedFeed}}");
-
-  for (const line of mixed.split("\n").filter((l) => l.includes("featuredFilter"))) {
-    assert.doesNotMatch(line, /locale/, `root hero filter must not use a language tag: ${line.trim()}`);
+test("each locale home keeps its own collection filter, from routes.yaml", () => {
+  const routes = readFileSync("routes.yaml", "utf8");
+  const expected = {
+    "/en/": ["tag:en+tag:-es+tag:-br", "home-en"],
+    "/es/": ["tag:es+tag:-en+tag:-br", "home-es"],
+    "/br/": ["tag:br+tag:-es+tag:-en", "home-br"],
+  };
+  for (const [collection, [filter, template]] of Object.entries(expected)) {
+    assert.ok(routes.includes(filter), `routes.yaml lost the ${collection} filter`);
+    assert.ok(routes.includes(`template: ${template}`), `routes.yaml lost the ${collection} template`);
+    const wrapper = readFileSync(`${template}.hbs`, "utf8");
+    assert.match(wrapper, /collection-layout/, `${template}.hbs must render the shared layout`);
+    // The filter is Ghost's, not the template's: the layout gets no filter argument, so
+    // posts arrive already scoped by locale and the locale key only selects wording.
+    assert.doesNotMatch(wrapper, /filter|tag:/, `${template}.hbs must not add a filter of its own`);
   }
-  assert.ok(!mixed.includes('{{> "featured-hero-es"'), "the root channel renders inside default.hbs (English UI)");
-  assert.ok(!mixed.includes('{{> "featured-hero-br"'), "the root channel renders inside default.hbs (English UI)");
-
-  assert.match(mixed, /\{\{> "featured-hero" featuredFilter="featured:true"\}\}/,
-    "featured_only on + no featured_tag -> featured:true");
-  assert.match(mixed, /concat\s+"featured:true\+tag:"\s+@custom\.featured_tag/,
-    "featured_only on + featured_tag -> featured:true+tag:<custom>");
-  assert.match(mixed, /concat\s+"tag:"\s+@custom\.featured_tag/,
-    "featured_only off + featured_tag -> tag:<custom>");
-  assert.match(mixed, /\{\{> "featured-hero" featuredFilter=""\}\}/,
-    "featured_only off + no featured_tag -> no filter (newest post)");
 });
 
-// --- the heroes must consume the injected filter ----------------------------------
+// --- the hero and the grid render every post once ---------------------------------
 
-test("each hero filters on the injected featuredFilter, not a hard-coded filter", () => {
+const slugsOf = (urls) => urls.map((url) => url.replaceAll("/", ""));
+
+test("the hero is the lead post and the grid starts after it", () => {
+  const { heroUrls, cards } = renderListing({ posts: LISTING });
+  assert.deepEqual(heroUrls, [LISTING[0].url]);
+  assert.deepEqual(slugsOf(cards), LISTING.slice(1).map((p) => p.slug));
+  assert.ok(!cards.includes(LISTING[0].url), "the hero must not also render as a card");
+});
+
+test("Ghost's featured flag does not move the hero", () => {
+  // A flag on the lead post changes nothing, and a flag further down does not promote
+  // that post: the hero is always posts[0]. No theme setting, no featured query.
+  for (const flaggedIndex of [0, 2]) {
+    const posts = LISTING.map((p, i) => ({ ...p, featured: i === flaggedIndex }));
+    const { heroUrls, cards } = renderListing({ posts });
+    assert.deepEqual(heroUrls, [posts[0].url], `a flag on ${posts[flaggedIndex].slug} must not move the hero`);
+    assert.deepEqual(slugsOf(cards), posts.slice(1).map((p) => p.slug));
+  }
+});
+
+test("every post of the page renders exactly once", () => {
+  const { heroUrls, cards } = renderListing({ posts: LISTING });
+  const rendered = [...heroUrls, ...cards];
+  assert.equal(rendered.length, LISTING.length, "hero + cards cover the page's posts");
+  assert.deepEqual([...rendered].sort(), LISTING.map((p) => p.url).sort(), "no post twice, none missing");
+});
+
+test("page 2 has no hero and lists every post of that page", () => {
+  const { heroUrls, cards } = renderListing({ posts: LISTING, page: 2 });
+  assert.deepEqual(heroUrls, []);
+  assert.deepEqual(slugsOf(cards), LISTING.map((p) => p.slug));
+});
+
+test("locale only changes wording, never which posts render", () => {
+  const en = renderListing({ posts: LISTING, locale: "en" });
+  const es = renderListing({ posts: LISTING, locale: "es" });
+  const br = renderListing({ posts: LISTING, locale: "br" });
+  assert.deepEqual(es.cards, en.cards);
+  assert.deepEqual(br.cards, en.cards);
+  assert.deepEqual(es.heroUrls, en.heroUrls);
+  assert.match(en.rowOut, /Featured/);
+  assert.match(es.rowOut, /Destacado/);
+  assert.match(br.rowOut, /Destaque/);
+});
+
+test("the hero strings are per-locale literals inside the loop", () => {
+  // Ghost drops partial hash arguments inside `{{#foreach}}`, where the label and the
+  // dates are printed, so each locale's hero carries its own literals instead.
+  assert.match(heroes.en, /font-mono">Featured</);
+  assert.match(heroes.es, /font-mono">Destacado</);
+  assert.match(heroes.br, /font-mono">Destaque</);
   for (const [locale, source] of Object.entries(heroes)) {
-    assert.match(source, /\{\{#get "posts" filter=featuredFilter/, `${locale} hero must use the injected filter`);
-    assert.doesNotMatch(
-      source,
-      /filter="(?:featured:true\+)?tag:/,
-      `${locale} hero still has a hard-coded filter, which the settings cannot override`,
-    );
+    assert.doesNotMatch(source, /format=[a-zA-Z]/, `${locale}: date format must be a literal`);
+    assert.doesNotMatch(source, /minute=minutes/, `${locale}: reading time must be a literal`);
   }
-});
-
-test("the dispatch partial covers all three locale heroes and is what featured-row calls", () => {
-  for (const hero of ["featured-hero-es", "featured-hero-br", "featured-hero"]) {
-    assert.ok(heroLocale.includes(`{{> "${hero}"`), `dispatch is missing ${hero}`);
-  }
-  // The partial hash argument is read at each hero's own top level (the `{{#get}}` call),
-  // the one scope where Ghost keeps it — see docs/v3-roadmap.md.
-  assert.match(heroLocale, /featuredFilter=\(concat /, "each hero must be handed a computed filter");
-
-  // The featured row must go through the shared dispatch, or the settings would apply
-  // to only some channels.
-  const calls = row.match(/\{\{> "featured-hero-locale" locale=locale mixedFeed=mixedFeed\}\}/g) ?? [];
-  assert.equal(calls.length, 1, "featured-row must use the shared hero dispatch");
-  assert.doesNotMatch(row, /\{\{> "featured-hero(?!-locale)/, "featured-row must not pick a hero directly");
+  // The row only dispatches on locale; it passes no hero strings.
+  assert.doesNotMatch(row, /label=|dateFormat|minutes=/, "the row must not pass hero strings into the loop");
+  assert.match(row, /\{\{> "featured-hero-es"\}\}/);
+  assert.match(row, /\{\{> "featured-hero-br"\}\}/);
+  assert.match(row, /\{\{> "featured-hero"\}\}/);
 });
