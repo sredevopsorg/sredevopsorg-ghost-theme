@@ -63,7 +63,7 @@
   "Pause": "Pause",
   "Stop": "Stop",
   "Speed": "Speed",
-  "TTS unavailable": "Text-to-speech unavailable — add an ElevenLabs API key in theme settings",
+  "TTS unavailable": "Text-to-speech unavailable — add a Google Cloud API key in theme settings",
   "TTS error": "TTS error — could not generate audio",
   "Generating audio…": "Generating audio…"
 }

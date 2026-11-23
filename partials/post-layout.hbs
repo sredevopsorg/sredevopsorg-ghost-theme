@@ -5,14 +5,14 @@
   {{!-- Island: fixed 2px reading-progress bar; renders into this empty div. --}}
   <div data-island="ReadingProgress" data-target=".gh-content"></div>
 
-  {{!-- Island: ElevenLabs text-to-speech player. Posts only; the API key is a Ghost
-        custom setting and is sent to the browser, so treat it as a public value. --}}
+  {{!-- Island: Google Cloud text-to-speech player (Chirp 3: HD). Posts only; the API
+        key is a Ghost custom setting and is sent to the browser, so restrict it by
+        HTTP referrer and treat it as a public value. `locale` selects the voice. --}}
   {{#if @custom.tts_enabled}}
   <div data-island="TtsPlayer"
        data-target=".gh-content"
        data-api-key="{{@custom.tts_api_key}}"
-       data-voice="EXAVITQu4vr4xnSDxMaL"
-       data-model="eleven_multilingual_v2">
+       data-locale="{{locale}}">
   </div>
   {{/if}}
 

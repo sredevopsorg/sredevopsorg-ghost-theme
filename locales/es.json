@@ -67,7 +67,7 @@
   "Pause": "Pausar",
   "Stop": "Detener",
   "Speed": "Velocidad",
-  "TTS unavailable": "Texto a voz no disponible — agregue una clave API de ElevenLabs en la configuración del tema",
+  "TTS unavailable": "Texto a voz no disponible — agregue una clave API de Google Cloud en la configuración del tema",
   "TTS error": "Error de TTS — no se pudo generar el audio",
   "Generating audio…": "Generando audio…"
 }

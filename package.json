@@ -122,7 +122,7 @@
                 "type": "text",
                 "default": "",
                 "group": "post",
-                "description": "ElevenLabs API key for text-to-speech on posts"
+                "description": "Google Cloud TTS API key; restrict it by HTTP referrer"
             }
         },
         "image_sizes": {

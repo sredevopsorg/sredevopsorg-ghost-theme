@@ -22,7 +22,7 @@ const FALLBACKS = {
   ttsPause: "Pause",
   ttsStop: "Stop",
   ttsSpeed: "Speed",
-  ttsUnavailable: "Text-to-speech unavailable — add an ElevenLabs API key in theme settings",
+  ttsUnavailable: "Text-to-speech unavailable — add a Google Cloud API key in theme settings",
   ttsError: "TTS error — could not generate audio",
   ttsGenerating: "Generating audio…",
   toc: "Table of Contents",
