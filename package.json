@@ -4,7 +4,7 @@
     "demo": "https://www.sredevops.org",
     "homepage": "https://www.sredevops.org",
     "docs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme#readme",
-    "version": "3.6.0",
+    "version": "3.7.0",
     "type": "module",
     "packageManager": "yarn@1.22.22",
     "engines": {
@@ -99,6 +99,18 @@
                 "type": "boolean",
                 "default": true,
                 "description": "Show a sign-in link in the main navigation"
+            },
+            "tts_enabled": {
+                "type": "boolean",
+                "default": true,
+                "group": "post",
+                "description": "Show a text-to-speech player on posts"
+            },
+            "tts_api_key": {
+                "type": "text",
+                "default": "",
+                "group": "post",
+                "description": "Google Cloud TTS API key; restrict it by HTTP referrer"
             }
         },
         "image_sizes": {

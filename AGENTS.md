@@ -177,7 +177,8 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 
 - `package.json` is also the Ghost theme manifest. Keep `config`, `image_sizes`, `gpm`
   and the `engines` fields valid.
-- Custom settings: `show_search` and `show_login` only. Keys are `snake_case`; never rename
+- Custom settings are append-only: `show_search`, `show_login`, `tts_enabled` and
+  `tts_api_key`. Keys are `snake_case`; never rename
   an existing key, because Ghost stores values by key. Descriptions must stay under 100
   characters. The former `featured_only` / `featured_tag` settings were removed with the
   separate hero query — do not bring them back.

@@ -136,8 +136,10 @@ test("the featured_* theme settings no longer exist", () => {
   assert.doesNotMatch(sources, /featured_only|featured_tag/, "no template may mention the removed settings");
 });
 
-test("the remaining custom settings keep their keys and GScan's limits", () => {
-  assert.deepEqual(Object.keys(custom).sort(), ["show_login", "show_search"]);
+test("the shipped custom settings keep their keys and GScan's limits", () => {
+  // Append-only list: a new feature adds its keys here, and a removed setting must not
+  // come back. `featured_*` stays out (see the test above).
+  assert.deepEqual(Object.keys(custom).sort(), ["show_login", "show_search", "tts_api_key", "tts_enabled"]);
   for (const [key, setting] of Object.entries(custom)) {
     if (setting.description) {
       assert.ok(setting.description.length < 100, `${key}: description is ${setting.description.length} chars`);
