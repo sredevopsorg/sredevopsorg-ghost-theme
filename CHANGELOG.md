@@ -1,5 +1,39 @@
 # Changelog
 
+## 3.8.0
+
+The post text-to-speech player gets a timebar, skip controls and a one-click MP3
+download, and reads in the Leda voice. No settings change, unless `tts_api_key` is still
+empty — see 3.7.0 below for the one-time setup.
+
+### Added
+
+- **A timebar, skip controls and an MP3 download.** The player has back/forward 10 s
+  buttons, a seek bar spanning the whole article with elapsed and remaining time, and a
+  **Download MP3** button that saves the article as one `<slug>-<lang>.mp3` file. Parts
+  already generated for playback are reused and the rest are generated on click, so a
+  download is billed like one uninterrupted listen. New control labels are translated in
+  `en`, `es` and `pt`.
+
+### Changed
+
+- **Posts are read with the Leda voice** — `en-US-Chirp3-HD-Leda`, `es-US-Chirp3-HD-Leda`
+  and `pt-BR-Chirp3-HD-Leda`. No setting changes; a mount point with `data-voice` still
+  overrides the name.
+
+## 3.7.0
+
+Posts can be listened to. Upgrading needs one step: paste a Google Cloud Text-to-Speech
+API key into `tts_api_key` (see the README's *Setup* section). Until then each post shows
+a disabled "text-to-speech unavailable" button, and nothing else changes.
+
+### Added
+
+- **A text-to-speech player on posts.** Each post reads its own article aloud with a
+  Google Cloud Chirp 3: HD voice (Kore), synthesised in the reader's browser. It skips
+  code blocks and tables, offers play/pause, stop and 0.5×–2× speed, and is controlled by
+  the `tts_enabled` and `tts_api_key` settings. Pages do not get a player.
+
 ## 3.6.0
 
 The featured post could be displayed twice on a home page; it cannot any more. Upgrading

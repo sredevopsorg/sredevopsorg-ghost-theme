@@ -65,5 +65,13 @@
   "Speed": "Velocidade",
   "TTS unavailable": "Texto para fala indisponível — adicione uma chave API do Google Cloud nas configurações do tema",
   "TTS error": "Erro de TTS — não foi possível gerar o áudio",
-  "Generating audio…": "Gerando áudio…"
+  "Generating audio…": "Gerando áudio…",
+  "Back 10 seconds": "Retroceder 10 segundos",
+  "Forward 10 seconds": "Avançar 10 segundos",
+  "Seek": "Buscar no áudio",
+  "Audio player": "Reprodutor de áudio",
+  "Download MP3": "Baixar MP3",
+  "Generating %done of %total…": "Gerando %done de %total…",
+  "Downloaded": "Baixado",
+  "%cached of %total parts available": "%cached de %total partes disponíveis"
 }

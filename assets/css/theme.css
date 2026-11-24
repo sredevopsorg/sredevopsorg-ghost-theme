@@ -296,6 +296,47 @@
   @apply w-full text-xs text-muted;
 }
 
+/* The live region stays in the DOM so its text is announced; an empty one must not
+   take up a row of the flex layout. */
+.tts-player .tts-status:empty {
+  @apply hidden;
+}
+
 .tts-player[data-state="error"] .tts-status {
   @apply text-brand-red;
+}
+
+/* Transport row: elapsed time, the seek slider and remaining time share one line and
+   the article-wide "n/N" parts counter closes it. It only appears once a track is
+   loaded, so an untouched post keeps exactly the button it always had. */
+.tts-player .tts-progress {
+  @apply hidden w-full flex-wrap items-center gap-3 text-xs text-muted;
+}
+
+.tts-player[data-state="playing"] .tts-progress,
+.tts-player[data-state="paused"] .tts-progress,
+.tts-player[data-state="generating"] .tts-progress {
+  @apply flex;
+}
+
+.tts-player .tts-time {
+  @apply shrink-0 font-mono tabular-nums text-strong;
+}
+
+.tts-player .tts-range {
+  @apply h-2 min-w-0 flex-1 cursor-pointer accent-brand-blue disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.tts-player .tts-range:focus-visible {
+  @apply outline outline-2 outline-offset-2 outline-brand-blue;
+}
+
+.tts-player .tts-parts {
+  @apply shrink-0 font-mono tabular-nums text-subtle-text;
+}
+
+/* The download sits at the far right on its own row: it is the action that costs
+   the most, so it should not read as part of the transport cluster. */
+.tts-player .tts-download {
+  @apply w-full justify-center sm:ml-auto sm:w-auto;
 }

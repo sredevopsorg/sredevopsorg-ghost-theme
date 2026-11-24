@@ -2,17 +2,32 @@ import { createRoot } from "react-dom/client";
 import { useEffect, useId, useRef, useState } from "react";
 import { getRoot, forgetRoot } from "../lib/island-root.js";
 import { t } from "../lib/theme-config.js";
-import { chunkText, voiceFor } from "../lib/tts.js";
+import { concatAudioBlobs } from "../lib/audio.js";
+import {
+  chunkText,
+  formatDuration,
+  missingIndexes,
+  trackArtifactName,
+  uniquePartsCount,
+  voiceFor,
+} from "../lib/tts.js";
 
 /**
- * Text-to-speech player for posts, powered by Cloud Text-to-Speech with a
+ * Text-to-speech miniplayer for posts, powered by Cloud Text-to-Speech with a
  * Chirp 3: HD voice.
  *
  * Mount point (partials/post-layout.hbs, post context only):
- *   <div data-island="TtsPlayer" data-target=".gh-content" data-locale="es" ...></div>
+ *   <div data-island="TtsPlayer" data-target=".gh-content" data-locale="es"
+ *        data-slug="the-post-slug" data-api-key="…"></div>
  *
  * The article text is read from the DOM, not from a payload: it is already on the
  * page, and cloning before stripping code/tables keeps the server markup untouched.
+ *
+ * The player is inline above the article and behaves like an audio miniplayer:
+ * play/pause, back/forward 10 s, stop, speed, a timebar with elapsed and remaining
+ * time, and a download that saves the whole article as one MP3. Only the play button
+ * renders before the first press, so the page looks unchanged until someone asks for
+ * audio.
  *
  * Three constraints shape the request code below:
  *
@@ -54,6 +69,9 @@ const BLOCK_SELECTOR = [
 const SILENT_WAV =
   "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
 
+/** How far the skip buttons move the playhead, in seconds. */
+const SKIP_SECONDS = 10;
+
 function articleText(target) {
   const article = document.querySelector(target);
   if (!article) return "";
@@ -71,9 +89,39 @@ function base64ToBlob(encoded) {
   return new Blob([bytes], { type: "audio/mpeg" });
 }
 
-function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
+/** Save a Blob as a file through a temporary link, then release the URL. */
+function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.rel = "noopener";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  // Deferred: Safari reads the URL after the click handler returns.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+/**
+ * Assume a chunk lasts this long until its metadata says otherwise. Only used to
+ * turn a timebar drag on a chunk nobody has played into an offset; Cloud TTS
+ * chunks are a few thousand characters each, so a few minutes.
+ */
+const ASSUMED_CHUNK_SECONDS = 90;
+
+function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
   const [status, setStatus] = useState("idle");
   const [speed, setSpeed] = useState(1);
+  // Playhead: the loaded chunk, and how far into it playback is.
+  const [index, setIndex] = useState(null);
+  const [current, setCurrent] = useState(0);
+  // How many chunks have been played through to their end.
+  const [heard, setHeard] = useState(0);
+  // Download state: `null` when idle, `{done, total}` while synthesising.
+  const [download, setDownload] = useState(null);
+  const [downloaded, setDownloaded] = useState(false);
+
   const speedRef = useRef(1);
   const audioRef = useRef(null);
   const audioUrlRef = useRef(null);
@@ -81,7 +129,19 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
   const cacheRef = useRef(new Map());
   const controllerRef = useRef(null);
   const aliveRef = useRef(true);
+  // Newest status, readable from media-event callbacks outside React's render.
+  const statusRef = useRef(status);
+  statusRef.current = status;
+  const indexRef = useRef(null);
+  const heardRef = useRef(0);
+  const durationsRef = useRef({});
+  const downloadRef = useRef(null);
+  // Separate from `controllerRef` so a download and playback can run at once.
+  const downloadControllerRef = useRef(null);
+  // True while a seek deliberately pauses the outgoing chunk.
+  const switchingRef = useRef(false);
   const speedId = useId();
+  const seekId = useId();
 
   const setSafeStatus = (next) => {
     if (aliveRef.current) setStatus(next);
@@ -94,9 +154,20 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
     }
   };
 
-  const detachHandlers = (audio) => {
+  /** Drop the element's per-chunk handlers; the element lives on for the unlock. */
+  const detachHandlers = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
     audio.onended = null;
     audio.onerror = null;
+  };
+
+  /** Mark every chunk up to and including `position` as heard. */
+  const markHeard = (position) => {
+    if (position + 1 > heardRef.current) {
+      heardRef.current = position + 1;
+      if (aliveRef.current) setHeard(heardRef.current);
+    }
   };
 
   /**
@@ -104,11 +175,14 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
    * The audio element itself is kept: it carries the gesture unlock.
    */
   const endSession = () => {
+    downloadRef.current = null;
+    downloadControllerRef.current?.abort();
+    downloadControllerRef.current = null;
     controllerRef.current?.abort();
     controllerRef.current = null;
     const audio = audioRef.current;
     if (audio) {
-      detachHandlers(audio);
+      detachHandlers();
       audio.pause();
     }
     releaseAudioUrl();
@@ -116,20 +190,11 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
     chunksRef.current = [];
   };
 
-  useEffect(() => {
-    aliveRef.current = true;
-    return () => {
-      aliveRef.current = false;
-      endSession();
-    };
-    // endSession only touches refs, so capturing it once is intentional.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   /**
-   * Create (once) and prime the audio element.
+   * Create (once) and prime the audio element, and install the listeners that keep
+   * the timebar current for whichever chunk is loaded.
    *
-   * Must be called synchronously from the click handler: iOS Safari ties playback
+   * Must be called synchronously from a click handler: iOS Safari ties playback
    * permission to the gesture, and the await on the synthesis request would end it.
    * A silent clip is played and discarded; the same element then carries the real
    * chunks, so no later `play()` needs its own gesture.
@@ -144,9 +209,52 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
       // Browsers that do not require an unlock reject or ignore this; the real
       // play() below still reports a genuine failure.
     });
+
+    const onMetadata = () => {
+      if (!aliveRef.current) return;
+      const known = Number.isFinite(audio.duration) && audio.duration > 0;
+      if (!known) return;
+      const at = indexRef.current;
+      if (at !== null) durationsRef.current[at] = audio.duration;
+    };
+
+    audio.onloadedmetadata = onMetadata;
+    audio.ondurationchange = onMetadata;
+    audio.ontimeupdate = () => {
+      if (!aliveRef.current) return;
+      setCurrent(audio.currentTime || 0);
+      // A chunk counts as heard once its last quarter second starts playing.
+      const known = Number.isFinite(audio.duration) && audio.duration > 0;
+      if (known && (audio.currentTime || 0) >= audio.duration - 0.25 && indexRef.current !== null) {
+        markHeard(indexRef.current);
+      }
+    };
+    audio.onplaying = () => {
+      // The silent unlock clip also fires `playing`; it must not make the UI claim
+      // the article is audible before the first chunk is loaded.
+      if (audio.src === SILENT_WAV || indexRef.current === null) return;
+      if (aliveRef.current && statusRef.current !== "generating") setSafeStatus("playing");
+    };
+    audio.onpause = () => {
+      // Only a reader-initiated pause lands here; an ended chunk moves straight on,
+      // and a seek pauses the old chunk on purpose before loading the next one.
+      if (audio.src === SILENT_WAV || indexRef.current === null || switchingRef.current) return;
+      if (aliveRef.current && statusRef.current === "playing") setSafeStatus("paused");
+    };
+
     audioRef.current = audio;
     return audio;
   };
+
+  useEffect(() => {
+    aliveRef.current = true;
+    return () => {
+      aliveRef.current = false;
+      endSession();
+    };
+    // endSession only touches refs, so capturing it once is intentional.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const synthChunk = async (text, signal) => {
     const { languageCode, name } = voiceFor(locale, voice);
@@ -180,29 +288,37 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
     return base64ToBlob(payload.audioContent);
   };
 
-  const playChunk = async (index, controller) => {
+  /**
+   * Load `position` into the audio element and play it from `offset` seconds.
+   * A chunk not in the cache is synthesised first (status `generating`).
+   */
+  const playChunk = async (position, controller, offset = 0) => {
     const chunks = chunksRef.current;
     if (!aliveRef.current || controller.signal.aborted) return;
 
-    if (index >= chunks.length) {
+    if (position >= chunks.length) {
       releaseAudioUrl();
+      markHeard(chunks.length - 1);
       setSafeStatus("idle");
       return;
     }
 
-    let blob = cacheRef.current.get(index);
+    let blob = cacheRef.current.get(position);
     if (!blob) {
-      // Only the very first chunk is "generating"; later gaps keep the button on
-      // Pause, because the article is already playing.
-      setSafeStatus(index === 0 ? "generating" : "playing");
-      blob = await synthChunk(chunks[index], controller.signal);
+      // The first chunk of a session, or a jump to one never reached, both wait on
+      // a synthesis request; the play button shows Generating meanwhile.
+      setSafeStatus("generating");
+      blob = await synthChunk(chunks[position], controller.signal);
       if (!aliveRef.current || controller.signal.aborted) return;
-      cacheRef.current.set(index, blob);
+      cacheRef.current.set(position, blob);
     }
+
+    // The previous chunk must not answer its own end/error once this one takes over.
+    detachHandlers();
 
     // Warm the next chunk while this one is audible; a failed prefetch is not an
     // error, the chunk is simply requested on demand when its turn comes.
-    const next = index + 1;
+    const next = position + 1;
     if (next < chunks.length && !cacheRef.current.has(next)) {
       synthChunk(chunks[next], controller.signal)
         .then((prefetched) => {
@@ -211,17 +327,21 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
         .catch(() => {});
     }
 
+    indexRef.current = position;
+    setIndex(position);
+
     const audio = audioRef.current ?? ensureAudio();
-    detachHandlers(audio);
     releaseAudioUrl();
 
     const url = URL.createObjectURL(blob);
     audioUrlRef.current = url;
     audio.src = url;
     audio.playbackRate = speedRef.current;
+    setCurrent(offset);
 
     audio.onended = () => {
       if (!aliveRef.current || controller.signal.aborted) return;
+      markHeard(position);
       playChunk(next, controller).catch((err) => {
         console.warn("[tts]", err.message);
         setSafeStatus("error");
@@ -235,12 +355,37 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
 
     try {
       await audio.play();
+      // Applied after play() resolves: some browsers ignore a seek on a source
+      // whose metadata has not loaded yet.
+      if (offset > 0) {
+        try {
+          audio.currentTime = offset;
+        } catch {
+          // A browser that refuses the seek plays the chunk from its start.
+        }
+      }
       if (aliveRef.current && !controller.signal.aborted) setSafeStatus("playing");
     } catch {
       if (!aliveRef.current || controller.signal.aborted) return;
       releaseAudioUrl();
       setSafeStatus("error");
     }
+  };
+
+  /** Take over from the loaded chunk: stop it and forget its handlers. */
+  const switchChunk = (position, offset) => {
+    const controller = controllerRef.current ?? new AbortController();
+    controllerRef.current = controller;
+    detachHandlers();
+    // The pause below is deliberate; do not let it surface as a reader's pause.
+    switchingRef.current = true;
+    audioRef.current?.pause();
+    switchingRef.current = false;
+    playChunk(position, controller, offset).catch((err) => {
+      if (!aliveRef.current || controller.signal.aborted) return;
+      console.warn("[tts]", err.message);
+      setSafeStatus("error");
+    });
   };
 
   const start = () => {
@@ -252,6 +397,12 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
 
     endSession();
     chunksRef.current = chunks;
+    durationsRef.current = {};
+    heardRef.current = 0;
+    setHeard(0);
+    setIndex(null);
+    setCurrent(0);
+    setDownloaded(false);
     const controller = new AbortController();
     controllerRef.current = controller;
     setSafeStatus("generating");
@@ -292,6 +443,14 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
 
   const stop = () => {
     endSession();
+    indexRef.current = null;
+    heardRef.current = 0;
+    durationsRef.current = {};
+    setIndex(null);
+    setCurrent(0);
+    setHeard(0);
+    setDownload(null);
+    setDownloaded(false);
     setSafeStatus("idle");
   };
 
@@ -300,6 +459,114 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
     speedRef.current = next;
     setSpeed(next);
     if (audioRef.current) audioRef.current.playbackRate = next;
+  };
+
+  const usable = status === "playing" || status === "paused";
+  const total = chunksRef.current.length;
+
+  /**
+   * Seconds into the article, from the loaded chunk and the media element's live
+   * position (not the last render's `current`, which lags behind a skip).
+   */
+  const elapsedTrackSeconds = () => {
+    let seconds = 0;
+    for (let before = 0; before < (indexRef.current ?? 0); before += 1) {
+      seconds += durationsRef.current[before] ?? ASSUMED_CHUNK_SECONDS;
+    }
+    return seconds + (audioRef.current?.currentTime || 0);
+  };
+  const totalTrackSeconds = () => {
+    let seconds = 0;
+    for (let at = 0; at < chunksRef.current.length; at += 1) {
+      seconds += durationsRef.current[at] ?? ASSUMED_CHUNK_SECONDS;
+    }
+    return seconds;
+  };
+
+  /** Move the playhead to the article timeline position in seconds. */
+  const seekToTrackSeconds = (trackSeconds) => {
+    if (!usable || indexRef.current === null) return;
+    const last = chunksRef.current.length - 1;
+    let remaining = Math.max(0, trackSeconds);
+    let target = 0;
+    while (target < last) {
+      const length = durationsRef.current[target] ?? ASSUMED_CHUNK_SECONDS;
+      if (remaining < length) break;
+      remaining -= length;
+      target += 1;
+    }
+    const offset = Math.min(remaining, (durationsRef.current[target] ?? ASSUMED_CHUNK_SECONDS) - 1);
+
+    const audio = audioRef.current;
+    if (target === indexRef.current && audio) {
+      try {
+        audio.currentTime = Math.max(0, offset);
+        setCurrent(audio.currentTime);
+      } catch {
+        // Ignore; the slider snaps back on the next timeupdate.
+      }
+      return;
+    }
+    // Seeking forward does NOT mark the chunks passed over as heard: they were
+    // never played, so the "n/N" counter must not claim otherwise.
+    switchChunk(target, Math.max(0, offset));
+  };
+
+  const seekBar = (event) => {
+    seekToTrackSeconds(Number(event.target.value));
+  };
+
+  /** Move the playhead by `delta` seconds, crossing chunk starts. */
+  const skip = (delta) => {
+    seekToTrackSeconds(elapsedTrackSeconds() + delta);
+  };
+
+  /**
+   * Download the whole article as one MP3.
+   *
+   * Chunks already cached (played or prefetched) are reused; the rest are
+   * synthesised here, so the download always saves the complete article and bills
+   * exactly what one uninterrupted listen would. Synthesis is sequential to stay
+   * inside the API's per-second quota, and Stop cancels it along with playback.
+   *
+   * It runs on its own AbortController so a download can finish while the article
+   * keeps playing; `endSession` (Stop, unmount) aborts that one too.
+   */
+  const downloadAudio = () => {
+    if (!chunksRef.current.length || downloadRef.current) return;
+
+    const controller = new AbortController();
+    downloadControllerRef.current = controller;
+    const missing = missingIndexes(chunksRef.current.length, cacheRef.current);
+    const job = {};
+    downloadRef.current = job;
+    setDownload({ done: 0, total: missing.length });
+    setDownloaded(false);
+
+    (async () => {
+      try {
+        for (const [step, position] of missing.entries()) {
+          const blob = await synthChunk(chunksRef.current[position], controller.signal);
+          if (job !== downloadRef.current || controller.signal.aborted) return;
+          cacheRef.current.set(position, blob);
+          if (aliveRef.current) setDownload({ done: step + 1, total: missing.length });
+        }
+        const parts = [];
+        for (let at = 0; at < chunksRef.current.length; at += 1) parts.push(cacheRef.current.get(at));
+        const blob = await concatAudioBlobs(parts, "audio/mpeg");
+        if (job !== downloadRef.current || controller.signal.aborted) return;
+        saveBlob(blob, trackArtifactName({ slug, locale }));
+        if (aliveRef.current) setDownloaded(true);
+      } catch (err) {
+        if (err?.name === "AbortError" || job !== downloadRef.current) return;
+        console.warn("[tts]", err.message);
+        setSafeStatus("error");
+      } finally {
+        if (downloadRef.current === job) downloadRef.current = null;
+        if (downloadControllerRef.current === controller) downloadControllerRef.current = null;
+        if (aliveRef.current) setDownload(null);
+      }
+    })();
   };
 
   if (!apiKey) {
@@ -312,13 +579,23 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
     );
   }
 
+  const downloadLabel = download
+    ? t("ttsDownloading").replace("%done", String(download.done)).replace("%total", String(download.total))
+    : downloaded
+      ? t("ttsDownloaded")
+      : t("ttsDownload");
+
   const statusText = status === "generating" ? t("ttsGenerating") : status === "error" ? t("ttsError") : "";
+  const cachedCount = uniquePartsCount(total, cacheRef.current);
+  const canDownload = total > 0 && cachedCount > 0 && !download;
+  const elapsed = elapsedTrackSeconds();
+  const length = totalTrackSeconds();
 
   return (
-    <div className="tts-player" data-state={status} role="group">
+    <div className="tts-player" data-state={status} role="group" aria-label={t("ttsPlayer")}>
       <button
         type="button"
-        className="tts-control"
+        className="tts-control tts-play"
         onClick={togglePlay}
         disabled={status === "generating"}
       >
@@ -327,11 +604,52 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
       <button
         type="button"
         className="tts-control"
+        onClick={() => skip(-SKIP_SECONDS)}
+        disabled={!usable}
+      >
+        {t("ttsBack")}
+      </button>
+      <button
+        type="button"
+        className="tts-control"
+        onClick={() => skip(SKIP_SECONDS)}
+        disabled={!usable}
+      >
+        {t("ttsForward")}
+      </button>
+      <button
+        type="button"
+        className="tts-control"
         onClick={stop}
-        disabled={status === "idle" || status === "generating" || status === "error"}
+        disabled={status === "idle" || status === "error"}
       >
         {t("ttsStop")}
       </button>
+
+      <div className="tts-progress">
+        <span className="tts-time">{formatDuration(elapsed)}</span>
+        <input
+          id={seekId}
+          type="range"
+          className="tts-range"
+          min={0}
+          max={Math.round(length)}
+          step={1}
+          value={Math.min(Math.round(elapsed), Math.round(length))}
+          onInput={seekBar}
+          disabled={!usable}
+          aria-label={t("ttsSeek")}
+          aria-valuetext={`${formatDuration(elapsed)} / ${formatDuration(length)}`}
+        />
+        <span className="tts-time">-{formatDuration(Math.max(0, length - elapsed))}</span>
+        <span
+          className="tts-parts"
+          title={t("ttsParts").replace("%cached", String(cachedCount)).replace("%total", String(total))}
+        >
+          {heard}/{total}
+        </span>
+      </div>
+
       <label className="tts-speed" htmlFor={speedId}>
         {t("ttsSpeed")}
         <select id={speedId} value={speed} onChange={changeSpeed}>
@@ -342,6 +660,10 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice }) {
           ))}
         </select>
       </label>
+      <button type="button" className="tts-control tts-download" onClick={downloadAudio} disabled={!canDownload}>
+        {downloadLabel}
+      </button>
+      {/* Always mounted so aria-live announces its text; `.tts-status:empty` is hidden. */}
       <span className="tts-status" role="status" aria-live="polite">
         {statusText}
       </span>

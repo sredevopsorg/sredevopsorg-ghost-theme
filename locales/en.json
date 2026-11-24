@@ -65,5 +65,13 @@
   "Speed": "Speed",
   "TTS unavailable": "Text-to-speech unavailable — add a Google Cloud API key in theme settings",
   "TTS error": "TTS error — could not generate audio",
-  "Generating audio…": "Generating audio…"
+  "Generating audio…": "Generating audio…",
+  "Back 10 seconds": "Back 10 seconds",
+  "Forward 10 seconds": "Forward 10 seconds",
+  "Seek": "Seek",
+  "Audio player": "Audio player",
+  "Download MP3": "Download MP3",
+  "Generating %done of %total…": "Generating %done of %total…",
+  "Downloaded": "Downloaded",
+  "%cached of %total parts available": "%cached of %total parts available"
 }
