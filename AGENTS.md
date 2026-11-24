@@ -153,6 +153,12 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
   `partials/island-config.hbs` (`{{json}}` + `{{t}}`, read with `t()` from
   `assets/js/lib/theme-config.js`). That payload is inline on every page.
 - Keep island Tailwind classes real: `yarn test:classes` fails otherwise.
+- `TtsPlayer` (posts only) synthesises the article in Cloud TTS chunks, and its
+  **Download MP3** button assembles them into one file (`assets/js/lib/audio.js`).
+  That download synthesises every chunk it does not already have, so it bills like one
+  full listen — do not "optimise" it into a free partial file without saying so.
+  Pure logic (chunking, voice names, time formatting, file names) lives in
+  `assets/js/lib/tts.js` and is unit tested; keep DOM and `fetch` in the island.
 
 ### Styling
 

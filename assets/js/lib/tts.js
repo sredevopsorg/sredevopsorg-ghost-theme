@@ -31,7 +31,7 @@ export const MAX_BYTES = 5000;
 export const MAX_SENTENCE_BYTES = 400;
 
 /** Chirp 3: HD accepts a fixed voice-name shape: `{languageCode}-Chirp3-HD-{Name}`. */
-const VOICE_NAME = "Kore";
+const VOICE_NAME = "Leda";
 
 /** Theme content key -> BCP-47 language code. Brazilian Portuguese is `br`, not `pt`. */
 const LANGUAGE_BY_LOCALE = {
@@ -185,4 +185,63 @@ export function chunkText(text, maxBytes = MAX_BYTES) {
 export function voiceFor(locale, name = VOICE_NAME) {
   const languageCode = LANGUAGE_BY_LOCALE[locale] ?? LANGUAGE_BY_LOCALE.en;
   return { languageCode, name: `${languageCode}-Chirp3-HD-${name}` };
+}
+
+/* --- Miniplayer helpers ---------------------------------------------------
+ *
+ * The player shows a timebar built from the chunk sequence (one chunk plays
+ * after the other), a downloaded-file name, and the count of chunks that still
+ * have to be synthesised. All of that is arithmetic on numbers and a Map, so it
+ * lives here — free of DOM and network — and is unit tested in Node.
+ */
+
+/** Short language code used in the download file name. */
+const FILENAME_LANG_BY_LOCALE = { en: "en", es: "es", br: "pt" };
+
+/**
+ * Media time as `m:ss`, or `h:mm:ss` past an hour.
+ *
+ * Non-finite or negative input — an MP3 whose duration is not known yet, an
+ * empty session — renders `0:00` rather than `NaN:NaN`.
+ */
+export function formatDuration(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+  const whole = Math.floor(seconds);
+  const hours = Math.floor(whole / 3600);
+  const minutes = Math.floor((whole % 3600) / 60);
+  const secs = whole % 60;
+  const pad = (value) => String(value).padStart(2, "0");
+  return hours > 0 ? `${hours}:${pad(minutes)}:${pad(secs)}` : `${minutes}:${pad(secs)}`;
+}
+
+/** Indexes of an article's chunks that the cache does not hold yet. */
+export function missingIndexes(total, cached) {
+  const missing = [];
+  for (let index = 0; index < total; index += 1) {
+    if (!cached?.has(index)) missing.push(index);
+  }
+  return missing;
+}
+
+/** How many chunks of an article are already cached. */
+export function uniquePartsCount(total, cached) {
+  return total - missingIndexes(total, cached).length;
+}
+
+/**
+ * Download file name for a generated article audio: `<slug>-<lang>.mp3`.
+ *
+ * The slug is reduced to `[a-z0-9-]` so the browser cannot be handed a path or
+ * an odd Unicode name; an empty result falls back to `article`.
+ */
+export function trackArtifactName({ slug, locale } = {}) {
+  const safeSlug =
+    String(slug ?? "")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "article";
+  const lang = FILENAME_LANG_BY_LOCALE[locale] ?? FILENAME_LANG_BY_LOCALE.en;
+  return `${safeSlug}-${lang}.mp3`;
 }

@@ -499,23 +499,48 @@ With `tts_enabled` on (the default), posts render a `TtsPlayer` island above the
 article. It reads the article text from `.gh-content` (skipping code blocks, tables
 and navigation) and calls the
 [Cloud Text-to-Speech REST API](https://docs.cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize)
-directly from the reader's browser with `tts_api_key`. The controls cover play/pause,
-stop and 0.5×–2× speed; their labels and status messages come from `locales/*.json`.
-Pages do not get a player.
+directly from the reader's browser with `tts_api_key`. The player is an ordinary audio
+miniplayer: play/pause, back/forward 10 seconds, stop, a timebar with elapsed and
+remaining time, 0.5×–2× speed, and a **Download MP3** button. Its labels and status
+messages come from `locales/*.json`; the controls stay hidden until someone presses
+play. Pages do not get a player.
 
 Voice selection follows the template's locale, so a post sounds native in each
 collection. `assets/js/lib/tts.js` owns this map (and its unit tests):
 
 | Template locale | Language code | Voice |
 |-----------------|---------------|-------|
-| `en` | `en-US` | `en-US-Chirp3-HD-Kore` |
-| `es` | `es-US` | `es-US-Chirp3-HD-Kore` |
-| `br` | `pt-BR` | `pt-BR-Chirp3-HD-Kore` |
+| `en` | `en-US` | `en-US-Chirp3-HD-Leda` |
+| `es` | `es-US` | `es-US-Chirp3-HD-Leda` |
+| `br` | `pt-BR` | `pt-BR-Chirp3-HD-Leda` |
 
-Kore is a neutral female voice. To use another of the 29 Chirp 3: HD names (Charon,
-Aoede, Puck, …), add `data-voice="Charon"` to the mount point in
-`partials/post-layout.hbs`; the island appends it to the locale's code, so no JS edit
-is needed.
+Leda is used for all three collections. The voice follows the **template's** `locale`,
+not the URL prefix: a Portuguese post renders in Portuguese only when the editor selects
+`custom-br.hbs` (see [Locale Content Authoring](#-locale-content-authoring)); posts left on
+`post.hbs` are read in English, exactly as they already take English reading-time
+strings. To use another of the 29 Chirp 3: HD names (Charon, Aoede, Puck, …), add
+`data-voice="Charon"` to the mount point in `partials/post-layout.hbs`; the island
+appends it to the locale's code, so no JS edit is needed.
+
+#### Timebar and download
+
+The timebar spans the whole article, even though the article is a sequence of
+synthesised chunks: the island adds each chunk's duration as it loads and assumes a
+nominal length for chunks nobody has reached yet, so a drag lands on the right chunk
+and offset. Skipping back into a chunk is free (it is already cached); skipping forward
+into a chunk that has not been synthesised yet waits for it, with the play button
+showing *Generating*.
+
+**Download MP3** saves the article as **one** file, `<post-slug>-<lang>.mp3`. Chunks
+already cached (played or prefetched) are reused, and the rest are synthesised on click
+— sequentially, behind a `Generating n of N` label — so the button always produces the
+complete article and bills exactly what one uninterrupted listen would. `Stop` cancels
+a download in progress. The chunks are concatenated byte for byte
+(`assets/js/lib/audio.js`): every chunk comes from the same voice and encoder
+settings, so one continuous MP3 frame stream results with no re-encoding in the
+browser. The file has no ID3 tags or duration header, so a desktop player may show its
+length a moment after opening it.
+
 
 #### How the request is built
 
@@ -575,7 +600,9 @@ theme has no server-side runtime to proxy the call. Two consequences:
 
 - **Every play bills the full article.** At ~6–9k characters per post, the free
   monthly million is roughly 120–160 listens *for the whole site*. There is no
-  caching: a reload and a second click both pay again.
+  caching: a reload and a second click both pay again. **Download MP3** costs the same
+  as one play: it reuses the chunks the session already paid for and synthesises only
+  the rest.
 - **The key is readable.** The HTTP-referrer restriction is what makes this
   acceptable: requests from `curl`, a server, or any other site carry no matching
   `Referer` and are rejected. It does not stop someone who copies the key into their

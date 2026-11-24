@@ -15,8 +15,18 @@ import assert from "node:assert/strict";
  * with real articles: accented Spanish doubles the byte cost, and DOM text can
  * contain long runs without any sentence punctuation.
  */
-const { MAX_BYTES, MAX_SENTENCE_BYTES, byteLength, chunkText, splitLongSentence, voiceFor } =
-  await import("../assets/js/lib/tts.js");
+const {
+  MAX_BYTES,
+  MAX_SENTENCE_BYTES,
+  byteLength,
+  chunkText,
+  formatDuration,
+  missingIndexes,
+  splitLongSentence,
+  trackArtifactName,
+  uniquePartsCount,
+  voiceFor,
+} = await import("../assets/js/lib/tts.js");
 
 const article = (n) =>
   Array.from({ length: n }, (_, i) => `Oración número ${i} sobre Kubernetes y SRE con métricas.`).join(" ");
@@ -135,10 +145,49 @@ test("chunk boundaries prefer sentence ends", () => {
 });
 
 test("voiceFor maps theme locales to Chirp 3: HD voice names", () => {
-  assert.deepEqual(voiceFor("en"), { languageCode: "en-US", name: "en-US-Chirp3-HD-Kore" });
-  assert.deepEqual(voiceFor("es"), { languageCode: "es-US", name: "es-US-Chirp3-HD-Kore" });
-  assert.deepEqual(voiceFor("br"), { languageCode: "pt-BR", name: "pt-BR-Chirp3-HD-Kore" });
-  assert.deepEqual(voiceFor("pt"), { languageCode: "en-US", name: "en-US-Chirp3-HD-Kore" });
-  assert.deepEqual(voiceFor(undefined), { languageCode: "en-US", name: "en-US-Chirp3-HD-Kore" });
+  assert.deepEqual(voiceFor("en"), { languageCode: "en-US", name: "en-US-Chirp3-HD-Leda" });
+  assert.deepEqual(voiceFor("es"), { languageCode: "es-US", name: "es-US-Chirp3-HD-Leda" });
+  assert.deepEqual(voiceFor("br"), { languageCode: "pt-BR", name: "pt-BR-Chirp3-HD-Leda" });
+  assert.deepEqual(voiceFor("pt"), { languageCode: "en-US", name: "en-US-Chirp3-HD-Leda" });
+  assert.deepEqual(voiceFor(undefined), { languageCode: "en-US", name: "en-US-Chirp3-HD-Leda" });
   assert.deepEqual(voiceFor("es", "Charon"), { languageCode: "es-US", name: "es-US-Chirp3-HD-Charon" });
+});
+
+test("formatDuration renders media time and never NaN", () => {
+  assert.equal(formatDuration(0), "0:00");
+  assert.equal(formatDuration(5), "0:05");
+  assert.equal(formatDuration(65), "1:05");
+  assert.equal(formatDuration(3599), "59:59");
+  assert.equal(formatDuration(3600), "1:00:00");
+  assert.equal(formatDuration(-3), "0:00");
+  assert.equal(formatDuration(undefined), "0:00");
+  assert.equal(formatDuration(Number.NaN), "0:00");
+  assert.equal(formatDuration(Number.POSITIVE_INFINITY), "0:00");
+});
+
+test("cache helpers count the chunks of an article", () => {
+  const cache = new Map([
+    [0, "a"],
+    [2, "c"],
+  ]);
+  assert.deepEqual(missingIndexes(4, cache), [1, 3]);
+  assert.deepEqual(missingIndexes(4, new Map()), [0, 1, 2, 3]);
+  assert.deepEqual(missingIndexes(0, cache), []);
+  assert.equal(uniquePartsCount(4, cache), 2);
+  assert.equal(uniquePartsCount(4, new Map()), 0);
+});
+
+test("trackArtifactName builds a safe locale-aware file name", () => {
+  assert.equal(
+    trackArtifactName({ slug: "kubernetes-en-chile", locale: "es" }),
+    "kubernetes-en-chile-es.mp3",
+  );
+  assert.equal(
+    trackArtifactName({ slug: "DevOps Days: Santiago!", locale: "en" }),
+    "devops-days-santiago-en.mp3",
+  );
+  assert.equal(trackArtifactName({ slug: "Año luz", locale: "br" }), "ano-luz-pt.mp3");
+  assert.equal(trackArtifactName({ slug: undefined, locale: "es" }), "article-es.mp3");
+  assert.equal(trackArtifactName({ slug: "post", locale: "pt" }), "post-en.mp3");
+  assert.equal(trackArtifactName(), "article-en.mp3");
 });
