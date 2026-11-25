@@ -598,32 +598,80 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
         className="tts-control tts-play"
         onClick={togglePlay}
         disabled={status === "generating"}
+        aria-label={status === "playing" ? t("ttsPause") : t("ttsPlay")}
       >
-        {status === "playing" ? t("ttsPause") : t("ttsPlay")}
+        {status === "playing" ? (
+          <svg
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            className="w-4 h-4"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M4 3h2v10H4zM10 3h2v10h-2z" />
+          </svg>
+        ) : (
+          <svg
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            className="w-4 h-4"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M5 3l6 4-6 4z" />
+          </svg>
+        )}
       </button>
       <button
         type="button"
         className="tts-control"
         onClick={() => skip(-SKIP_SECONDS)}
         disabled={!usable}
+        aria-label={t("ttsBack")}
       >
-        {t("ttsBack")}
+        <svg
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          className="w-4 h-4"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M4 4h2v8H4zM8 3l-4 4 4 4z" />
+        </svg>
       </button>
       <button
         type="button"
         className="tts-control"
         onClick={() => skip(SKIP_SECONDS)}
         disabled={!usable}
+        aria-label={t("ttsForward")}
       >
-        {t("ttsForward")}
+        <svg
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          className="w-4 h-4"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M4 3l4 4-4 4zM8 4h2v8H8z" />
+        </svg>
       </button>
       <button
         type="button"
         className="tts-control"
         onClick={stop}
         disabled={status === "idle" || status === "error"}
+        aria-label={t("ttsStop")}
       >
-        {t("ttsStop")}
+        <svg
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          className="w-4 h-4"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M4 4h8v8H4z" />
+        </svg>
       </button>
 
       <div className="tts-progress">
@@ -660,8 +708,22 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
           ))}
         </select>
       </label>
-      <button type="button" className="tts-control tts-download" onClick={downloadAudio} disabled={!canDownload}>
-        {downloadLabel}
+      <button
+        type="button"
+        className="tts-control tts-download"
+        onClick={downloadAudio}
+        disabled={!canDownload}
+        aria-label={downloadLabel}
+      >
+        <svg
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          className="w-4 h-4"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M8 2a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V2.5a.5.5 0 0 1 .5-.5zM4 8v4h8V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2z" />
+        </svg>
       </button>
       {/* Always mounted so aria-live announces its text; `.tts-status:empty` is hidden. */}
       <span className="tts-status" role="status" aria-live="polite">
