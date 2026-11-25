@@ -281,7 +281,7 @@
 }
 
 .tts-player .tts-control {
-  @apply inline-flex items-center justify-center rounded-lg border border-border-strong bg-surface px-3 py-1.5 text-xs font-semibold text-strong transition-colors hover:border-brand-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue disabled:cursor-not-allowed disabled:opacity-50;
+  @apply inline-flex items-center justify-center rounded-lg border border-border-strong bg-surface w-8 h-8 p-0 transition-colors hover:border-brand-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 .tts-player .tts-speed {
@@ -338,5 +338,5 @@
 /* The download sits at the far right on its own row: it is the action that costs
    the most, so it should not read as part of the transport cluster. */
 .tts-player .tts-download {
-  @apply w-full justify-center sm:ml-auto sm:w-auto;
+  @apply w-8 h-8;
 }
