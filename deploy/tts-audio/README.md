@@ -1,0 +1,314 @@
+# Article audio pipeline
+
+Pre-generated article audio for sredevops.org: Ghost webhooks mark a post dirty, a
+Kubernetes Job speaks it once with a local Kokoro model, the MP3 lands in Google Cloud
+Storage, and the theme's player streams it. The reader never calls a speech API.
+
+This directory is **not** part of the Ghost theme package. `scripts/ship-manifest.mjs`
+refuses to ship it, and `yarn verify` never runs it; its own gate is `make test`.
+
+```
+ Ghost ──webhook──► API Gateway ──► tts-webhook (Deployment, 2 replicas)
+                                     │ verifies X-Ghost-Signature
+                                     │ skips drafts / untagged / unchanged posts
+                                     └─► Job tts-<post-id>-<hash>
+                                           Admin API ─► text ─► hash ─► skip?
+                                           Kokoro ─► ffmpeg ─► one MP3
+                                           ─► gs://<bucket>/audio/<id>/<hash>.mp3
+                                           ─► PUT codeinjection_foot (the marker)
+
+ reader ──► https://audio.sredevops.org/audio/<id>/<hash>.mp3   (Cloudflare DNS → GCS)
+```
+
+See [docs/adr/0005-local-tts-audio-pipeline.md](../../docs/adr/0005-local-tts-audio-pipeline.md)
+for *why* these choices, and [README § Article audio](../../README.md#article-audio-pre-generated-kokoro)
+for the reader-facing behaviour.
+
+---
+
+## What you need before starting
+
+| Thing | Why | Where |
+|---|---|---|
+| `gcloud` CLI, authenticated | bucket, CORS, lifecycle, service account | local |
+| `kubectl` pointed at the GKE cluster | deploy, backfill, logs | local |
+| A Gateway (Gateway API) or Traefik | expose the receiver | the cluster |
+| Cloudflare access to `sredevops.org` DNS | the `audio` record | Cloudflare |
+| A Ghost custom integration | Admin API key + webhook secret | Ghost Admin |
+
+`make test` needs only `kubectl` (for kustomize), `envsubst`, `node` 24 and optionally
+`shellcheck`. None of them touch a cluster.
+
+---
+
+## 1. Google Cloud
+
+```bash
+make gcp-bootstrap GCP_PROJECT=<project> GCS_BUCKET=<bucket> GCP_LOCATION=<region>
+```
+
+That command is idempotent and does four things:
+
+1. Creates the bucket with **uniform bucket-level access** and public-access prevention, so
+   only an explicit `allUsers` binding grants read.
+2. Applies [`config/cors.json`](config/cors.json) through `scripts/cors.sh`: `GET`/`HEAD`
+   from the site origins, exposing `Accept-Ranges` and `Content-Range` — without those, a
+   seek in the player restarts the file.
+3. Applies [`config/lifecycle.json`](config/lifecycle.json): objects under `audio/` are
+   deleted after **90 days**. Superseded audio is only referenced by the marker, so a
+   stale object is dead weight; 90 days is long enough for a reader who left a tab open and
+   for a CDN to keep serving a cached page.
+4. Grants `roles/storage.objectAdmin` **on the bucket** to
+   `tts-audio-runner@<project>.iam.gserviceaccount.com` and creates the account if needed.
+
+Then create the key — this is the only long-lived credential in the system:
+
+```bash
+make gcp-key                      # writes ./key.json (git-ignored)
+```
+
+### Why a JSON key and not Workload Identity
+
+The bucket is in one project and the cluster is in another, the publication does not use
+Workload Identity yet, and migrating it is a change to the Ghost deployment that this
+repository does not own. A key with a bucket-scoped role, mounted read-only into the Jobs
+only (never into the receiver), is the smaller surface today.
+
+**To migrate later**, when the cluster does use Workload Identity: annotate the
+`tts-worker` ServiceAccount with
+`iam.gke.io/gcp-service-account=<gsa>@<project>.iam.gserviceaccount.com`, add
+`roles/iam.workloadIdentityUser` for `serviceAccount:<project>.svc.id.goog[tts-audio/tts-worker]`,
+and delete the `gcs-key` volume, the `GOOGLE_APPLICATION_CREDENTIALS` env and the
+`gcs-key.json` Secret entry. Nothing in the worker code changes.
+
+---
+
+## 2. Cloudflare DNS
+
+One record, in the `sredevops.org` zone:
+
+| Type | Name | Target | Proxy |
+|------|------|--------|-------|
+| CNAME | `audio` | `c.storage.googleapis.com` | **Proxied** (orange cloud) |
+
+Nothing else. Cloudflare manages DNS; uploads and reads are GCS. The proxy gives the host a
+certificate and a cache in front of the bucket.
+
+Verify it end to end once there is at least one object:
+
+```bash
+OBJ=audio/<post-id>/<hash>.mp3 make cf-verify
+```
+
+The script checks the four properties the player depends on: `Content-Type: audio/mpeg`,
+`Accept-Ranges: bytes`, the immutable `Cache-Control`, and that a `Range` request comes back
+**206 Partial Content**. If Cloudflare is stripping ranges, switch the record to **DNS
+only** (grey cloud): the player still works, you only lose the CDN, and `AUDIO_BASE_URL`
+does not change.
+
+---
+
+## 3. Ghost integration
+
+Ghost Admin → **Integrations** → *Add custom integration*, name it `tts-audio`.
+
+1. Copy the **Admin API key** (`id:secret`) and the **Content API key**.
+2. The integration must have **Administrator** rights: the job writes code injection, which
+   is an admin-only column. Point it at nothing else.
+3. Create a **webhook** with:
+   - **URL**: `https://<TTS_HOST>/ghost` (`TTS_HOST` is the hostname you will deploy)
+   - **Secret**: any long random string — the receiver verifies `X-Ghost-Signature` with it
+   - **Events**: `Post added`, `Post published edited`, `Post unpublished`, `Post deleted`
+
+`Post published edited` fires both on publish and on every later edit, which is why the
+receiver also checks the content hash: a re-save that changes nothing queues no work.
+
+> The webhook URL must be reachable **from the Ghost server**, not from a browser.
+
+---
+
+## 4. Create the Secret
+
+```bash
+make secret \
+  ADMIN_KEY='<id>:<secret>' \
+  WEBHOOK_SECRET='<the webhook secret>' \
+  GCS_KEY=./key.json
+# then delete the local copy: the cluster now has the only one
+rm key.json
+```
+
+This writes `tts-audio` in the `tts-audio` namespace with three keys: `admin-api-key`,
+`webhook-secret`, `gcs-key.json`. It is never committed; `base/secret.example.yaml`
+documents the shape and is never applied.
+
+**Rotation.** Create a new key with `make gcp-key`, re-run `make secret`, `make restart`,
+then disable/delete the old key in the GCP console. The jobs pick the new key up as they
+start; the receiver only uses it to clear markers on delete.
+
+---
+
+## 5. Deploy
+
+The route needs to know your Gateway. On a Gateway API cluster:
+
+```bash
+make deploy \
+  TAG=<12-char commit sha from the image build> \
+  TTS_HOST=tts.sredevops.org \
+  GATEWAY_NAME=<gateway> GATEWAY_NAMESPACE=<namespace> GATEWAY_SECTION=web
+```
+
+`render.sh` refuses to render without those values, and refuses to emit a manifest that
+still contains a placeholder it does not expect — the failure mode it prevents is a route
+pointing at `${GATEWAY_NAME}`.
+
+On **Traefik**, edit `overlay/kustomization.yaml` to list `route-traefik.yaml` instead of
+`route.yaml`, and pass `TLS_MIDDLEWARE` and `TLS_SECRET`.
+
+Then point DNS for `TTS_HOST` at the Gateway as you do for any other service, and check:
+
+```bash
+curl -sS https://<TTS_HOST>/healthz          # {"ok":true,...}
+make status
+make logs
+```
+
+The image comes from GHCR:
+
+```
+ghcr.io/sredevopsorg/sredevopsorg-ghost-theme/tts-audio-runner:<sha>
+```
+
+It is public (the repository is public), so no `imagePullSecrets` are needed. If the
+package is ever made private, add a `docker-registry` Secret and an `imagePullSecrets`
+entry to both the Deployment and the Job template in [`base/configmap.yaml`](base/configmap.yaml).
+
+---
+
+## 6. Backfill the archive
+
+Every post published before the pipeline existed has no audio. The backfill Job walks the
+Admin API and queues one synthesis Job per post that needs one.
+
+```bash
+make backfill-plan      # DRY RUN: how many posts, no Jobs created
+make backfill           # queue them
+```
+
+Each post is an independent Job (`tts-<id>-<hash>`), so the backfill is resumable: a post
+already up to date is skipped by the hash check, and a Job name that already exists is not
+created twice. Re-running is safe and cheap.
+
+Rough cost: a 9k-character article is ~8k chars/s of CPU, so **1–2 minutes per post** in a
+2-CPU Job. A hundred posts is a couple of hours of cluster time, not of anyone's attention.
+
+---
+
+## 7. Listen before you trust it
+
+The voices are Kokoro's, not the Chirp 3: HD voice the site used. Judge Spanish and
+Portuguese before the archive goes through them:
+
+```bash
+make dev-synth TEXT="Kubernetes es el orquestador de referencia." LOCALE=es OUT=sample-es.mp3
+make dev-synth TEXT="O Kubernetes é o orquestrador de referência." LOCALE=br OUT=sample-br.mp3
+```
+
+Files land in `.dev-out/`. To change a voice, edit `TTS_VOICES` in
+[`base/configmap.yaml`](base/configmap.yaml), apply, and re-run `make backfill`; the content
+hash includes the voice, so every post is regenerated on its next edit or backfill.
+
+---
+
+## Operating it
+
+| Symptom | Look at | Likely cause |
+|---|---|---|
+| Post stays silent after publishing | `make logs` (receiver), then `kubectl -n tts-audio logs job/tts-...` | webhook secret mismatch (401), Gateway not routing, post has no locale tag |
+| Receiver logs `ignore … content hash unchanged` | — | Ghost re-saved the post; expected |
+| Job fails with `Ghost 401` | Secret | Admin API key revoked or wrong format |
+| Job fails with `bucket` errors | Secret | key rotated without `make secret`, or the GSA lost its binding |
+| Player falls back to Cloud TTS on an old post | `make status` | its marker was removed, or the object expired (90-day lifecycle) |
+| `cf-verify` fails on partial content | Cloudflare | proxy stripped ranges — use a DNS-only record |
+| Audio plays but sounds like the wrong language | `kubectl logs` for `phonemes ... dropped` | a locale tag mismatch, or a missing espeak-ng language pack in the image |
+| Job fails with `espeak-ng is not installed` | image | the base image lost `espeak-ng`; it is a hard dependency, not optional |
+
+Useful commands:
+
+```bash
+make status                 # deployments, services, last Jobs
+make logs                   # tail the receiver
+kubectl -n tts-audio get jobs --sort-by=.metadata.creationTimestamp
+kubectl -n tts-audio logs job/<name> --tail=100
+make backfill-plan          # what would be queued right now
+make teardown               # remove the pipeline from the cluster (bucket kept)
+```
+
+---
+
+## Throughput and job sizing
+
+Measured on a 2-vCPU container, on real Spanish articles:
+
+| Quantity | Measured |
+|---|---|
+| synthesis | **~8 characters of article per second of CPU** |
+| model load, per Job | ~10 s |
+| a ~300-character article | ~35 s of synthesis, ~16 s of audio |
+| a 10k-character article | ~20 min of synthesis at 2 CPUs |
+| threading 1 → 2 threads | 4.5 → 4.9 chars/s (barely worth it) |
+| output | 24 kHz mono → 96 kbps MP3, ~1 MB per 90 s |
+
+So the job template asks for **4 CPUs** (roughly halving the numbers above) with a
+**1-hour** `activeDeadlineSeconds`. The knobs that actually move throughput:
+
+- **CPU limit** — the dominant factor. Raising the Job's limit from 2 to 4 roughly halves
+  the wall time; it is a `resources` edit in `base/configmap.yaml`.
+- **`TTS_CHUNK_CHARS`** — larger chunks amortise per-call overhead. 450 is the default;
+  past ~500 the model's prosody degrades.
+- **A GPU** — the same image runs with `KOKORO_DEVICE=gpu` and
+  `resources.limits.nvidia.com/gpu` in the job template, unchanged otherwise. Not worth it
+  for a few posts a day; worth it for a large backfill.
+
+A backfill of N posts creates N Jobs, each of which the cluster schedules
+independently, so wall-clock time is roughly `total_characters / (8 * CPUs_available)`
+rather than a sum.
+
+## The model lock
+
+The image bakes Kokoro's weights and verifies every file against
+[`worker/models.lock.json`](worker/models.lock.json) at build time; a `REPLACE_ME` entry
+**fails the build** rather than shipping an unchecked artifact. The lock is populated and
+every checksum is verified against the pinned upstream revision
+(`onnx-community/Kokoro-82M-v1.0-ONNX @ 1939ad2a`).
+
+To regenerate it, run this from a machine that can reach the Hugging Face CDN:
+
+```bash
+cd worker
+node scripts/update-models.mjs             # fetch, hash, rewrite the lock
+node scripts/update-models.mjs --set-rev <40-char sha>   # move to a new revision
+```
+
+Review the diff before committing: a changed checksum means the upstream artifact moved,
+which should be a deliberate decision, never a surprise in a rebuild.
+
+Adding a voice means adding it to `files` in the lock and to `TTS_VOICES` in the
+ConfigMap; the Dockerfile iterates the lock. The voice must be one the model ships
+(`voices/<name>.bin`) **and** whose language `espeak-ng` can phonemise — the American and
+British English sets, `ef_*/em_*` (Spanish) and `pf_*/pm_*` (Brazilian Portuguese).
+
+---
+
+## What is deliberately not here
+
+- **No Artifact Registry.** Images go to GHCR, authenticated by the workflow's own token.
+  The cluster therefore needs no GCP registry credential, only the bucket key.
+- **No CronJob.** Synthesis is event-driven and the backfill is idempotent; a nightly
+  re-read of the archive would cost cluster time to find nothing to do.
+- **No GPU.** The quantized model runs on CPU at an acceptable rate. The same image runs
+  unchanged on a GPU: set `resources.limits.nvidia.com/gpu` in the job template and
+  `KOKORO_DEVICE=gpu` in the ConfigMap.
+- **No Ghost plugin or server-side code.** The theme has no runtime; everything happens in
+  the marker, the webhook receiver and the Jobs.

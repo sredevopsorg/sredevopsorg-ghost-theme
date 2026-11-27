@@ -1,0 +1,189 @@
+# tts-audio — build, test and publish the article-audio runner image.
+#
+# The image lives next to the theme but is not part of it: `deploy/tts-audio/` never ships
+# in the theme zip (scripts/ship-manifest.mjs refuses anything outside its allow-list), and
+# this workflow is the only thing that produces it.
+#
+# Images go to **GHCR**, not Artifact Registry: the repository is already the place the
+# package is reviewed, the push is authenticated by the workflow's own `GITHUB_TOKEN`, and
+# there is no GCP credential in a build job that only needs to write an image.
+#
+# Tag policy, which the cluster depends on:
+#   :<sha>   the 12-character commit SHA — **this is what the manifests reference**
+#   :main    convenience tag for humans; never referenced by a manifest
+#
+# `pull_request` builds and tests but never pushes: a PR cannot publish an image that a
+# cluster could pull.
+#
+# Triggers: PRs and pushes touching the worker or this workflow, plus manual dispatch.
+name: tts-audio
+
+on:
+  pull_request:
+    paths:
+      - "deploy/tts-audio/**"
+      - ".github/workflows/tts-audio-ci.yaml"
+  push:
+    branches:
+      - main
+    paths:
+      - "deploy/tts-audio/**"
+      - ".github/workflows/tts-audio-ci.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tts-audio-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}/tts-audio-runner
+
+jobs:
+  # ── 1. Offline gate: manifests render, secrets stay placeholders, units pass ──
+  manifests-and-units:
+    name: render + unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Install worker dependencies
+        working-directory: deploy/tts-audio/worker
+        run: npm ci --ignore-scripts
+
+      - name: Check the kustomize toolchain
+        run: kubectl version --client
+
+      # `test.sh` checks for these and fails with a clear message if they are missing.
+      # `ffmpeg` is not optional here: the job tests encode real audio through the same
+      # concat/silence path a Job uses, so the test suite must run the real binary rather
+      # than a mock. `espeak-ng` is only needed by the smoke test, which runs in the image
+      # job below, where the runtime actually has it.
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends shellcheck ffmpeg
+
+      - name: Run the offline gate
+        run: ./deploy/tts-audio/test.sh
+
+  # ── 2. Image: build, smoke-test the real model, publish on main ──────────────
+  image:
+    name: build + kokoro smoke
+    runs-on: ubuntu-latest
+    needs: manifests-and-units
+    permissions:
+      contents: read
+      packages: write # push to ghcr.io/<owner>/<repo>
+      id-token: write # provenance attestation
+      attestations: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3.6.1
+        with:
+          # `load: true` below needs the docker-container driver or the image never lands
+          # in the local daemon for the runtime smoke test.
+          driver: docker-container
+
+      - name: Compute the image tag
+        id: meta
+        run: |
+          echo "tag=${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          # Images are public with the repo; this is the fallback if that ever changes.
+          echo "publish=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        if: steps.meta.outputs.publish == 'true'
+        uses: docker/login-action@v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # The build itself downloads the pinned model and verifies every file against
+      # models.lock.json inside the Dockerfile, so a moved or corrupted upstream artefact
+      # fails here rather than in a Job at 2 a.m.
+      - name: Build the runner image
+        uses: docker/build-push-action@v6.7.0
+        with:
+          context: deploy/tts-audio/worker
+          file: deploy/tts-audio/worker/Dockerfile
+          load: true
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}
+            ${{ env.IMAGE }}:pr-${{ github.event.pull_request.number || github.sha }}
+          # The default `docker` driver cannot export an image to the local daemon that
+          # the smoke steps then run, so a container driver is required for `load: true`.
+          cache-from: type=gha,scope=tts-audio
+          cache-to: type=gha,scope=tts-audio,mode=max
+
+      - name: Smoke-test the real model in the image
+        run: |
+          # The only check that exercises the ONNX weights, the tokenizer, espeak-ng and
+          # ffmpeg together, in every locale. Fails on a silent buffer, a wrong duration,
+          # a missing model or a missing espeak-ng language pack.
+          #
+          # `--entrypoint node` is required: the image entrypoint is `node src/index.mjs`,
+          # so arguments after the image name would be treated as a post id for the job
+          # rather than a command to run.
+          docker run --rm --entrypoint node "${IMAGE}:${{ steps.meta.outputs.tag }}" test/smoke.mjs
+
+      - name: The receiver answers /healthz
+        run: |
+          # The shared image must be able to start the webhook entrypoint, not only the
+          # synthesis one; a broken import there would otherwise appear first in a cluster.
+          docker run -d --rm --name tts-health -e GHOST_TTS_WEBHOOK_SECRET=x \
+            -e GHOST_API_URL=https://example.org -e GHOST_ADMIN_API_KEY=x \
+            -e GCS_BUCKET=x -e AUDIO_BASE_URL=https://audio.example.org -e WORKER_IMAGE=x \
+            -p 18080:8080 "${IMAGE}:${{ steps.meta.outputs.tag }}" --serve
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:18080/healthz; then ok=1; break; fi
+            sleep 1
+          done
+          docker stop tts-health >/dev/null 2>&1 || true
+          test "${ok:-}" = "1" || { echo "the receiver never became healthy"; exit 1; }
+
+      - name: Push the image and its provenance
+        if: steps.meta.outputs.publish == 'true'
+        uses: docker/build-push-action@v6.7.0
+        id: push
+        with:
+          context: deploy/tts-audio/worker
+          file: deploy/tts-audio/worker/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}
+            ${{ env.IMAGE }}:main
+          cache-from: type=gha,scope=tts-audio
+          provenance: true
+          sbom: true
+
+      - name: Summary
+        run: |
+          {
+            echo "### tts-audio image"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| tag | \`${{ steps.meta.outputs.tag }}\` |"
+            echo "| published | \`${{ steps.meta.outputs.publish }}\` |"
+            echo "| reference | \`${IMAGE}:${{ steps.meta.outputs.tag }}\` |"
+            [ -n "${{ steps.push.outputs.digest }}" ] && echo "| digest | \`${{ steps.push.outputs.digest }}\` |"
+            echo
+            echo "Deploy with:"
+            echo '```'
+            echo "make -C deploy/tts-audio deploy TAG=${{ steps.meta.outputs.tag }} TTS_HOST=... GATEWAY_NAME=... GATEWAY_NAMESPACE=..."
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,26 @@
+# Base for the article-audio pipeline: the parts that are the same in every cluster.
+#
+# Cluster-specific values (Gateway, hostname, image tag) are **not** here — they live in
+# overlay/kustomization.yaml, so this base renders on its own (`kustomize build base`
+# works and is what `make test` checks) and an overlay can pin them without touching the
+# resources.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: tts-audio
+      app.kubernetes.io/managed-by: kustomize
+
+resources:
+  - namespace.yaml
+  - serviceaccounts.yaml
+  - rbac.yaml
+  - configmap.yaml
+  - webhook.yaml
+  - backfill.yaml
+  - netpol.yaml
+
+# Drop the namespace from generated names/selectors: every object declares its namespace
+# explicitly, and adding `namespace: tts-audio` here would also rewrite the Namespace
+# object itself (which kustomize then rejects).

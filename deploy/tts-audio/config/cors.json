@@ -1,0 +1,19 @@
+[
+  {
+    "origin": [
+      "https://www.sredevops.org",
+      "https://sredevops.org",
+      "http://localhost:2368"
+    ],
+    "method": ["GET", "HEAD"],
+    "responseHeader": [
+      "Content-Type",
+      "Content-Length",
+      "Content-Range",
+      "Accept-Ranges",
+      "ETag",
+      "Last-Modified"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

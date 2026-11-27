@@ -1,0 +1,16 @@
+# Namespace for the article-audio pipeline.
+#
+# Everything the pipeline runs — the receiver, the per-post Jobs, the backfill Job — lives
+# here, and the receiver's RBAC is scoped to it. Nothing else in the cluster is touched.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/part-of: tts-audio
+    # Pod Security Admission: every pod here runs non-root, read-only and without
+    # capabilities, so the restricted profile can be enforced rather than merely allowed.
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted

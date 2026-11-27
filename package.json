@@ -4,7 +4,7 @@
     "demo": "https://www.sredevops.org",
     "homepage": "https://www.sredevops.org",
     "docs": "https://github.com/sredevopsorg/sredevopsorg-ghost-theme#readme",
-    "version": "3.8.1",
+    "version": "4.0.0",
     "type": "module",
     "packageManager": "yarn@1.22.22",
     "engines": {
@@ -110,7 +110,13 @@
                 "type": "text",
                 "default": "",
                 "group": "post",
-                "description": "Google Cloud TTS API key; restrict it by HTTP referrer"
+                "description": "Google TTS fallback key for posts without audio yet"
+            },
+            "tts_audio_host": {
+                "type": "text",
+                "default": "https://audio.sredevops.org",
+                "group": "post",
+                "description": "Origin serving pre-generated article audio; empty to disable"
             }
         },
         "image_sizes": {

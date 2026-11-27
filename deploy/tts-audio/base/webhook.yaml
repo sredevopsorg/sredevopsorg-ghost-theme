@@ -1,0 +1,188 @@
+# The webhook receiver.
+#
+# Ghost POSTs every publish/edit/delete here; the receiver verifies the signature, decides
+# whether the post needs audio, and creates a Job. It never synthesises, so it stays
+# small (128 Mi, ~40 MB RSS) and answers in milliseconds — the API Gateway in front of it
+# has a 30 s timeout and that is a ceiling, not a budget.
+#
+# Two replicas: a Ghost delivery must not fail because one pod is rolling. The Pod
+# Disruption Budget allows one to go at a time.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-webhook
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: webhook
+spec:
+  replicas: 2
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tts-audio
+      app.kubernetes.io/component: webhook
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tts-audio
+        app.kubernetes.io/component: webhook
+    spec:
+      serviceAccountName: tts-webhook
+      automountServiceAccountToken: true
+      # The receiver only needs the ClusterIP, and it is reachable by name anyway.
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: tts-audio
+              app.kubernetes.io/component: webhook
+      containers:
+        - name: webhook
+          # Tag set by overlay/kustomization.yaml (images.newTag), not here.
+          image: ghcr.io/sredevopsorg/sredevopsorg-ghost-theme/tts-audio-runner:latest
+          imagePullPolicy: IfNotPresent
+          args: ["--serve"]
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: tts-audio
+          # Secrets the receiver actually uses: the webhook HMAC and the Admin key it
+          # needs to clear a marker on unpublish/delete. The GCS key is mounted only into
+          # Jobs, never into this pod.
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: IMAGE_TAG
+              value: "${TAG}"
+            # The image a created Job runs: the same digest this Deployment runs, so a
+            # receiver can never queue Jobs on an image it was not built with.
+            - name: WORKER_IMAGE
+              value: "${IMAGE}"
+            - name: GHOST_TTS_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: tts-audio
+                  key: webhook-secret
+            - name: GHOST_ADMIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tts-audio
+                  key: admin-api-key
+          volumeMounts:
+            - name: job-template
+              mountPath: /etc/tts-audio
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 96Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: job-template
+          configMap:
+            name: tts-job-template
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-webhook
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: webhook
+spec:
+  type: ClusterIP
+  # Exposed through the Gateway API HTTPRoute (base/httproute.yaml) or the Traefik
+  # IngressRoute (base/ingressroute.yaml); nothing here needs a NodePort or an LB.
+  selector:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: webhook
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: tts-webhook
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: webhook
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tts-audio
+      app.kubernetes.io/component: webhook
+---
+# An HPA if metrics-server is present; harmless otherwise. The receiver is CPU-idle
+# except for signature checks, so this exists for a webhook storm, not for steady state.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: tts-webhook
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: webhook
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: tts-webhook
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

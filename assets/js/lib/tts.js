@@ -245,3 +245,101 @@ export function trackArtifactName({ slug, locale } = {}) {
   const lang = FILENAME_LANG_BY_LOCALE[locale] ?? FILENAME_LANG_BY_LOCALE.en;
   return `${safeSlug}-${lang}.mp3`;
 }
+
+/* --- Pre-generated audio ---------------------------------------------------
+ *
+ * A post whose audio the pipeline has already synthesised carries a marker in its code
+ * injection (deploy/tts-audio/README.md):
+ *
+ *   <meta name="sredevops:tts" content='{"v":1,"hash":"…","file":"https://…/x.mp3",…}'>
+ *
+ * `codeinjection_foot` renders inside `<body>` (via {{ghost_foot}} in partials/shell.hbs),
+ * which is where a `<meta name>` is legal — an attribute or a comment in the mount point
+ * would not survive Ghost's parsing of the injection. The island finds the marker with a
+ * DOM query and uses the file as one `<audio>` source instead of synthesising chunk by
+ * chunk in Cloud TTS.
+ *
+ * Both helpers are pure so the parsing and the URL policy are unit tested here rather
+ * than in a browser.
+ */
+
+/** Name of the marker tag. Must match `deploy/tts-audio/worker/src/markers.mjs`. */
+export const AUDIO_MARKER_NAME = "sredevops:tts";
+
+/** Keys the pipeline writes; anything else makes the marker untrusted. */
+const MARKER_KEYS = new Set(["v", "hash", "file", "voice", "bytes", "duration", "at"]);
+
+/**
+ * Parse the marker's JSON payload.
+ *
+ * Returns `null` for a missing, malformed, or unexpected marker rather than throwing:
+ * a bad marker must degrade to "no pre-generated audio" (the Cloud TTS path), never to a
+ * broken player. Unknown keys are rejected, so a marker written by something other than
+ * the pipeline cannot smuggle values into the island.
+ */
+export function parseAudioMarker(text) {
+  const raw = String(text ?? "").trim();
+  if (!raw) return null;
+
+  let value;
+  try {
+    value = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  for (const key of Object.keys(value)) {
+    if (!MARKER_KEYS.has(key)) return null;
+  }
+  if (typeof value.file !== "string" || typeof value.hash !== "string") return null;
+  return value;
+}
+
+/**
+ * Is this URL safe to hand to an `<audio>` element?
+ *
+ * The marker is post content, and post content can be edited by anyone with Admin
+ * access; the island must not be talked into loading `javascript:`, a `data:` URL
+ * (which would make the element parse attacker-controlled bytes as audio) or a foreign
+ * host that would silently replace the audio with someone else's recording.
+ *
+ * `host` is the expected audio origin, e.g. `https://audio.sredevops.org`. The URL's
+ * origin must equal it exactly, so `https://audio.sredevops.org.evil.test/` fails.
+ */
+export function audioUrlIsAllowed(url, host) {
+  if (typeof url !== "string" || typeof host !== "string" || !host) return false;
+  let parsed;
+  let expected;
+  try {
+    parsed = new URL(url);
+    expected = new URL(host);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== "https:") return false;
+  if (expected.protocol !== "https:") return false;
+  if (parsed.origin !== expected.origin) return false;
+  // A path is part of the contract (`/audio/<post>/<hash>.mp3`); an empty one is a mistake.
+  return parsed.pathname.length > 1;
+}
+
+/**
+ * The audio resolved for a page: `{ hash, file, voice, duration }` or `null`.
+ *
+ * Kept separate from the DOM so the island can be told "here is the marker text, here is
+ * the allowed host" and be unit tested with neither.
+ */
+export function resolveAudio(markerText, audioHost) {
+  const marker = parseAudioMarker(markerText);
+  if (!marker) return null;
+  if (!audioUrlIsAllowed(marker.file, audioHost)) {
+    console.warn("[tts] audio marker points outside", audioHost, "— falling back to Cloud TTS");
+    return null;
+  }
+  return {
+    hash: marker.hash,
+    file: marker.file,
+    voice: marker.voice,
+    duration: Number.isFinite(marker.duration) ? marker.duration : null,
+  };
+}

@@ -1,0 +1,43 @@
+# RBAC for the webhook receiver: it may create Jobs in its own namespace and read them
+# back, and that is the whole of its cluster authority.
+#
+# Deliberately absent:
+#   - `delete jobs` for anything but its own Jobs: the label restriction is not
+#     expressible in RBAC, so the receiver deletes by label instead and this Role grants
+#     `deletecollection` on jobs only (still inside tts-audio).
+#   - pods/log: the receiver reports "queued", not the Job's output; the operator reads
+#     logs with kubectl.
+#   - cluster-scoped anything.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: tts-webhook-jobs
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+rules:
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["deletecollection"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tts-webhook-jobs
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: tts-webhook-jobs
+subjects:
+  - kind: ServiceAccount
+    name: tts-webhook
+    namespace: tts-audio

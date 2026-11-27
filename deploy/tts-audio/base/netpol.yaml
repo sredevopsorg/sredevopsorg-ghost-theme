@@ -1,0 +1,95 @@
+# Network policy: the two workloads may reach exactly what they need.
+#
+# Default-deny ingress in the namespace, then one allow rule for the gateway. Egress is
+# restricted to DNS, HTTPS (Ghost + GCS) and, for the receiver, the Kubernetes API — the
+# Job it creates is the one thing that needs the API server.
+#
+# The exporter ports are the egress proxy ports some GKE configurations route through;
+# removing this file restores the cluster default if your CNI is not enforcing it yet
+# (GKE Dataplane V2 enforces it, the older Calico plugin does too).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-webhook-ingress
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: tts-audio
+      app.kubernetes.io/component: webhook
+  policyTypes:
+    - Ingress
+  ingress:
+    # Only the ingress controller / gateway. Namespaces are a value to fill in:
+    # `gke-gateway-infra`, `traefik`, `ingress-nginx` — whatever this cluster runs.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ${GATEWAY_NAMESPACE}
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: egress-dns-and-https
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: tts-audio
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Ghost Admin API and GCS both live on HTTPS; the IPs are the cluster's egress path
+    # and are not pinned, so the policy allows the port rather than the destination.
+    # Tighten it to ipBlock entries if your cluster has a fixed egress range.
+    - ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-webhook-kubernetes-api
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: tts-audio
+      app.kubernetes.io/component: webhook
+  policyTypes:
+    - Egress
+  egress:
+    # The API server's ClusterIP; GKE answers on 443 and 443 only.
+    - ports:
+        - protocol: TCP
+          port: 443

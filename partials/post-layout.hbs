@@ -5,10 +5,19 @@
   {{!-- Island: fixed 2px reading-progress bar; renders into this empty div. --}}
   <div data-island="ReadingProgress" data-target=".gh-content"></div>
 
-  {{!-- Island: Google Cloud text-to-speech miniplayer (Chirp 3: HD). Posts only; the
-        API key is a Ghost custom setting and is sent to the browser, so restrict it by
-        HTTP referrer and treat it as a public value. `locale` selects the voice and
-        `slug` names the downloaded MP3. --}}
+  {{!-- Island: article audio miniplayer. Posts only.
+        The normal source is the MP3 the pipeline pre-generates and stores in GCS
+        (deploy/tts-audio/): the island finds it through the `<meta name="sredevops:tts">`
+        marker the job writes into the post's code injection, which {{ghost_foot}} renders
+        inside <body> — that is why nothing here has to know about it.
+
+        The Cloud TTS API key is the *fallback* for a post whose audio has not been
+        generated yet (a new post between publish and the job finishing, a deleted
+        object). It is a Ghost custom setting and is sent to the browser, so restrict it
+        by HTTP referrer and treat it as a public value; leaving it empty still plays the
+        pre-generated audio, and only disables the fallback.
+
+        `locale` selects the fallback voice and `slug` names the downloaded MP3. --}}
   {{#if @custom.tts_enabled}}
   <div data-island="TtsPlayer"
        data-target=".gh-content"

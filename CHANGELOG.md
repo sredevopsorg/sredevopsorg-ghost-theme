@@ -1,5 +1,61 @@
 # Changelog
 
+## 4.0.0
+
+Post audio no longer runs in the reader's browser. Each article is spoken once, by an
+open-weight model running server-side, stored as a single MP3 and streamed from
+`audio.sredevops.org`. Listening is free for the publication, costs nothing per reader,
+seeks natively and can be downloaded without generating anything.
+
+**This is a major release because the upgrade is not drop-in.** The pipeline lives outside
+the theme (`deploy/tts-audio/`) and has to exist before posts get pre-generated audio. A
+post that has no audio yet plays exactly as it did in 3.8.x, so nothing breaks — but that
+path still bills the Google Cloud key per listener, and it is now the *fallback*, not the
+normal one.
+
+### Added
+
+- **Pre-generated audio, streamed from GCS.** A post carries a `<meta name="sredevops:tts">`
+  marker in its code injection; the player reads it and plays the stored MP3, so seeking
+  is native, the duration is exact, and **Download MP3** is a link to the same file rather
+  than a second synthesis. With a marker present the player needs **no API key at all**.
+- **`tts_audio_host` setting** (default `https://audio.sredevops.org`) — the origin
+  pre-generated audio is served from. Clear it to disable streaming and fall back.
+  Append-only, like every other setting; existing values are untouched.
+- **`deploy/tts-audio/`** — the synthesis pipeline: a Ghost webhook receiver and a
+  Kubernetes Job that speak each post with
+  [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (Apache-2.0), encode one tagged
+  MP3 with ffmpeg, upload it to GCS and write the marker. Kubernetes manifests, a GHCR
+  image build, a backfill job and a runbook are included. Not part of the theme package.
+
+### Changed
+
+- **The Cloud TTS player is the fallback now.** Posts with no usable marker — a new post
+  between publishing and the job finishing, a deleted object, a marker naming a host the
+  theme does not trust — still use the browser-direct Cloud TTS path from 3.8.x,
+  unchanged. `tts_api_key` still works and is still public; leaving it empty is now fine
+  once the archive has audio.
+- **`tts_api_key`'s description** now says it is the fallback key. The key itself is
+  unchanged and nothing needs re-entering.
+- **The player strings** are reworded where the old text no longer applied
+  ("Audio unavailable for this article" instead of a message about adding a Google key),
+  and a loading state was added for the network fetch of the pre-generated file.
+
+### Upgrade
+
+1. Keep the theme upgrade: with no markers anywhere, every post plays as before.
+2. To get pre-generated audio, deploy `deploy/tts-audio/` following its README — GCS
+   bucket, Cloudflare DNS, Ghost integration and webhook, service-account key, then
+   `make deploy` and `make backfill`.
+3. Once posts carry markers, `tts_api_key` can be cleared in Ghost Admin.
+
+## 3.8.1
+
+The player's text buttons became icons: play/pause, back, forward, stop and download are
+inline SVG with the accessible name moved to `aria-label`, so screen readers still
+announce the translated action and the controls are square 32px targets. No settings
+change.
+
 ## 3.8.0
 
 The post text-to-speech player gets a timebar, skip controls and a one-click MP3

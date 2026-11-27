@@ -1,0 +1,47 @@
+# Traefik IngressRoute for the webhook receiver — the alternative to httproute.yaml.
+#
+# Only one of the two route files may be active; overlay/kustomization.yaml lists
+# route.yaml (HTTPRoute) by default. Swap it for route-traefik.yaml, and fill in the
+# middleware / secret your cluster uses for TLS.
+#
+# The entries here mirror apiVersion: traefik.io/v1alpha1, which is the CRD shipped by
+# Traefik 2.10+ / 3.x.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: tts-webhook-rate
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+spec:
+  # A publish storm or a runaway loop must not fill the Job queue. Ghost sends a
+  # handful of deliveries per edit at most.
+  rateLimit:
+    average: 30
+    burst: 15
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: tts-webhook
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: webhook
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`${TTS_HOST}`) && (PathPrefix(`/ghost`) || Path(`/healthz`))
+      middlewares:
+        - name: tts-webhook-rate
+        - name: ${TLS_MIDDLEWARE}
+      services:
+        - name: tts-webhook
+          port: 80
+          # The receiver never holds a connection long; this is a ceiling.
+          responsetimeout: 15s
+  tls:
+    # Fill in the secret cert-manager issues for this host, or use your ACME resolver.
+    secretName: ${TLS_SECRET}
