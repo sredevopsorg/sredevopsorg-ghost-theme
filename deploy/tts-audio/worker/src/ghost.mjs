@@ -1,8 +1,22 @@
 /**
  * Ghost Admin API client, split into the two things this pipeline does with it:
  * **reading** a post (the job) and **writing** the marker back (the job and the
- * receiver). Both use the same key: Ghost honours `Authorization: Ghost <id>:<secret>`
- * on the Admin API, and code injection is an admin-only column.
+ * receiver). Code injection is an admin-only column, so both need an admin key.
+ *
+ * ## Authentication: the key is not the token
+ *
+ * Ghost's `Authorization: Ghost <token>` header takes a **signed JWT**, not the
+ * `id:secret` string from Ghost Admin. This is the single most expensive thing to get
+ * wrong here: sending the raw key produces `400 INVALID_JWT`, which reads like a bad
+ * key, so every symptom points at the credential rather than at the request. Ghost's own
+ * code makes it unambiguous (`core/server/auth/api-key/admin.js`):
+ *
+ *     const decoded = jwt.decode(token, { complete: true });
+ *     if (!decoded || !decoded.header) throw BadRequestError({ code: 'INVALID_JWT' });
+ *     const apiKeyId = decoded.header.kid;
+ *
+ * So: header `{ alg: "HS256", typ: "JWT", kid: <id> }`, payload `{ iat, exp, aud: "/admin/" }`,
+ * signed with the **hex-decoded** secret as an HMAC key. See `signAdminToken`.
  *
  * Why the Admin API and not the public `<url>.md`: `.md` needs no key, and the job
  * fetches it anyway as a divergence check (see `readPost` / `mdUrl`), but it is a
@@ -12,6 +26,7 @@
  * also how the tests get a real post without a Ghost instance.
  */
 
+import { createHmac } from "node:crypto";
 import { parseMarker, removeMarker } from "./markers.mjs";
 
 /** Locales a post may be tagged with, in the theme's content keys. `br` is not `pt`. */
@@ -28,10 +43,25 @@ const API = "v6.0";
  * the wrong language — the pipeline §"Content scope" limit, not an oversight.
  */
 export function localeOf(tags) {
-  const names = (tags ?? [])
-    .filter((tag) => tag && tag.visibility !== "internal" && !String(tag.name ?? "").startsWith("#"))
-    .map((tag) => String(tag.name ?? tag.slug ?? "").trim().toLowerCase());
-  const matches = LOCALES.filter((locale) => names.includes(locale));
+  // Match on the **slug**, and fall back to the name only when there is no slug.
+  //
+  // The slugs are what `routes.yaml` filters on (`tag:es+tag:-en+tag:-br`), and they are
+  // stable. The *names* are editorial: this publication's locale tags are named
+  // "Español", "English" and "Português", so matching names found nothing and marked
+  // every real post ineligible. A tag with slug `es` and name `Español` is still `es`.
+  const slugs = (tags ?? [])
+    .filter((tag) => tag && tag.visibility !== "internal")
+    .map((tag) => {
+      const slug = String(tag.slug ?? "").trim().toLowerCase();
+      if (slug) return slug;
+      // Webhook payloads may omit the slug; the name is the only identifier then, and a
+      // `#hash` name is a private tag, not a locale.
+      const name = String(tag.name ?? "").trim().toLowerCase();
+      return name.startsWith("#") ? "" : name;
+    })
+    .filter(Boolean);
+
+  const matches = LOCALES.filter((locale) => slugs.includes(locale));
   return matches.length === 1 ? matches[0] : null;
 }
 
@@ -44,10 +74,48 @@ class GhostError extends Error {
   }
 }
 
-function headers(adminKey) {
+/** How long a signed token is valid. Ghost rejects anything older than 5 minutes. */
+export const TOKEN_TTL_SECONDS = 300;
+
+/** Ghost's Admin API audience. Requests to another route are refused. */
+const ADMIN_AUDIENCE = "/admin/";
+
+const base64url = (value) => Buffer.from(value).toString("base64url");
+
+/**
+ * Sign a Ghost Admin API token.
+ *
+ * Split `id:secret` at the **first** colon only: the secret is hex, but splitting on the
+ * last colon instead breaks a malformed key in a confusing way rather than failing loudly.
+ *
+ * The secret is hex, so it is decoded to bytes before being used as the HMAC key — using
+ * the hex *string* as the key produces a valid-looking JWT that Ghost rejects.
+ */
+export function signAdminToken(adminKey, { now = Date.now(), ttl = TOKEN_TTL_SECONDS } = {}) {
+  const key = String(adminKey ?? "");
+  const colon = key.indexOf(":");
+  if (colon < 1) {
+    throw new Error("GHOST_ADMIN_API_KEY is not in `id:secret` form");
+  }
+  const id = key.slice(0, colon);
+  const secret = key.slice(colon + 1);
+  if (!/^[0-9a-f]+$/i.test(secret) || secret.length % 2 !== 0) {
+    throw new Error("GHOST_ADMIN_API_KEY secret is not hex — copy the Admin API key from Ghost Admin");
+  }
+
+  const issuedAt = Math.floor(now / 1000);
+  const header = { alg: "HS256", typ: "JWT", kid: id };
+  const payload = { iat: issuedAt, exp: issuedAt + ttl, aud: ADMIN_AUDIENCE };
+
+  const signingInput = `${base64url(JSON.stringify(header))}.${base64url(JSON.stringify(payload))}`;
+  const signature = createHmac("sha256", Buffer.from(secret, "hex")).update(signingInput).digest("base64url");
+  return `${signingInput}.${signature}`;
+}
+
+/** The request headers for an Admin API call, including a freshly signed token. */
+export function ghostHeaders(adminKey) {
   return {
-    // Ghost accepts `id:secret` (new format) and the legacy `id:secrethex`.
-    Authorization: `Ghost ${adminKey}`,
+    Authorization: `Ghost ${signAdminToken(adminKey)}`,
     Accept: "application/json",
     "User-Agent": "sredevops-tts-audio/1",
   };
@@ -85,19 +153,24 @@ export function mdUrl(siteUrl, slug) {
  * `post` (`admin` or `md`). The Markdown is always fetched when `siteUrl` is set, even
  * when the Admin API answered, because `verifyRepresentations` compares the two.
  *
- * `formats=html,md` makes Ghost render both from the same stored source, so the two
- * bodies are the *same revision* of the article — which is what makes comparing them a
- * meaningful drift check rather than a race between two renders.
+ * The Admin API's accepted formats are `html`, `mobiledoc`, `lexical` and `plaintext` —
+ * **not** `md`. Requesting `formats=html,md` is a `422 Validation (AllowedValues) failed
+ * for formats`, which the client used to report as an unexplained read failure.
+ *
+ * `plaintext` is what the drift check actually wants: Ghost derives it from the same
+ * stored source in the same request, so it is the *same revision* of the article and
+ * comparing it with `html` is meaningful rather than a race between two renders.
  */
 export async function readPost(config, postId, { fetchImpl = fetch } = {}) {
   if (config.adminKey && config.ghostApiUrl) {
-    const url = `${config.ghostApiUrl}/ghost/api/admin/posts/${encodeURIComponent(postId)}/?formats=html,md`;
-    const response = await fetchImpl(url, { headers: headers(config.adminKey) });
+    const url = `${config.ghostApiUrl}/ghost/api/admin/posts/${encodeURIComponent(postId)}/?formats=html,plaintext`;
+    const response = await fetchImpl(url, { headers: ghostHeaders(config.adminKey) });
     if (!response.ok) await fail(response);
     const payload = await response.json();
     const post = payload?.posts?.[0];
     if (!post) throw new Error(`Ghost returned no post for id ${postId}`);
-    return { post, md: post.markdown ?? "", source: "admin" };
+    // `plaintext` is the second representation when the Admin API answered.
+    return { post, md: post.plaintext ?? "", source: "admin" };
   }
 
   if (!config.siteUrl) {
@@ -270,7 +343,7 @@ export async function writeCodeInjection(config, post, foot, { fetchImpl = fetch
   const attempt = async () => {
     const response = await fetchImpl(url, {
       method: "PUT",
-      headers: { ...headers(config.adminKey), "Content-Type": "application/json" },
+      headers: { ...ghostHeaders(config.adminKey), "Content-Type": "application/json" },
       body: JSON.stringify({ posts: [{ updated_at: post.updated_at, codeinjection_foot: foot }] }),
     });
     if (!response.ok) await fail(response);
