@@ -134,6 +134,17 @@ else
   green "job template ok"
 fi
 
+step "prune helper refuses to act without CONFIRM"
+# `prune-stale.sh` deletes objects, so the default has to be a dry run. Checked by
+# rendering to an empty set and asserting it only reports.
+if [ -x scripts/prune-stale.sh ]; then
+  out="$(./scripts/prune-stale.sh /tmp/tts-audio-base.yaml gw-ns gw-ns 2>&1 || true)"
+  if printf '%s' "$out" | grep -qi "deleting\|deleted"; then
+    fail "prune-stale.sh acted without --confirm"
+  fi
+  green "prune helper is dry by default"
+fi
+
 step "no secrets in the tree"
 if [ -f base/secret.example.yaml ] && grep -q 'REPLACE_ME' base/secret.example.yaml; then
   green "secret.example.yaml holds placeholders only"
