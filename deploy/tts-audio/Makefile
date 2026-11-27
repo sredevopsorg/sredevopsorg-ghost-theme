@@ -28,7 +28,11 @@ GATEWAY_NAME   ?=
 GATEWAY_NAMESPACE ?=
 GATEWAY_SECTION ?= web
 TLS_MIDDLEWARE ?=
-TLS_SECRET     ?=
+TLS_SECRET     ?= tts-audio-tls
+# A Gateway can only reference a certificate in its own namespace, and the wildcard
+# *.sredevops.org Origin certificate already lives in this namespace.
+TLS_SOURCE_NAMESPACE ?= security-feed
+TLS_SOURCE_SECRET    ?= security-feed-sredevops-tls
 
 KUBECTL ?= kubectl
 SUDO    ?= sudo
@@ -74,6 +78,16 @@ apply: ## Render and apply (used by deploy and backfill; not usually called dire
 
 .PHONY: deploy
 deploy: apply ## Apply the rendered manifests (TAG is required; see render.sh)
+
+.PHONY: tls-secret
+tls-secret: ## Copy the wildcard *.sredevops.org cert into the Gateway's namespace
+	@$(KUBECTL) -n $(TLS_SOURCE_NAMESPACE) get secret $(TLS_SOURCE_SECRET) >/dev/null 2>&1 \
+	  || { echo "tls-secret: $(TLS_SOURCE_NAMESPACE)/$(TLS_SOURCE_SECRET) not found" >&2; echo "           set TLS_SOURCE_NAMESPACE / TLS_SOURCE_SECRET" >&2; exit 2; }
+	@$(KUBECTL) -n $(TLS_SOURCE_NAMESPACE) get secret $(TLS_SOURCE_SECRET) -o json \
+	  | node -e 'const j=JSON.parse(require("fs").readFileSync(0,"utf8")); delete j.metadata.namespace; delete j.metadata.resourceVersion; delete j.metadata.uid; delete j.metadata.creationTimestamp; delete j.metadata.managedFields; delete j.metadata.selfLink; delete j.metadata.annotations?.["kubectl.kubernetes.io/last-applied-configuration"]; j.metadata.name=process.argv[1]; j.metadata.annotations={...(j.metadata.annotations||{}),"tts-audio/source":"$(TLS_SOURCE_NAMESPACE)/$(TLS_SOURCE_SECRET)"}; process.stdout.write(JSON.stringify(j));' "$(TLS_SECRET)" \
+	  | $(KUBECTL) -n $(GATEWAY_NAMESPACE) apply -f -
+	@echo "tls-secret: $(GATEWAY_NAMESPACE)/$(TLS_SECRET) <- $(TLS_SOURCE_NAMESPACE)/$(TLS_SOURCE_SECRET)"
+	@echo "tls-secret: this is a snapshot; re-run it when the wildcard certificate is renewed"
 
 .PHONY: secret
 secret: ## Create/refresh the Secret from ADMIN_KEY, WEBHOOK_SECRET, GCS_KEY=<path>

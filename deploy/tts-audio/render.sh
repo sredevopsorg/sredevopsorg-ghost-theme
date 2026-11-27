@@ -50,6 +50,15 @@ VARS='${TAG} ${TTS_HOST} ${GATEWAY_NAME} ${GATEWAY_NAMESPACE} ${GATEWAY_SECTION}
 
 rendered="$(kubectl kustomize "$HERE/$OVERLAY" | envsubst "$VARS")"
 
+# The Gateway is rendered on its own so it keeps its own namespace. It is optional: a
+# cluster that already publishes the receiver through an existing Gateway (or through a
+# Traefik IngressRoute) does not need one, and `GATEWAY_NAME` there names that Gateway.
+if [ "${WITH_GATEWAY:-1}" = "1" ] && [ -f "$HERE/$OVERLAY/gateway.yaml" ]; then
+  rendered="${rendered}
+---
+$(envsubst "$VARS" < "$HERE/$OVERLAY/gateway.yaml")"
+fi
+
 # Placeholders that are supposed to survive: the Job template inside the ConfigMap is
 # filled by the receiver when it creates a Job, not when this script runs.
 SURVIVORS='POST_ID|IMAGE|POD_NAMESPACE'

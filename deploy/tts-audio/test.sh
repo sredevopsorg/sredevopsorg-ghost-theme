@@ -73,9 +73,24 @@ fi
 docs="$(printf '%s' "$rendered" | grep -c '^apiVersion:')"
 kinds="$(printf '%s' "$rendered" | grep -c '^kind:')"
 [ "$docs" -eq "$kinds" ] || fail "every apiVersion needs exactly one kind (${docs} vs ${kinds})"
-for kind in Namespace ServiceAccount Role RoleBinding ConfigMap Deployment Service Job HTTPRoute NetworkPolicy PodDisruptionBudget HorizontalPodAutoscaler; do
+for kind in Namespace ServiceAccount Role RoleBinding ConfigMap Deployment Service Job HTTPRoute NetworkPolicy PodDisruptionBudget HorizontalPodAutoscaler Gateway; do
   printf '%s' "$rendered" | grep -q "^kind: ${kind}$" || fail "rendered output is missing a ${kind}"
 done
+
+step "gateway"
+# Rendered outside the kustomization precisely so `namespace: tts-audio` cannot rewrite it;
+# a Gateway in the wrong namespace is the failure that produced Cloudflare 1016.
+gw_ns="$(printf '%s' "$rendered" | awk '/^kind: Gateway$/{seen=1} seen && /^  namespace:/{print $2; exit}')"
+if [ "$gw_ns" != "gw-ns" ]; then
+  fail "Gateway namespace is '${gw_ns}', expected the GATEWAY_NAMESPACE value (gw-ns)"
+fi
+printf '%s' "$rendered" | grep -q 'name: gw$' || fail "Gateway is not named after GATEWAY_NAME (gw)"
+# The listener port is Traefik's websecure container port, not the Service's 443.
+printf '%s' "$rendered" | grep -q 'port: 8443' || fail "Gateway listener is not on 8443 (Traefik websecure container port)"
+# allowedRoutes must not be the cluster's default `Same`: the route lives in tts-audio.
+printf '%s' "$rendered" | grep -q 'from: All' || fail "Gateway allowedRoutes must be All, or the route stays unattached"
+printf '%s' "$rendered" | grep -q "hostname: tts.example.org" || fail "Gateway hostname is not TTS_HOST"
+green "gateway ok"
 
 step "job template"
 # The template is a JSON document inside a ConfigMap block scalar. Extracted with node so
