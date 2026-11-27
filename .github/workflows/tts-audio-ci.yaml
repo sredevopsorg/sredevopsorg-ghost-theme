@@ -91,7 +91,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Set up Buildx
-        uses: docker/setup-buildx-action@v3.6.1
+        uses: docker/setup-buildx-action@v4.4.1
         with:
           # `load: true` below needs the docker-container driver or the image never lands
           # in the local daemon for the runtime smoke test.
