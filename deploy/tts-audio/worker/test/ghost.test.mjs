@@ -25,7 +25,7 @@ const { createHmac } = await import("node:crypto");
 
 const config = {
   ghostApiUrl: "https://ghost.test",
-  adminKey: "id:secret",
+  adminKey: "6b093438902def00019b98fe:abababababababababababababababababababababababababababababababab",
   audioBaseUrl: "https://audio.test",
   webhookSecret: "s3cret",
   siteUrl: "https://site.test",
@@ -61,6 +61,16 @@ test("locale is the single public locale tag, and never a guess", () => {
   assert.equal(localeOf(undefined), null);
 });
 
+test("a locale tag is matched by slug, not by its editorial name", () => {
+  // Measured against the live publication: locale tags are *named* "Español"/"English"
+  // and *slugged* `es`/`en`. Matching names marked every real post ineligible.
+  assert.equal(localeOf([{ name: "Español", slug: "es", visibility: "public" }]), "es");
+  assert.equal(localeOf([{ name: "English", slug: "en", visibility: "public" }]), "en");
+  assert.equal(localeOf([{ name: "Português", slug: "br", visibility: "public" }]), "br");
+  // Webhook payloads can omit the slug; the name is still usable then.
+  assert.equal(localeOf([{ name: "es" }]), "es");
+});
+
 test("the .md URL is the post's public path, not its API path", () => {
   assert.equal(mdUrl("https://site.test/", "/mi-post"), "https://site.test/mi-post/.md");
   assert.equal(mdUrl("https://site.test", "mi-post"), "https://site.test/mi-post/.md");
@@ -68,13 +78,17 @@ test("the .md URL is the post's public path, not its API path", () => {
 
 test("readPost asks the Admin API for both formats and keeps the stored post", async () => {
   const fetchImpl = fetchQueue([
-    { status: 200, body: { posts: [{ id: "abc", slug: "s", html: "<p>x</p>", markdown: "# x" }] } },
+    { status: 200, body: { posts: [{ id: "abc", slug: "s", html: "<p>x</p>", plaintext: "x" }] } },
   ]);
   const { post, source } = await readPost(config, "abc", { fetchImpl });
 
   const request = fetchImpl.calls[0];
-  assert.match(request.url, /\/ghost\/api\/admin\/posts\/abc\/\?formats=html,md$/);
-  assert.equal(request.init.headers.Authorization, "Ghost id:secret");
+  // `md` is not an accepted Admin API format (Ghost answers 422); `plaintext` is, and it
+  // is derived from the same stored source, which is what the drift check needs.
+  assert.match(request.url, /\/ghost\/api\/admin\/posts\/abc\/\?formats=html,plaintext$/);
+  // The header must be a signed JWT, not the raw key (see test/auth.test.mjs). The exact
+  // token changes per second, so only its shape is asserted here.
+  assert.match(request.init.headers.Authorization, /^Ghost [A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/);
   assert.equal(source, "admin");
   assert.equal(post.slug, "s");
 });
@@ -348,9 +362,8 @@ test("the backfill listing names the failing key on INVALID_JWT", async () => {
   assert.equal(code, 1);
   const joined = lines.join("\n");
   assert.match(joined, /INVALID_JWT/);
-  // The key id is named so an operator can tell *which* integration to regenerate. This
-  // config's key is `id:s`, so the id is `id`.
-  assert.match(joined, /key id id\)/);
+  // The key id is named so an operator can tell *which* integration to regenerate.
+  assert.match(joined, /key id 6b093438902def00019b98fe\)/);
   assert.match(joined, /regenerate its Admin API key/);
   // And the run ends with a structured line rather than an escaping exception.
   assert.match(joined, /"result":"failed"/);

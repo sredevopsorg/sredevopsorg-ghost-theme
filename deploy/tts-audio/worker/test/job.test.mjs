@@ -14,7 +14,7 @@ const { buildMarker, setMarker } = await import("../src/markers.mjs");
 
 const config = {
   ghostApiUrl: "https://ghost.test",
-  adminKey: "id:secret",
+  adminKey: "6b093438902def00019b98fe:abababababababababababababababababababababababababababababababab",
   audioBaseUrl: "https://audio.test",
   bucket: "bucket",
   chunkChars: 350,

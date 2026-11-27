@@ -252,22 +252,49 @@ hash includes the voice, so every post is regenerated on its next edit or backfi
 
 ### Is the Admin key actually valid?
 
-Do not judge it by `/site/`: that endpoint answers **200 without any auth**, so a revoked key
-looks fine there. Test an endpoint that requires an integration and compare it with a
-deliberately wrong key — the two must differ:
+Two traps, in the order they cost the most time.
 
-```bash
-curl -s -o /dev/null -w 'given: %{http_code}\n' \
-  -H "Authorization: Ghost $ADMIN_KEY" https://www.sredevops.org/ghost/api/admin/settings/
-curl -s -o /dev/null -w 'garbage: %{http_code}\n' \
-  -H "Authorization: Ghost 000000000000000000000000:$(printf 'f%.0s' $(seq 64))" \
-  https://www.sredevops.org/ghost/api/admin/settings/
+**1. The header takes a signed JWT, not the key.** `Authorization: Ghost <token>` where
+`<token>` is an HS256 JWT (`kid` = key id, `aud` = `/admin/`), signed with the
+hex-decoded secret. Sending the raw `id:secret` gives **`400 INVALID_JWT`**, which reads
+exactly like a revoked key. Ghost's source is explicit about it:
+
+```js
+const decoded = jwt.decode(token, { complete: true });
+if (!decoded || !decoded.header) throw BadRequestError({ code: 'INVALID_JWT' });
+const apiKeyId = decoded.header.kid;
 ```
 
-A **403** is "no key sent"; **400 `INVALID_JWT`** is "a key was sent and rejected". If the
-given key returns the same 400 as the garbage one, the integration was deleted or its key
-regenerated — create/repair it in Ghost Admin → Integrations, give it the **Administrator**
-role, and re-run `make secret` + `make restart`.
+The worker signs per request (`signAdminToken` in `worker/src/ghost.mjs`). Do not test the
+key with a bare `curl` and an `id:secret` header — that test always fails.
+
+**2. `/site/` answers 200 without any auth**, so it proves nothing about the key.
+
+Node signs without needing Ghost's internals:
+
+```bash
+ADMIN_KEY='<id>:<secret>' node -e '
+  const c = require("crypto");
+  const [id, s] = process.env.ADMIN_KEY.split(":");
+  const n = Math.floor(Date.now() / 1000);
+  const b = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
+  const si = b({ alg: "HS256", typ: "JWT", kid: id }) + "." + b({ iat: n, exp: n + 300, aud: "/admin/" });
+  process.stdout.write(si + "." + c.createHmac("sha256", Buffer.from(s, "hex")).update(si).digest("base64url"));
+' | xargs -I{} curl -s -o /dev/null -w '%{http_code}\n' \
+    -H "Authorization: Ghost {}" https://www.sredevops.org/ghost/api/admin/settings/
+```
+
+**200** means the key is good. A **400 `INVALID_JWT`** with a *correctly signed* token means
+the integration was deleted or its key regenerated — repair it in Ghost Admin →
+Integrations, give it the **Administrator** role (needed to write code injection), then
+`make secret` + `make restart`. A **403** means no header was sent.
+
+The quickest end-to-end check is the backfill in dry-run mode, which exercises the same
+signed read the Jobs use and nothing else:
+
+```bash
+make backfill-plan
+```
 
 | Symptom | Look at | Likely cause |
 |---|---|---|

@@ -12,7 +12,7 @@
  * the expensive work in retryable, per-post Jobs.
  */
 
-import { localeOf, markerIsCurrent } from "./ghost.mjs";
+import { ghostHeaders, localeOf, markerIsCurrent } from "./ghost.mjs";
 import { markerOf } from "./markers.mjs";
 import { contentHash } from "./hash.mjs";
 import { postText } from "./job.mjs";
@@ -48,9 +48,8 @@ async function listPosts(config, { fetchImpl = fetch, page = 1, limit = PAGE_LIM
     `?filter=${encodeURIComponent("status:published")}` +
     `&formats=html&include=tags` +
     `&limit=${limit}&page=${page}`;
-  const response = await fetchImpl(url, {
-    headers: { Authorization: `Ghost ${config.adminKey}`, Accept: "application/json" },
-  });
+  // Same signing as the shared client — the key is never sent directly.
+  const response = await fetchImpl(url, { headers: ghostHeaders(config.adminKey) });
   if (!response.ok) {
     // Keep Ghost's own error, and say which key failed when it is an auth failure.
     // "Ghost 400 Bad Request" is what a revoked or wrong admin key looks like: the whole
