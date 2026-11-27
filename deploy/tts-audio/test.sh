@@ -132,6 +132,17 @@ else
 fi
 
 step "worker unit tests"
+# The job and audio suites encode real audio through ffmpeg rather than mocking it —
+# that is the point of testing the concat/silence path — so a missing binary would fail
+# with a bare `spawn ffmpeg ENOENT` deep inside a test. Say so here instead.
+missing_bins=""
+for bin in node ffmpeg ffprobe; do
+  command -v "$bin" >/dev/null 2>&1 || missing_bins="$missing_bins $bin"
+done
+if [ -n "$missing_bins" ]; then
+  fail "missing required binary/binaries:${missing_bins} (install ffmpeg; node 24 for the tests)"
+fi
+
 if command -v node >/dev/null 2>&1; then
   (cd worker && node --test test/*.test.mjs) || fail "worker unit tests failed"
 else

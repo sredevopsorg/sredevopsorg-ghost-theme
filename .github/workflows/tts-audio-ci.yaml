@@ -62,8 +62,15 @@ jobs:
       - name: Check the kustomize toolchain
         run: kubectl version --client
 
-      - name: Install shellcheck
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends shellcheck
+      # `test.sh` checks for these and fails with a clear message if they are missing.
+      # `ffmpeg` is not optional here: the job tests encode real audio through the same
+      # concat/silence path a Job uses, so the test suite must run the real binary rather
+      # than a mock. `espeak-ng` is only needed by the smoke test, which runs in the image
+      # job below, where the runtime actually has it.
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends shellcheck ffmpeg
 
       - name: Run the offline gate
         run: ./deploy/tts-audio/test.sh
