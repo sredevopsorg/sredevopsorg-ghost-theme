@@ -1,12 +1,14 @@
 import { createRoot } from "react-dom/client";
 import { useEffect, useId, useRef, useState } from "react";
 import { getRoot, forgetRoot } from "../lib/island-root.js";
-import { t } from "../lib/theme-config.js";
+import { t, themeConfig } from "../lib/theme-config.js";
 import { concatAudioBlobs } from "../lib/audio.js";
 import {
+  AUDIO_MARKER_NAME,
   chunkText,
   formatDuration,
   missingIndexes,
+  resolveAudio,
   trackArtifactName,
   uniquePartsCount,
   voiceFor,
@@ -47,6 +49,20 @@ import {
  *
  * The audio element, object URL and in-flight requests are owned by refs and released
  * on stop, on end/error and on unmount, so no playback or download outlives the island.
+ *
+ * --- Pre-generated audio (the normal path) -------------------------------------
+ *
+ * The pipeline in deploy/tts-audio/ synthesises each article once with a local Kokoro
+ * model and stores it in GCS; the post then carries a marker in its code injection:
+ *
+ *   <meta name="sredevops:tts" content='{"v":1,"hash":"…","file":"https://…"}' >
+ *
+ * When that marker resolves to a file on the theme's audio host, the island switches to
+ * **file mode**: a single `<audio src>`, so seeking is native, the duration is exact, and
+ * nothing is synthesised per listener. Cloud TTS stays as the **fallback** for a post
+ * whose audio has not been generated yet (a new post between publish and the job finishing,
+ * a deleted object, or a marker pointing somewhere the theme does not trust) — in that
+ * mode the chunked path below is used unchanged.
  */
 
 const ENDPOINT = "https://texttospeech.googleapis.com/v1/text:synthesize";
@@ -68,6 +84,32 @@ const BLOCK_SELECTOR = [
 /** 44-byte silent WAV. Primes the audio element inside the click; never audible. */
 const SILENT_WAV =
   "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+
+/**
+ * Is the element still holding the silent unlock clip?
+ *
+ * Not `audio.src === SILENT_WAV`: the property returns the *resolved* URL, and browsers
+ * differ on whether a `data:` URL survives that resolution unchanged. Comparing the
+ * attribute the island itself set is the only reliable test.
+ */
+function isSilentClip(element) {
+  return element.getAttribute("src") === SILENT_WAV;
+}
+
+/**
+ * The host pre-generated audio is served from, read from the theme config.
+ *
+ * A pipeline ConfigMap value mirrored in partials/island-config.hbs so the island never
+ * hard-codes it: moving the bucket is a theme setting, not a JS release.
+ */
+const DEFAULT_AUDIO_HOST = "https://audio.sredevops.org";
+
+/** Read the marker the pipeline writes into the post's code injection. */
+function readAudioMarker() {
+  if (typeof document === "undefined") return null;
+  const el = document.querySelector(`meta[name="${AUDIO_MARKER_NAME}"]`);
+  return el?.getAttribute("content") ?? null;
+}
 
 /** How far the skip buttons move the playhead, in seconds. */
 const SKIP_SECONDS = 10;
@@ -111,7 +153,13 @@ function saveBlob(blob, filename) {
 const ASSUMED_CHUNK_SECONDS = 90;
 
 function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
+  // Resolved once at mount: the marker does not change while the page is open, and a
+  // re-read during render would make the mode flip on an unrelated state update.
+  const [audio] = useState(() => resolveAudio(readAudioMarker(), themeConfig().audioHost || DEFAULT_AUDIO_HOST));
   const [status, setStatus] = useState("idle");
+  // `file` when a pre-generated MP3 is available, `cloud` for the Cloud TTS fallback.
+  const [mode, setMode] = useState(audio ? "file" : "cloud");
+  const modeRef = useRef(audio ? "file" : "cloud");
   const [speed, setSpeed] = useState(1);
   // Playhead: the loaded chunk, and how far into it playback is.
   const [index, setIndex] = useState(null);
@@ -232,13 +280,13 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
     audio.onplaying = () => {
       // The silent unlock clip also fires `playing`; it must not make the UI claim
       // the article is audible before the first chunk is loaded.
-      if (audio.src === SILENT_WAV || indexRef.current === null) return;
+      if (modeRef.current !== "cloud" || isSilentClip(audio) || indexRef.current === null) return;
       if (aliveRef.current && statusRef.current !== "generating") setSafeStatus("playing");
     };
     audio.onpause = () => {
       // Only a reader-initiated pause lands here; an ended chunk moves straight on,
       // and a seek pauses the old chunk on purpose before loading the next one.
-      if (audio.src === SILENT_WAV || indexRef.current === null || switchingRef.current) return;
+      if (modeRef.current !== "cloud" || isSilentClip(audio) || indexRef.current === null || switchingRef.current) return;
       if (aliveRef.current && statusRef.current === "playing") setSafeStatus("paused");
     };
 
@@ -255,6 +303,89 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
     // endSession only touches refs, so capturing it once is intentional.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /* --- File mode: one pre-generated file, streamed from the audio host ----------
+   *
+   * No chunking, no synthesis, no API key. The media element is the source of truth for
+   * time, so the transport UI (seek slider, skip, speed) drives it directly and the
+   * "n/N parts" counter — which describes a chunk cache — is not shown.
+   */
+
+  /** Mark the file as heard once its final quarter second starts. */
+  const markFileProgress = () => {
+    const element = audioRef.current;
+    if (!element || !aliveRef.current) return;
+    const known = Number.isFinite(element.duration) && element.duration > 0;
+    if (known && element.currentTime >= element.duration - 0.25) markHeard(0);
+  };
+
+  /**
+   * Attach the pre-generated file to the media element and play it.
+   *
+   * Called from a click, so iOS's gesture requirement is satisfied by calling `play()`
+   * synchronously — the file needs no synthesis round trip before playback starts.
+   */
+  const playFile = () => {
+    const element = audioRef.current ?? ensureAudio();
+    detachHandlers();
+
+    releaseAudioUrl();
+    indexRef.current = 0;
+    setIndex(0);
+    setCurrent(0);
+    heardRef.current = 0;
+    setHeard(0);
+
+    element.onloadedmetadata = () => {
+      if (aliveRef.current) setCurrent(0);
+    };
+    element.ontimeupdate = () => {
+      if (!aliveRef.current) return;
+      setCurrent(element.currentTime || 0);
+      markFileProgress();
+    };
+    element.onended = () => {
+      if (!aliveRef.current) return;
+      markHeard(0);
+      setSafeStatus("idle");
+    };
+    element.onerror = () => {
+      // `stop()` clears the source and a media element with no source fires `error` too;
+      // only a failure to load the actual file is a reason to fall back.
+      if (!aliveRef.current || element.getAttribute("src") !== audio.file) return;
+      console.warn("[tts] pre-generated audio failed to load; falling back to Cloud TTS");
+      releaseAudioUrl();
+      fallBackToCloud();
+    };
+
+    element.src = audio.file;
+    element.playbackRate = speedRef.current;
+    setSafeStatus("loading");
+    element.play().then(
+      () => {
+        if (aliveRef.current) setSafeStatus("playing");
+      },
+      () => {
+        if (aliveRef.current) setSafeStatus("error");
+      },
+    );
+  };
+
+  /**
+   * Switch from file mode to the Cloud TTS path after the file failed.
+   *
+   * The mode lives in a ref as well as state so the decision survives re-renders without
+   * a second React commit racing the audio events.
+   */
+  const fallBackToCloud = () => {
+    modeRef.current = "cloud";
+    setMode("cloud");
+    if (!apiKey) {
+      setSafeStatus("error");
+      return;
+    }
+    startCloud();
+  };
 
   const synthChunk = async (text, signal) => {
     const { languageCode, name } = voiceFor(locale, voice);
@@ -388,7 +519,7 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
     });
   };
 
-  const start = () => {
+  const startCloud = () => {
     const chunks = chunkText(articleText(target));
     if (!chunks.length) {
       setSafeStatus("error");
@@ -438,11 +569,19 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
 
     // Synchronous within the click: this is what makes iOS allow the later play().
     ensureAudio();
-    start();
+    // File mode assigns `src` immediately, which is itself inside the gesture.
+    if (modeRef.current === "file" && audio) playFile();
+    else startCloud();
   };
 
   const stop = () => {
     endSession();
+    // File mode plays from the element with no chunk cache, so stopping must release the
+    // source; otherwise the next play resumes at the old position with no handlers left.
+    if (modeRef.current === "file") {
+      audioRef.current?.removeAttribute("src");
+      audioRef.current?.load();
+    }
     indexRef.current = null;
     heardRef.current = 0;
     durationsRef.current = {};
@@ -461,7 +600,9 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
     if (audioRef.current) audioRef.current.playbackRate = next;
   };
 
-  const usable = status === "playing" || status === "paused";
+  // `loading` only exists in file mode (a metadata round trip) and is treated as usable so
+  // the transport strip lays out while the file arrives.
+  const usable = status === "playing" || status === "paused" || status === "loading";
   const total = chunksRef.current.length;
 
   /**
@@ -469,6 +610,8 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
    * position (not the last render's `current`, which lags behind a skip).
    */
   const elapsedTrackSeconds = () => {
+    // File mode: the element's own currentTime *is* the article timeline.
+    if (mode === "file") return audioRef.current?.currentTime || 0;
     let seconds = 0;
     for (let before = 0; before < (indexRef.current ?? 0); before += 1) {
       seconds += durationsRef.current[before] ?? ASSUMED_CHUNK_SECONDS;
@@ -476,6 +619,13 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
     return seconds + (audioRef.current?.currentTime || 0);
   };
   const totalTrackSeconds = () => {
+    // File mode: the duration comes from the MP3's Xing header, so it is exact once
+    // metadata loads; the marker's value covers the moment before that.
+    if (mode === "file") {
+      const measured = audioRef.current?.duration;
+      if (Number.isFinite(measured) && measured > 0) return measured;
+      return audio?.duration || 0;
+    }
     let seconds = 0;
     for (let at = 0; at < chunksRef.current.length; at += 1) {
       seconds += durationsRef.current[at] ?? ASSUMED_CHUNK_SECONDS;
@@ -486,6 +636,17 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
   /** Move the playhead to the article timeline position in seconds. */
   const seekToTrackSeconds = (trackSeconds) => {
     if (!usable || indexRef.current === null) return;
+    if (mode === "file") {
+      const element = audioRef.current;
+      if (!element) return;
+      try {
+        element.currentTime = Math.max(0, Math.min(trackSeconds, totalTrackSeconds() || trackSeconds));
+        setCurrent(element.currentTime);
+      } catch {
+        // Ignore; the slider snaps back on the next timeupdate.
+      }
+      return;
+    }
     const last = chunksRef.current.length - 1;
     let remaining = Math.max(0, trackSeconds);
     let target = 0;
@@ -533,6 +694,21 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
    * keeps playing; `endSession` (Stop, unmount) aborts that one too.
    */
   const downloadAudio = () => {
+    if (mode === "file" && audio?.file) {
+      // File mode: the bytes already exist on the CDN. The link points straight at the
+      // object, whose `Content-Disposition` names the saved file (a `download` attribute
+      // is ignored cross-origin). This click never costs a synthesis.
+      const link = document.createElement("a");
+      link.href = audio.file;
+      link.download = trackArtifactName({ slug, locale });
+      link.rel = "noopener";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setDownloaded(true);
+      return;
+    }
     if (!chunksRef.current.length || downloadRef.current) return;
 
     const controller = new AbortController();
@@ -569,7 +745,9 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
     })();
   };
 
-  if (!apiKey) {
+  // No pre-generated audio *and* no Cloud TTS key: there is nothing this player can do.
+  // With a file it works without any key, which is the point of the pipeline.
+  if (mode === "cloud" && !apiKey) {
     return (
       <div className="tts-player" data-state="unavailable">
         <button type="button" className="tts-control" disabled>
@@ -585,20 +763,31 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
       ? t("ttsDownloaded")
       : t("ttsDownload");
 
-  const statusText = status === "generating" ? t("ttsGenerating") : status === "error" ? t("ttsError") : "";
+  const statusText =
+    status === "loading"
+      ? t("ttsAudioLoading")
+      : status === "generating"
+        ? t("ttsGenerating")
+        : status === "error"
+          ? t("ttsError")
+          : "";
   const cachedCount = uniquePartsCount(total, cacheRef.current);
-  const canDownload = total > 0 && cachedCount > 0 && !download;
+  // File mode can always be downloaded: the bytes already exist on the CDN.
+  const canDownload =
+    mode === "file" ? Boolean(audio?.file) && !download : total > 0 && cachedCount > 0 && !download;
   const elapsed = elapsedTrackSeconds();
   const length = totalTrackSeconds();
 
   return (
-    <div className="tts-player" data-state={status} role="group" aria-label={t("ttsPlayer")}>
+    <div className="tts-player" data-state={status} data-mode={mode} role="group" aria-label={t("ttsPlayer")}>
       <button
         type="button"
         className="tts-control tts-play"
         onClick={togglePlay}
-        disabled={status === "generating"}
-        aria-label={status === "playing" ? t("ttsPause") : t("ttsPlay")}
+        disabled={status === "generating" || status === "loading"}
+        aria-label={
+          status === "playing" ? t("ttsPause") : status === "loading" ? t("ttsAudioLoading") : t("ttsPlay")
+        }
       >
         {status === "playing" ? (
           <svg
@@ -690,12 +879,16 @@ function TtsPlayer({ apiKey, target = ".gh-content", locale, voice, slug }) {
           aria-valuetext={`${formatDuration(elapsed)} / ${formatDuration(length)}`}
         />
         <span className="tts-time">-{formatDuration(Math.max(0, length - elapsed))}</span>
-        <span
-          className="tts-parts"
-          title={t("ttsParts").replace("%cached", String(cachedCount)).replace("%total", String(total))}
-        >
-          {heard}/{total}
-        </span>
+        {/* The "n/N" counter describes a chunk cache, which file mode does not have: a
+            single streamed file has nothing to count, so it is hidden there. */}
+        {mode === "cloud" && (
+          <span
+            className="tts-parts"
+            title={t("ttsParts").replace("%cached", String(cachedCount)).replace("%total", String(total))}
+          >
+            {heard}/{total}
+          </span>
+        )}
       </div>
 
       <label className="tts-speed" htmlFor={speedId}>

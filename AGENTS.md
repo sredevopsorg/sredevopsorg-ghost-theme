@@ -7,7 +7,7 @@ the multi-locale model, and deployment. This file records the commands, invarian
 pitfalls an agent needs in order to change the code safely. If the two disagree, prefer
 `README.md` and the code, then fix this file in the same change.
 
-Last verified: 2026-11-21 against theme version 3.6.0.
+Last verified: 2026-11-26 against theme version 4.0.0.
 
 ## What this repository is
 
@@ -48,6 +48,7 @@ yarn install --frozen-lockfile   # exactly what CI installs; fails on a stale lo
 | `yarn test:bundle` | Loads the built entry and checks the island/code-splitting contract |
 | `yarn test:classes` | Every class in a template or island has CSS in the build |
 | `yarn package` | Writes and validates `dist/<name>-<version>.zip`; keeps older archives |
+| `deploy/tts-audio/test.sh` (`make -C deploy/tts-audio test`) | Offline gate for the audio pipeline: kustomize render, placeholder refusal, worker unit tests |
 | `node scripts/release-notes.mjs <version>` | Prints the `CHANGELOG.md` section for a release body |
 | `yarn ghost:up` / `ghost:down` / `ghost:restart` / `ghost:logs` | Local Ghost 6 + MySQL stack on port 2368 |
 | `yarn fixtures:capture` / `normalize` / `diff` / `promote` | Golden-HTML fixture workflow (needs a seeded Ghost) |
@@ -78,6 +79,7 @@ Rules of thumb:
 | `lib/vite/` | Vite plugin that turns `manifest.json` into the two Handlebars partials |
 | `scripts/` | Node ESM tooling: manifest checks, packaging, fixtures, font/icon sync |
 | `tests/` | `node:test` suites; `tests/fixtures/golden/` is the reviewed HTML baseline |
+| `deploy/tts-audio/` | **Not part of the theme.** Kokoro synthesis worker, webhook receiver, Kubernetes manifests, GHCR image build; denied by `ship-manifest.mjs` and not covered by `yarn verify` (its gate is `deploy/tts-audio/test.sh`) |
 | `docs/` | ADRs, release checklist, roadmap (historical) |
 | `routes.yaml` | Locale collections and taxonomies; uploaded in Ghost Admin, not deployed by CI |
 | `locales/` | Ghost translation JSON (`en`, `es`, `pt`) |
@@ -153,12 +155,19 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
   `partials/island-config.hbs` (`{{json}}` + `{{t}}`, read with `t()` from
   `assets/js/lib/theme-config.js`). That payload is inline on every page.
 - Keep island Tailwind classes real: `yarn test:classes` fails otherwise.
-- `TtsPlayer` (posts only) synthesises the article in Cloud TTS chunks, and its
-  **Download MP3** button assembles them into one file (`assets/js/lib/audio.js`).
-  That download synthesises every chunk it does not already have, so it bills like one
-  full listen — do not "optimise" it into a free partial file without saying so.
-  Pure logic (chunking, voice names, time formatting, file names) lives in
-  `assets/js/lib/tts.js` and is unit tested; keep DOM and `fetch` in the island.
+- `TtsPlayer` (posts only) has **two modes**, and the distinction is load-bearing:
+  - **File mode (normal):** the island reads the `<meta name="sredevops:tts">` marker the
+    pipeline writes into the post's code-injection footer, and plays the one MP3 from
+    `tts_audio_host`. No synthesis, no key, native seek and duration; **Download** is a
+    link to the same file. The host comes from the marker and the `tts_audio_host`
+    setting — never hard-code it in the island (a test greps for that literal).
+  - **Cloud mode (fallback):** for a post with no usable marker, the old browser-direct
+    Cloud TTS path runs unchanged, chunks the article and assembles a download. It bills
+    per listener, so do not route posts without a marker into it on purpose.
+  Pure logic lives in `assets/js/lib/tts.js` (chunking, voice names, marker parsing, URL
+  allow-list, time formatting, file names) and is unit tested; keep DOM and `fetch` in
+  the island. `parseAudioMarker` must stay strict: an unknown key or a foreign/non-https
+  host means "no pre-generated audio", never a broken player.
 
 ### Styling
 
@@ -183,8 +192,8 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
 
 - `package.json` is also the Ghost theme manifest. Keep `config`, `image_sizes`, `gpm`
   and the `engines` fields valid.
-- Custom settings are append-only: `show_search`, `show_login`, `tts_enabled` and
-  `tts_api_key`. Keys are `snake_case`; never rename
+- Custom settings are append-only: `show_search`, `show_login`, `tts_enabled`,
+  `tts_api_key` and `tts_audio_host`. Keys are `snake_case`; never rename
   an existing key, because Ghost stores values by key. Descriptions must stay under 100
   characters. The former `featured_only` / `featured_tag` settings were removed with the
   separate hero query — do not bring them back.
@@ -225,6 +234,24 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
   branch protection.
 
 ## Change workflows
+
+**Audio pipeline change (`deploy/tts-audio/`)**
+
+1. Edit the worker under `deploy/tts-audio/worker/src/` and its unit tests beside it;
+   keep pure logic (text extraction, hashing, markers, ffmpeg argv) free of I/O so it is
+   testable without a cluster, a model or a bucket.
+2. `./deploy/tts-audio/test.sh` (or `make -C deploy/tts-audio test`). It renders the
+   manifests with test values, refuses unfilled placeholders, validates the Job template
+   JSON and runs the worker tests. It needs no cluster.
+3. Manifest changes are reviewed like code: `render.sh` refuses to emit a route whose
+   Gateway is still a placeholder, which is the failure it exists to prevent.
+4. `models.lock.json` entries must be real sha256 values. A `REPLACE_ME` entry fails the
+   image build on purpose; populate it with `worker/scripts/update-models.mjs` from a host
+   that can reach the Hugging Face CDN.
+5. The image, the smoke test and the `/healthz` start check run in the `tts-audio`
+   workflow. A voice or speed change is a ConfigMap edit, not a code change.
+6. Never apply the pipeline from a theme release, and never let `deploy/` ship. The theme
+   and the pipeline ship independently.
 
 **Template or partial change**
 
@@ -267,7 +294,8 @@ document when behavior, commands or settings change, and keep `AGENTS.md` in syn
 - Adding a client-side router, moving page rendering into React, or making rendering
   depend on JavaScript.
 - Adding third-party requests, a second package manager, a second lockfile, or a
-  network-dependent build step.
+  network-dependent build step. (The one exception is `deploy/tts-audio/worker/`, which
+  is a separate npm project and never ships; the theme itself stays Yarn-only.)
 - Committing `.env`, secrets, local Ghost content, or archives.
 - Running `git commit --amend`, rebases or force-pushes on shared branches without being
   asked; do not rewrite history that was already reviewed.
@@ -280,5 +308,6 @@ document when behavior, commands or settings change, and keep `AGENTS.md` in syn
 - [ ] Generated manifest partials were rebuilt and committed if assets changed.
 - [ ] `git diff --check` is clean.
 - [ ] Template changes were exercised against a local Ghost, or the reason they were not.
+- [ ] `deploy/tts-audio/test.sh` passes if anything under `deploy/tts-audio/` changed.
 - [ ] Docs/README updated when behavior, commands or settings changed.
 - [ ] No secrets, `dist/`, `assets/built/` or unrelated files in the diff.

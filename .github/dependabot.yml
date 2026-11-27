@@ -9,3 +9,21 @@ updates:
     directory: /
     schedule:
       interval: daily
+
+  # The article-audio worker has its own lockfile (npm, not yarn) because it ships as a
+  # container image and the theme's dependency set must not grow an ONNX runtime.
+  - package-ecosystem: npm
+    directory: /deploy/tts-audio/worker
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    groups:
+      # ONNX runtime, the model loader and the GCS client move together; one PR per week
+      # is reviewable, twenty are not.
+      tts-audio:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directory: /deploy/tts-audio/worker
+    schedule:
+      interval: weekly

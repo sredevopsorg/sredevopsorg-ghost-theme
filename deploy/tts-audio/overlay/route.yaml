@@ -1,0 +1,44 @@
+# Gateway API route for the webhook receiver.
+#
+# Ghost POSTs to https://$TTS_HOST/ghost. The host terminates TLS (see the Gateway's own
+# listener) and forwards here; the receiver speaks plain HTTP on :80.
+#
+# The parent Gateway is a single value to fill in (`GATEWAY_NAME`, `GATEWAY_NAMESPACE`) —
+# every cluster names it differently. `make test` fails while it is still a placeholder,
+# so a route can never be applied pointing at a Gateway that does not exist.
+#
+# Selected by overlay/kustomization.yaml. For Traefik, swap it for route-traefik.yaml.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tts-webhook
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: webhook
+spec:
+  parentRefs:
+    - name: ${GATEWAY_NAME}
+      namespace: ${GATEWAY_NAMESPACE}
+      sectionName: ${GATEWAY_SECTION}
+  hostnames:
+    - ${TTS_HOST}
+  rules:
+    - matches:
+        # Only the two routes the receiver implements. Anything else is a 404 from the
+        # receiver, but keeping the match narrow means a misconfigured host on the same
+        # Gateway cannot reach it at all.
+        - path:
+            type: PathPrefix
+            value: /ghost
+        - path:
+            type: Exact
+            value: /healthz
+      backendRefs:
+        - name: tts-webhook
+          port: 80
+      # Ghost waits 10 s for a delivery; the receiver answers in milliseconds. A shorter
+      # timeout than the LoadBalancer default surfaces a stuck receiver sooner.
+      timeouts:
+        request: 15s
+        backendRequest: 15s

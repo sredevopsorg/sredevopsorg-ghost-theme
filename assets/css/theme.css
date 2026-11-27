@@ -315,8 +315,16 @@
 
 .tts-player[data-state="playing"] .tts-progress,
 .tts-player[data-state="paused"] .tts-progress,
+.tts-player[data-state="loading"] .tts-progress,
 .tts-player[data-state="generating"] .tts-progress {
   @apply flex;
+}
+
+/* File mode streams one pre-generated file: the button is disabled until the media
+   element has its metadata, which is a network round trip rather than a synthesis, so
+   the status line explains the wait. */
+.tts-player[data-state="loading"] .tts-status {
+  @apply text-muted;
 }
 
 .tts-player .tts-time {

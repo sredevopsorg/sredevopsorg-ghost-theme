@@ -461,8 +461,9 @@ authoritative settings table.
 |--------|------|---------|-------|-------------|
 | `show_search` | Boolean | `true` | site-wide | Show a search icon in the main navigation |
 | `show_login` | Boolean | `true` | site-wide | Show a sign-in link in the main navigation |
-| `tts_enabled` | Boolean | `true` | Post | Show a text-to-speech player on posts |
-| `tts_api_key` | Text | *(empty)* | Post | Google Cloud TTS API key; restrict it by HTTP referrer |
+| `tts_enabled` | Boolean | `true` | Post | Show the article audio player on posts |
+| `tts_api_key` | Text | *(empty)* | Post | Google TTS fallback key for posts without audio yet |
+| `tts_audio_host` | Text | `https://audio.sredevops.org` | Post | Origin serving pre-generated audio; empty disables it |
 
 ### Featured hero
 
@@ -493,145 +494,109 @@ only picks the file.
 > separate query. Re-capture against a seeded Ghost (`yarn fixtures:capture`,
 > `yarn fixtures:normalize`) and review the diff before promoting.
 
-### Text-to-speech player (Google Cloud Chirp 3: HD)
+### Article audio (pre-generated, Kokoro)
 
-With `tts_enabled` on (the default), posts render a `TtsPlayer` island above the
-article. It reads the article text from `.gh-content` (skipping code blocks, tables
-and navigation) and calls the
-[Cloud Text-to-Speech REST API](https://docs.cloud.google.com/text-to-speech/docs/reference/rest/v1/text/synthesize)
-directly from the reader's browser with `tts_api_key`. The player is an ordinary audio
-miniplayer: play/pause, back/forward 10 seconds, stop, a timebar with elapsed and
-remaining time, 0.5×–2× speed, and a **Download MP3** button. Its labels and status
-messages come from `locales/*.json`; the controls stay hidden until someone presses
-play. Pages do not get a player.
+With `tts_enabled` on (the default), posts render the `TtsPlayer` island above the article: a
+miniplayer with play/pause, back/forward 10 seconds, stop, a timebar with elapsed and
+remaining time, 0.5×–2× speed, and **Download MP3**. The controls appear only once someone
+presses play. Pages do not get a player.
 
-Voice selection follows the template's locale, so a post sounds native in each
-collection. `assets/js/lib/tts.js` owns this map (and its unit tests):
+**Download MP3** links straight at the stored object: the file is already on the CDN, so a
+download costs nothing and takes no time. The saved name (`<slug>-<lang>.mp3`) comes from
+the object's `Content-Disposition` header, because browsers ignore a `download` attribute
+on a cross-origin URL.
 
-| Template locale | Language code | Voice |
-|-----------------|---------------|-------|
-| `en` | `en-US` | `en-US-Chirp3-HD-Leda` |
-| `es` | `es-US` | `es-US-Chirp3-HD-Leda` |
-| `br` | `pt-BR` | `pt-BR-Chirp3-HD-Leda` |
+**The audio is not synthesised in the reader's browser.** Each published post is spoken
+once, server-side, by an open-weight local model
+([Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M), Apache-2.0), stored in a Google
+Cloud Storage bucket and served from **`https://audio.sredevops.org`**. The player streams
+that one file, so seeking is native, the duration is exact, and a listen costs nothing.
 
-Leda is used for all three collections. The voice follows the **template's** `locale`,
-not the URL prefix: a Portuguese post renders in Portuguese only when the editor selects
-`custom-br.hbs` (see [Locale Content Authoring](#-locale-content-authoring)); posts left on
-`post.hbs` are read in English, exactly as they already take English reading-time
-strings. To use another of the 29 Chirp 3: HD names (Charon, Aoede, Puck, …), add
-`data-voice="Charon"` to the mount point in `partials/post-layout.hbs`; the island
-appends it to the locale's code, so no JS edit is needed.
+How the page finds the file: the synthesis job writes a single marker line into the post's
+**code injection** (Settings → Post → Code injection, *Footer*):
 
-#### Timebar and download
+```html
+<meta name="sredevops:tts" content='{"v":1,"hash":"…","file":"https://audio.sredevops.org/audio/<post>/<hash>.mp3",…}'>
+```
 
-The timebar spans the whole article, even though the article is a sequence of
-synthesised chunks: the island adds each chunk's duration as it loads and assumes a
-nominal length for chunks nobody has reached yet, so a drag lands on the right chunk
-and offset. Skipping back into a chunk is free (it is already cached); skipping forward
-into a chunk that has not been synthesised yet waits for it, with the play button
-showing *Generating*.
+`{{ghost_foot}}` renders that inside `<body>` ([partials/shell.hbs](partials/shell.hbs)),
+and the island reads it with `document.querySelector('meta[name="sredevops:tts"]')`. Do not
+edit or delete it by hand: it is rewritten on every regeneration, and removing it makes the
+post fall back to Cloud TTS (see below).
 
-**Download MP3** saves the article as **one** file, `<post-slug>-<lang>.mp3`. Chunks
-already cached (played or prefetched) are reused, and the rest are synthesised on click
-— sequentially, behind a `Generating n of N` label — so the button always produces the
-complete article and bills exactly what one uninterrupted listen would. `Stop` cancels
-a download in progress. The chunks are concatenated byte for byte
-(`assets/js/lib/audio.js`): every chunk comes from the same voice and encoder
-settings, so one continuous MP3 frame stream results with no re-encoding in the
-browser. The file has no ID3 tags or duration header, so a desktop player may show its
-length a moment after opening it.
+The same voice family is used in each collection, selected from the post's locale tag:
 
+| Locale tag | Kokoro voice | espeak-ng language | Notes |
+|-----------|--------------|--------------------|-------|
+| `en` | `af_heart` | `en-us` | American English, highest-graded voice in the release |
+| `es` | `ef_dora` | `es` | Spanish, 0.98× speed |
+| `br` | `pf_dora` | `pt-br` | Brazilian Portuguese (`pt-br`, not `pt`), 0.98× speed |
 
-#### How the request is built
+A post gets audio only when it carries **exactly one** of those tags. A post with no tag,
+or with two, is skipped rather than guessed: the voice follows the tag, not the template,
+so a `custom-br.hbs` post must also be tagged `br`.
 
-Two Cloud TTS constraints shape the island:
+#### The pipeline
 
-- **5000 bytes per request, and it cannot be raised.** The limit is counted in UTF-8
-  *bytes*, not characters, so accented Spanish and Portuguese cost two bytes per
-  vowel. `assets/js/lib/tts.js` packs whole sentences into chunks under the cap,
-  hard-splits a single oversized token (a long URL) by code point, and never cuts a
-  multi-byte character in half — `tests/tts.test.mjs` pins all three behaviours. The
-  island fetches the chunks in order, prefetching the next while the current one
-  plays, so the gap between chunks is one short request rather than a full article.
-- **A second, undocumented cap applies per sentence: about 610 bytes.** Past that the
-  API answers `400 This request contains sentences that are too long` — measured
-  against the live endpoint (610 bytes of ordinary words passes, 620 fails). Article
-  text read from the DOM can contain long unpunctuated runs (table cells, list items,
-  a stripped code block), so sentences are bounded to 400 bytes, breaking at clause
-  punctuation first and at word boundaries otherwise. Each fragment is terminated, so
-  packing them back into one request cannot recreate a long sentence.
-- **Chirp 3: HD batch mode has no speaking rate.** Speed is the media element's
-  `playbackRate`, which preserves pitch and costs nothing; re-synthesising per speed
-  would bill the article again on every change.
+The pipeline lives beside the theme in [`deploy/tts-audio/`](deploy/tts-audio/README.md) —
+outside the theme package, and refused by `scripts/ship-manifest.mjs` if it ever tried to
+ship. It is **not** deployed by this repository's CI; see the runbook for the commands.
 
-Reading the article text has one trap of its own: `textContent` concatenates without
-separators, so `<li>uno</li><li>dos</li>` reads as `unodoss`. The island inserts a
-space after every block element before reading the text, which is also what keeps
-table rows from fusing into one unpronounceable token.
+```
+Ghost webhook (post.added / post.published.edited / post.unpublished / post.deleted)
+  → https://<TTS_HOST>/ghost  → API Gateway / HTTPRoute → tts-webhook (Deployment)
+        verifies the signature, decides, creates a Job — answers 202 in milliseconds
+  → Job tts-worker
+        1. reads the post (Admin API; the public <url>.md without a key)
+        2. extracts the text the reader would hear
+        3. hashes text + voice + speed; stops if the marker already matches
+        4. synthesises with Kokoro, encodes one MP3 (ffmpeg, ID3 + duration header)
+        5. uploads audio/<post-id>/<hash>.mp3 to GCS (immutable Cache-Control)
+        6. writes the marker into the post's code injection
+```
 
-The response is base64 MP3, decoded into a `Blob` and played from an object URL that
-is revoked on stop, on end/error and on unmount.
+Each language is phonemised with **espeak-ng** and then spoken by the same ONNX model.
+That detail is not incidental: `kokoro-js`, the usual JS wrapper, only ships English
+voice names and an English-only phonemizer, so it cannot produce `es` or `br` audio at all
+— it throws on `ef_dora` and hard-codes `language = "en"`. The worker therefore calls the
+model directly (`deploy/tts-audio/worker/src/tts.mjs` explains the three steps). Measured
+throughput is **~8 characters per second of CPU** on 2 vCPUs, plus ~10 s of model load per
+job; see the runbook for how the job is sized.
 
-One browser detail is load-bearing: the first `play()` happens *after* a synthesis
-request, and iOS Safari only grants playback permission inside the user gesture. The
-island therefore creates and primes a single audio element on a silent clip
-synchronously in the click, then reuses that element for every chunk — without it the
-player would work on desktop and stay silent on iPhone.
+The image is published to **GHCR** (`ghcr.io/sredevopsorg/sredevopsorg-ghost-theme/tts-audio-runner`,
+tagged with the commit SHA) by [.github/workflows/tts-audio-ci.yaml](.github/workflows/tts-audio-ci.yaml).
+DNS for `audio.sredevops.org` is a proxy record in **Cloudflare** pointing at the bucket;
+Cloudflare manages DNS only — reads and writes are GCS.
 
-#### Setup
+#### Fallback: Google Cloud TTS
 
-1. In the Google Cloud console, enable **Cloud Text-to-Speech API** for a project and
-   link billing ([pricing](https://cloud.google.com/text-to-speech/pricing): Chirp 3: HD
-   is **$30 per 1M characters**, with **1M characters free per month**).
-2. Create an **API key** and restrict it — both restrictions matter:
-   - *API restrictions*: allow only **Cloud Text-to-Speech API**.
-   - *Application restrictions* → **Websites**: add `https://www.sredevops.org/*` and,
-     for local work, `http://localhost:2368/*`.
-3. Set a **budget alert** on the project. Treat the cap as the real limit.
-4. Paste the key into **Ghost Admin → Settings → Design → Theme → `tts_api_key`**.
+A post with no marker — a new post in the seconds between publish and the job finishing, a
+post whose audio was deleted, or one whose marker names a host the theme does not trust —
+falls back to **the old browser-direct Cloud TTS path**, unchanged: the article text is read
+from `.gh-content`, chunked, and synthesised per chunk behind `tts_api_key`. It is a real
+fallback and it bills like one, per listener. The chunking rules in
+[assets/js/lib/tts.js](assets/js/lib/tts.js) still apply there only.
 
-Leaving `tts_api_key` empty renders a single disabled "unavailable" button instead;
-the article never breaks.
+To enable it, create a **Google Cloud API key** restricted to *Cloud Text-to-Speech API*
+and to the *Websites* `https://www.sredevops.org/*` and `http://localhost:2368/*`, then paste
+it into **Ghost Admin → Settings → Design → Theme → `tts_api_key`**. The key is embedded in
+the post HTML and is therefore public; treat it as such, keep the project on a low quota,
+and rotate it if the bill moves.
 
-#### Cost and the public key
+Leaving `tts_api_key` empty is fine once the archive has audio: pre-generated files need no
+key at all. A post with **neither** a marker nor a key renders a single disabled
+"unavailable" button, and the article is unaffected.
 
-**The API key is embedded in the post HTML and sent to every visitor** — a Ghost
-theme has no server-side runtime to proxy the call. Two consequences:
+#### Reading the text
 
-- **Every play bills the full article.** At ~6–9k characters per post, the free
-  monthly million is roughly 120–160 listens *for the whole site*. There is no
-  caching: a reload and a second click both pay again. **Download MP3** costs the same
-  as one play: it reuses the chunks the session already paid for and synthesises only
-  the rest.
-- **The key is readable.** The HTTP-referrer restriction is what makes this
-  acceptable: requests from `curl`, a server, or any other site carry no matching
-  `Referer` and are rejected. It does not stop someone who copies the key into their
-  own browser — so keep the project on a low, explicitly-set quota and rotate the key
-  if the bill moves.
-
-Browser-direct CORS is what makes this possible at all; the endpoint reflects the
-request's `Origin` (verified against `texttospeech.googleapis.com`). If the cost or
-exposure becomes a problem, the next step is the design below.
-
-#### Future: pre-generated audio on Cloud Storage (not implemented)
-
-The intended production shape moves synthesis out of the reader's browser entirely:
-
-1. A Ghost **webhook** (`post.added`, `post.edited`) calls a small always-on job —
-   Cloud Run or a Cloud Function — authenticated to Cloud TTS and to Cloud Storage.
-2. The job extracts the post's text, synthesises it (`synthesizeLongAudio`, or the
-   same chunker for a one-shot batch) with the locale's Chirp 3: HD voice, and writes
-   `<post-slug>-<content-hash>.mp3` to a GCS bucket with `Cache-Control` set for CDN
-   caching.
-3. It stores the object URL on the post, so the theme can read it from post markup
-   and render a plain `<audio src>` — no API key in HTML, no per-visitor cost, and
-   the same file served from cache to every reader.
-4. Regeneration is edge-triggered: a content hash in the filename means an edit
-   produces a new object, and a bucket lifecycle rule deletes superseded audio.
-
-That variant needs a GCS bucket, a service account, and a deployable job — none of
-which belong in this repository — so the shipped island stays browser-direct until
-that infrastructure exists.
+The job extracts text with the same rules the browser fallback uses — `pre`, `code`,
+tables, `nav` and scripts dropped; a space after every block element so `<li>uno</li><li>dos</li>`
+does not read as "unodoss"; the feature-image caption skipped when it repeats the excerpt —
+plus normalisation the browser never needed: entities decoded, typographic quotes
+straightened and soft hyphens removed. Sentences are split on the same boundaries as
+[assets/js/lib/tts.js](assets/js/lib/tts.js) and terminated, which is what gives the model
+natural pauses and keeps regeneration deterministic. There is no byte cap: the 5000-byte
+and 610-byte Cloud TTS limits only matter on the fallback path.
 
 ### Image Size Presets
 

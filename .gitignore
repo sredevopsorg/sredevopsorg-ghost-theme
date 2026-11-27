@@ -42,8 +42,17 @@ tests/fixtures/current/
 # v3: build output is generated, never committed (npm run build)
 assets/built/
 
+# The audio worker is a separate npm project (deploy/tts-audio/worker/); its lockfile is
+# the one npm lock this repository tracks, because the image build requires `npm ci`.
+!deploy/tts-audio/worker/package-lock.json
+
 # v3: tooling probes must never land in the theme root. Ghost's gscan pass scandirs
 # this directory and a 0700 entry makes it throw EACCES, which makes Ghost treat the
 # active theme as invalid and 500 every frontend route in the dev stack.
 .twprobe-*
 .dsh-*
+
+# tts-audio: the service-account key is created locally and never committed
+key.json
+.rendered.yaml
+.dev-out/

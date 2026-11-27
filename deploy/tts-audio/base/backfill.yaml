@@ -1,0 +1,98 @@
+# Backfill: give the archive the audio it never had.
+#
+# The webhook only fires on future events, so every post published before the pipeline
+# existed would keep using the Cloud TTS fallback forever. This Job walks the Admin API
+# and creates one synthesis Job per post that has no current audio.
+#
+# It is **not** a CronJob: it is idempotent (a post already up to date is skipped, and a
+# Job name derived from the post id and hash cannot be created twice), so it is created on
+# demand instead of running on a timer and re-reading the whole archive every night.
+#
+#   kubectl delete job -n tts-audio tts-backfill --ignore-not-found
+#   kubectl create job -n tts-audio tts-backfill --from=cronjob-inline   # not applicable
+#   make backfill                                                      # see the Makefile
+#
+# `DRY_RUN=1` prints the plan — how many posts would be queued — without creating Jobs.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tts-backfill
+  namespace: tts-audio
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: backfill
+spec:
+  # Long enough for a few hundred posts of plan work, short enough to notice a hang. The
+  # synthesis itself happens in the child Jobs, not here.
+  activeDeadlineSeconds: 1800
+  backoffLimit: 1
+  completions: 1
+  parallelism: 1
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tts-audio
+        app.kubernetes.io/component: backfill
+    spec:
+      serviceAccountName: tts-webhook
+      automountServiceAccountToken: true
+      restartPolicy: Never
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: backfill
+          # Tag set by overlay/kustomization.yaml (images.newTag), not here.
+          image: ghcr.io/sredevopsorg/sredevopsorg-ghost-theme/tts-audio-runner:latest
+          imagePullPolicy: IfNotPresent
+          args: ["--backfill"]
+          envFrom:
+            - configMapRef:
+                name: tts-audio
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: WORKER_IMAGE
+              value: "${IMAGE}"
+            - name: GHOST_ADMIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tts-audio
+                  key: admin-api-key
+            # Set to "1" to print the plan without creating anything.
+            - name: DRY_RUN
+              value: "0"
+          volumeMounts:
+            - name: job-template
+              mountPath: /etc/tts-audio
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            privileged: false
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: job-template
+          configMap:
+            name: tts-job-template
+        - name: tmp
+          emptyDir:
+            sizeLimit: 256Mi

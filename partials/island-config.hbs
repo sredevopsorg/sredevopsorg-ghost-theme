@@ -24,6 +24,7 @@
 {{json
     siteUrl=@site.url
     locale="es"
+    audioHost=@custom.tts_audio_host
     toc="Índice de contenidos"
     tocCollapse="Colapsar"
     tocExpand="Expandir"
@@ -46,14 +47,17 @@
     ttsDownloading="Generando %done de %total…"
     ttsDownloaded="Descargado"
     ttsParts="%cached de %total partes disponibles"
-    ttsUnavailable="Texto a voz no disponible — agregue una clave API de Google Cloud en la configuración del tema"
-    ttsError="Error de TTS — no se pudo generar el audio"
+    ttsUnavailable="Audio no disponible para este artículo"
+    ttsAudioLoading="Cargando audio…"
+    ttsAudioFallback="El audio en streaming no está disponible — usando texto a voz en vivo"
+    ttsError="Error de audio — no se pudo reproducir"
     ttsGenerating="Generando audio…"
 }}
 {{else match locale "=" "br"}}
 {{json
     siteUrl=@site.url
     locale="br"
+    audioHost=@custom.tts_audio_host
     toc="Sumário"
     tocCollapse="Colapsar"
     tocExpand="Expandir"
@@ -76,14 +80,17 @@
     ttsDownloading="Gerando %done de %total…"
     ttsDownloaded="Baixado"
     ttsParts="%cached de %total partes disponíveis"
-    ttsUnavailable="Texto para fala indisponível — adicione uma chave API do Google Cloud nas configurações do tema"
-    ttsError="Erro de TTS — não foi possível gerar o áudio"
+    ttsUnavailable="Áudio indisponível para este artigo"
+    ttsAudioLoading="Carregando áudio…"
+    ttsAudioFallback="O áudio em streaming não está disponível — usando texto para fala ao vivo"
+    ttsError="Erro de áudio — não foi possível reproduzir"
     ttsGenerating="Gerando áudio…"
 }}
 {{else}}
 {{json
     siteUrl=@site.url
     locale=@site.locale
+    audioHost=@custom.tts_audio_host
     toc=(t "Table of Contents")
     tocCollapse=(t "Collapse")
     tocExpand=(t "Expand")
@@ -106,8 +113,10 @@
     ttsDownloading=(t "Generating %done of %total…")
     ttsDownloaded=(t "Downloaded")
     ttsParts=(t "%cached of %total parts available")
-    ttsUnavailable=(t "TTS unavailable")
-    ttsError=(t "TTS error")
+    ttsUnavailable=(t "Audio unavailable for this article")
+    ttsAudioLoading=(t "Loading audio…")
+    ttsAudioFallback=(t "Streaming audio is unavailable — using live text-to-speech")
+    ttsError=(t "Audio error — could not play")
     ttsGenerating=(t "Generating audio…")
 }}
 {{/match}}

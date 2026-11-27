@@ -1,0 +1,28 @@
+# Overlay for the production cluster.
+#
+# This is where every value this repository cannot know is filled in. The placeholders are
+# `${VAR}` strings: the Makefile renders with `kubectl kustomize` and then substitutes them
+# from the environment (`render.sh`), because kustomize itself does not expand environment
+# variables (`images.newTag: ${TAG}` would reach the API server literally). `make test`
+# fails while any of them is still unset, so a route can never be applied pointing at a
+# Gateway that does not exist, and an image tag can never silently be the last build.
+#
+#   make deploy TAG=<sha> TTS_HOST=tts.sredevops.org \
+#     GATEWAY_NAME=<your gateway> GATEWAY_NAMESPACE=<its namespace>
+#
+# Swap route.yaml for route-traefik.yaml on a Traefik cluster (and set TLS_MIDDLEWARE /
+# TLS_SECRET instead of GATEWAY_SECTION).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: tts-audio
+
+resources:
+  - ../base
+  - route.yaml
+
+# Left literal on purpose: a render that forgets `TAG` must produce `${TAG}` (and fail
+# `make test`) rather than pin every workload to `latest`.
+images:
+  - name: ghcr.io/sredevopsorg/sredevopsorg-ghost-theme/tts-audio-runner
+    newTag: "${TAG}"

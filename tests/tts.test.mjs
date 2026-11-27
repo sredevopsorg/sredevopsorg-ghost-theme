@@ -25,6 +25,9 @@ const {
   splitLongSentence,
   trackArtifactName,
   uniquePartsCount,
+  audioUrlIsAllowed,
+  parseAudioMarker,
+  resolveAudio,
   voiceFor,
 } = await import("../assets/js/lib/tts.js");
 
@@ -190,4 +193,97 @@ test("trackArtifactName builds a safe locale-aware file name", () => {
   assert.equal(trackArtifactName({ slug: undefined, locale: "es" }), "article-es.mp3");
   assert.equal(trackArtifactName({ slug: "post", locale: "pt" }), "post-en.mp3");
   assert.equal(trackArtifactName(), "article-en.mp3");
+});
+
+/* --- Pre-generated audio marker --------------------------------------------
+ *
+ * The pipeline (deploy/tts-audio/) writes a `<meta name="sredevops:tts">` marker into the
+ * post's code injection; the island reads it from the DOM and plays the file directly.
+ * Two things are worth pinning: that a malformed marker is simply "no audio" (so playback
+ * degrades to Cloud TTS rather than breaking), and that a marker cannot point the audio
+ * element at a foreign host or a non-https scheme.
+ */
+
+const AUDIO_HOST = "https://audio.sredevops.org";
+
+const markerJson = (overrides = {}) =>
+  JSON.stringify({
+    v: 1,
+    hash: "0123456789abcdef",
+    file: "https://audio.sredevops.org/audio/abc/0123456789abcdef.mp3",
+    voice: "ef_dora",
+    bytes: 12345,
+    duration: 640,
+    at: "2026-11-26",
+    ...overrides,
+  });
+
+test("a valid marker resolves to a playable file", () => {
+  const resolved = resolveAudio(markerJson(), AUDIO_HOST);
+  assert.equal(resolved.file, "https://audio.sredevops.org/audio/abc/0123456789abcdef.mp3");
+  assert.equal(resolved.hash, "0123456789abcdef");
+  assert.equal(resolved.voice, "ef_dora");
+  assert.equal(resolved.duration, 640);
+});
+
+test("a missing or malformed marker means no pre-generated audio", () => {
+  for (const value of [null, undefined, "", "   ", "{not json", "[]", '"a string"', "42", "{}"]) {
+    assert.equal(resolveAudio(value, AUDIO_HOST), null, `marker ${JSON.stringify(value)}`);
+    assert.equal(parseAudioMarker(value), null, `parse ${JSON.stringify(value)}`);
+  }
+});
+
+test("a marker with keys the pipeline never writes is refused", () => {
+  // A marker is post content and can be edited by anyone with Admin access; an unknown
+  // key would be how a foreign value reaches the island.
+  assert.equal(parseAudioMarker(markerJson({ evil: "https://evil.test/x.mp3" })), null);
+});
+
+test("audio URLs are https and same-origin only", () => {
+  assert.equal(audioUrlIsAllowed(`${AUDIO_HOST}/audio/a/b.mp3`, AUDIO_HOST), true);
+
+  // Plain http, and the schemes that would let a marker smuggle markup or data.
+  assert.equal(audioUrlIsAllowed("http://audio.sredevops.org/audio/a/b.mp3", AUDIO_HOST), false);
+  assert.equal(audioUrlIsAllowed("javascript:alert(1)", AUDIO_HOST), false);
+  assert.equal(audioUrlIsAllowed("data:audio/mpeg;base64,AAAA", AUDIO_HOST), false);
+  assert.equal(audioUrlIsAllowed("//audio.sredevops.org/audio/a/b.mp3", AUDIO_HOST), false);
+
+  // A foreign host, including one that only *looks* like ours.
+  assert.equal(audioUrlIsAllowed("https://evil.test/audio/a/b.mp3", AUDIO_HOST), false);
+  assert.equal(audioUrlIsAllowed("https://audio.sredevops.org.evil.test/a.mp3", AUDIO_HOST), false);
+  assert.equal(audioUrlIsAllowed("https://evil.test/?next=https://audio.sredevops.org/a.mp3", AUDIO_HOST), false);
+
+  // No path is a mistake, not a valid object.
+  assert.equal(audioUrlIsAllowed(AUDIO_HOST, AUDIO_HOST), false);
+  // Garbage in, false out — never a throw on a page that has to keep working.
+  assert.equal(audioUrlIsAllowed(undefined, AUDIO_HOST), false);
+  assert.equal(audioUrlIsAllowed(42, AUDIO_HOST), false);
+  assert.equal(audioUrlIsAllowed(`${AUDIO_HOST}/a.mp3`, ""), false);
+});
+
+test("a marker pointing at a foreign host falls back to Cloud TTS", () => {
+  const resolved = resolveAudio(markerJson({ file: "https://evil.test/audio.mp3" }), AUDIO_HOST);
+  assert.equal(resolved, null);
+  // The other fields are valid; the URL alone is what disqualifies it.
+  assert.equal(parseAudioMarker(markerJson({ file: "https://evil.test/audio.mp3" })).hash, "0123456789abcdef");
+});
+
+test("a marker without a file or hash is refused", () => {
+  assert.equal(parseAudioMarker(markerJson({ file: undefined })), null);
+  assert.equal(parseAudioMarker(markerJson({ hash: undefined })), null);
+  assert.equal(parseAudioMarker(markerJson({ file: 42 })), null);
+});
+
+test("a non-numeric duration is ignored rather than rendered as NaN", () => {
+  assert.equal(resolveAudio(markerJson({ duration: "long" }), AUDIO_HOST).duration, null);
+  assert.equal(resolveAudio(markerJson({ duration: undefined }), AUDIO_HOST).duration, null);
+});
+
+test("the island reads the audio host from the marker, not from a hard-coded literal", async () => {
+  // The host is a pipeline ConfigMap value mirrored in island-config.hbs; a second copy
+  // in the island would drift from it silently. Only the fallback constant may mention it.
+  const source = await import("node:fs/promises").then((fs) => fs.readFile("assets/js/islands/TtsPlayer.jsx", "utf8"));
+  const occurrences = source.match(/audio\.sredevops\.org/g) ?? [];
+  assert.equal(occurrences.length, 1, "the host must appear once, as DEFAULT_AUDIO_HOST");
+  assert.match(source, /DEFAULT_AUDIO_HOST = "https:\/\/audio\.sredevops\.org"/);
 });

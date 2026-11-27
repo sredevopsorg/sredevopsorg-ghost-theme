@@ -1,0 +1,19 @@
+{
+  "name": "@sredevops/tts-audio-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kokoro text-to-speech synthesis and Ghost webhook receiver for sredevops.org article audio",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "smoke": "node test/smoke.mjs"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "7.17.1",
+    "@huggingface/transformers": "3.7.6"
+  }
+}

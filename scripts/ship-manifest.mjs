@@ -19,8 +19,8 @@ const ROOT = process.cwd();
 /** Pruned during the walk for speed; never shippable. */
 const PRUNE = [".git", "node_modules"];
 
-/** Directories whose contents must never ship (tooling, tests, docs). */
-const DENY_DIRS = [".github", ".vscode", ".idea", "lib", "scripts", "tests", "docs"];
+/** Directories whose contents must never ship (tooling, tests, docs, infrastructure). */
+const DENY_DIRS = [".github", ".vscode", ".idea", "lib", "scripts", "tests", "docs", "deploy"];
 
 /** Individual files that must never ship. */
 const DENY_FILES = [
@@ -128,6 +128,14 @@ for (const [assetPath, templates] of assetReferences(all)) {
     errors.push(`${expected} exists but is excluded from the package (referenced by ${templates.join(", ")})`);
   }
 }
+
+// `deploy/` is the article-audio pipeline (Kokoro jobs, Kubernetes manifests, a Dockerfile
+// and a second lockfile). It lives beside the theme because the theme is what plays its
+// output, but Ghost must never receive it: a theme upload would carry an ONNX runtime and
+// a service-account path into a CMS. Asserted explicitly so a future allow-list edit
+// cannot quietly admit it.
+const deployLeak = all.filter((rel) => rel.split(posix.sep)[0] === "deploy" && ships(rel));
+for (const rel of deployLeak) errors.push(`infrastructure file would ship: ${rel}`);
 
 // Redundant with the deny rules, but it turns a silent rule regression into a loud failure.
 const leaked = all.filter((rel) => DENY_DIRS.includes(rel.split(posix.sep)[0]) && ships(rel));
