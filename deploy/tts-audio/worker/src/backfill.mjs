@@ -98,7 +98,15 @@ export async function planPost(config, post, { fetchImpl = fetch } = {}) {
  * production, because it says how many posts and how many minutes of CPU a full
  * backfill is about to cost.
  */
-export async function backfill({ config, log = () => {}, fetchImpl = fetch, dryRun = process.env.DRY_RUN === "1" }) {
+export async function backfill({
+  config,
+  log = () => {},
+  fetchImpl = fetch,
+  dryRun = process.env.DRY_RUN === "1",
+  // Injectable so a test can drive the "the API server is unreachable" path, which is
+  // exactly what a NetworkPolicy blocking the backfill looks like.
+  createJob = createPostJob,
+}) {
   let page = 1;
   let pages = 1;
   const totals = { scanned: 0, eligible: 0, created: 0, skipped: 0, ineligible: 0, failed: 0 };
@@ -137,7 +145,7 @@ export async function backfill({ config, log = () => {}, fetchImpl = fetch, dryR
           totals.created += 1;
           continue;
         }
-        const result = await createPostJob(config, { postId: post.id, hash: plan.hash });
+        const result = await createJob(config, { postId: post.id, hash: plan.hash });
         // `exists` is a success: a previous run already queued this exact article.
         if (result === "exists") {
           totals.skipped += 1;
@@ -153,6 +161,9 @@ export async function backfill({ config, log = () => {}, fetchImpl = fetch, dryR
     page += 1;
   } while (page <= pages);
 
-  log(JSON.stringify({ result: dryRun ? "dry-run" : "ok", ...totals }));
+  // The exit code already reflected failures, but the line said "ok" — so a run that
+  // queued nothing out of 221 posts finished as `{"result":"ok","failed":221}`.
+  const result = dryRun ? "dry-run" : totals.failed > 0 ? "failed" : "ok";
+  log(JSON.stringify({ result, ...totals }));
   return totals.failed > 0 ? 1 : 0;
 }
