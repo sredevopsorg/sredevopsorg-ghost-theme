@@ -368,3 +368,34 @@ test("the backfill listing names the failing key on INVALID_JWT", async () => {
   // And the run ends with a structured line rather than an escaping exception.
   assert.match(joined, /"result":"failed"/);
 });
+
+test("a backfill whose Jobs cannot be created reports failed, not ok", async () => {
+  // Observed in the cluster: 221 posts read fine, then every Job creation failed with
+  // `connect ECONNREFUSED <apiserver>:443` (a NetworkPolicy blocking the backfill). The
+  // run logged {"result":"ok","failed":221} and exited 1 — the pod was right, the summary
+  // line was not.
+  const { backfill } = await import("../src/backfill.mjs");
+  const listOk = {
+    ok: true,
+    status: 200,
+    json: async () => ({
+      posts: [{ id: "p1", slug: "s1", tags: [{ name: "Español", slug: "es" }], html: "<p>Hola.</p>" }],
+      meta: { pagination: { page: 1, pages: 1 } },
+    }),
+  };
+  const lines = [];
+  const code = await backfill({
+    config,
+    log: (line) => lines.push(line),
+    fetchImpl: async () => listOk,
+    createJob: async () => {
+      throw new Error("connect ECONNREFUSED 10.43.0.1:443");
+    },
+  });
+
+  assert.equal(code, 1, "a run that created nothing must exit non-zero");
+  const summary = JSON.parse(lines.at(-1));
+  assert.equal(summary.result, "failed");
+  assert.equal(summary.failed, 1);
+  assert.equal(summary.created, 0);
+});
