@@ -116,7 +116,7 @@ jobs:
       # models.lock.json inside the Dockerfile, so a moved or corrupted upstream artefact
       # fails here rather than in a Job at 2 a.m.
       - name: Build the runner image
-        uses: docker/build-push-action@v6.7.0
+        uses: docker/build-push-action@v7.4.0
         with:
           context: deploy/tts-audio/worker
           file: deploy/tts-audio/worker/Dockerfile
@@ -157,7 +157,7 @@ jobs:
 
       - name: Push the image and its provenance
         if: steps.meta.outputs.publish == 'true'
-        uses: docker/build-push-action@v6.7.0
+        uses: docker/build-push-action@v7.4.0
         id: push
         with:
           context: deploy/tts-audio/worker
