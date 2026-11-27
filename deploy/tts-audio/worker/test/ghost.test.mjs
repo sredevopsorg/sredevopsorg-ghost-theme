@@ -319,3 +319,39 @@ test("a payload without content_hash still gets a unique job name per delivery",
   assert.notEqual(created[0].hash, created[1].hash);
   assert.match(created[0].hash, /^e[0-9a-f]{9}$/);
 });
+
+test("a rejected Admin key is reported as an auth failure, not a bad request", async () => {
+  // Ghost answers a revoked key with 400 INVALID_JWT, which reads like a malformed query.
+  // Both the post client and the backfill listing must say what to do about it.
+  const wrongKey = {
+    status: 400,
+    statusText: "Bad Request",
+    json: async () => ({ errors: [{ message: "Invalid token", code: "INVALID_JWT" }] }),
+    text: async () => "",
+  };
+  const fetchImpl = async () => wrongKey;
+
+  await assert.rejects(() => readPost(config, "abc", { fetchImpl }), /Admin API key was rejected/);
+});
+
+test("the backfill listing names the failing key on INVALID_JWT", async () => {
+  const { backfill } = await import("../src/backfill.mjs");
+  const wrongKey = {
+    status: 400,
+    statusText: "Bad Request",
+    ok: false,
+    json: async () => ({ errors: [{ message: "Invalid token", code: "INVALID_JWT" }] }),
+  };
+  // The first listing request fails, so `backfill` reports through its own log and exits 1.
+  const lines = [];
+  const code = await backfill({ config, log: (line) => lines.push(line), fetchImpl: async () => wrongKey });
+  assert.equal(code, 1);
+  const joined = lines.join("\n");
+  assert.match(joined, /INVALID_JWT/);
+  // The key id is named so an operator can tell *which* integration to regenerate. This
+  // config's key is `id:s`, so the id is `id`.
+  assert.match(joined, /key id id\)/);
+  assert.match(joined, /regenerate its Admin API key/);
+  // And the run ends with a structured line rather than an escaping exception.
+  assert.match(joined, /"result":"failed"/);
+});

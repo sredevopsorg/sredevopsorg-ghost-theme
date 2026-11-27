@@ -250,11 +250,32 @@ hash includes the voice, so every post is regenerated on its next edit or backfi
 
 ## Operating it
 
+### Is the Admin key actually valid?
+
+Do not judge it by `/site/`: that endpoint answers **200 without any auth**, so a revoked key
+looks fine there. Test an endpoint that requires an integration and compare it with a
+deliberately wrong key — the two must differ:
+
+```bash
+curl -s -o /dev/null -w 'given: %{http_code}\n' \
+  -H "Authorization: Ghost $ADMIN_KEY" https://www.sredevops.org/ghost/api/admin/settings/
+curl -s -o /dev/null -w 'garbage: %{http_code}\n' \
+  -H "Authorization: Ghost 000000000000000000000000:$(printf 'f%.0s' $(seq 64))" \
+  https://www.sredevops.org/ghost/api/admin/settings/
+```
+
+A **403** is "no key sent"; **400 `INVALID_JWT`** is "a key was sent and rejected". If the
+given key returns the same 400 as the garbage one, the integration was deleted or its key
+regenerated — create/repair it in Ghost Admin → Integrations, give it the **Administrator**
+role, and re-run `make secret` + `make restart`.
+
 | Symptom | Look at | Likely cause |
 |---|---|---|
 | Post stays silent after publishing | `make logs` (receiver), then `kubectl -n tts-audio logs job/tts-...` | webhook secret mismatch (401), Gateway not routing, post has no locale tag |
+| Backfill job fails immediately | `kubectl -n tts-audio logs job/tts-backfill` | `INVALID_JWT` — see "Is the Admin key actually valid?" above |
 | Receiver logs `ignore … content hash unchanged` | — | Ghost re-saved the post; expected |
 | Job fails with `Ghost 401` | Secret | Admin API key revoked or wrong format |
+| Job fails with `Ghost 400 INVALID_JWT` | Secret | the Admin API key is not valid on this instance: revoked, or copied from a different integration. `/site/` still answering 200 proves nothing — it is public without auth |
 | Job fails with `bucket` errors | Secret | key rotated without `make secret`, or the GSA lost its binding |
 | Player falls back to Cloud TTS on an old post | `make status` | its marker was removed, or the object expired (90-day lifecycle) |
 | `cf-verify` fails on partial content | Cloudflare | proxy stripped ranges — use a DNS-only record |
