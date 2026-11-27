@@ -90,6 +90,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      # Required to build the arm64 half of the published manifest on an amd64 runner.
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.6.0
+
       - name: Set up Buildx
         uses: docker/setup-buildx-action@v4.4.1
         with:
@@ -120,6 +124,14 @@ jobs:
         with:
           context: deploy/tts-audio/worker
           file: deploy/tts-audio/worker/Dockerfile
+          # The local cluster mixes architectures: the amd64 k3s worker runs these pods
+          # today, but the control-plane node is arm64 and only cordoned, so a pod could
+          # land there and fail with ImagePullBackOff against an amd64-only manifest.
+          #
+          # That is the *push* step below. This one still builds amd64 only, because
+          # `load: true` cannot take a multi-platform build and the smoke test runs on the
+          # amd64 runner.
+          platforms: linux/amd64
           load: true
           tags: |
             ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}
@@ -163,6 +175,9 @@ jobs:
           context: deploy/tts-audio/worker
           file: deploy/tts-audio/worker/Dockerfile
           push: true
+          # Both architectures the cluster has. arm64 is emulated via QEMU on the amd64
+          # runner, which only affects build time, not the result.
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.IMAGE }}:${{ steps.meta.outputs.tag }}
             ${{ env.IMAGE }}:main
