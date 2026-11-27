@@ -43,8 +43,35 @@ for the reader-facing behaviour.
 
 ## 1. Google Cloud
 
+The defaults in the Makefile (and `base/configmap.yaml`) are
+`GCP_PROJECT=sredevopsorg`, `GCS_BUCKET=tts-sredevopsorg`; override them for another
+project. The service account is `tts-audio-runner@<project>.iam.gserviceaccount.com` and
+needs object access to that bucket only.
+
 ```bash
 make gcp-bootstrap GCP_PROJECT=<project> GCS_BUCKET=<bucket> GCP_LOCATION=<region>
+```
+
+`gcp-bootstrap` needs a principal that can **administer** the bucket (IAM + CORS). The
+runner service account deliberately cannot: it is scoped to objects, so it can write audio
+but not widen its own permissions. If you are using the runner key by mistake you will see
+`storage.buckets.get` / `storage.buckets.update` denied.
+
+Three failures are worth naming, because each one leaves a pipeline that looks deployed
+but produces nothing a reader can hear:
+
+| Symptom | Cause |
+|---|---|
+| `The specified bucket does not exist` | `GCS_BUCKET` names a bucket that was never created, or the wrong project |
+| Anonymous `GET` on an object returns **403** | `allUsers` → `roles/storage.objectViewer` is missing; the player cannot read it |
+| `OPTIONS` preflight has no `access-control-allow-origin` | CORS was never applied; a ranged seek fails in the browser |
+
+Verify all three after the bootstrap:
+
+```bash
+curl -s -o /dev/null -w 'anonymous: %{http_code}\n' "https://storage.googleapis.com/$GCS_BUCKET/<any-object>"
+curl -sI -X OPTIONS -H 'Origin: https://www.sredevops.org' -H 'Access-Control-Request-Method: GET' \
+  "https://storage.googleapis.com/$GCS_BUCKET/<any-object>" | grep -i access-control
 ```
 
 That command is idempotent and does four things:

@@ -13,7 +13,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUCKET="${GCS_BUCKET:-sredevops-audio}"
+BUCKET="${GCS_BUCKET:-tts-sredevopsorg}"
 
 command -v gcloud >/dev/null || { echo "cors: gcloud is required" >&2; exit 2; }
 
