@@ -21,6 +21,21 @@ import { createPostJob } from "./k8s.mjs";
 const PAGE_LIMIT = 50;
 
 /**
+ * Ghost's machine-readable error code (`INVALID_JWT`, `RESOURCE_NOT_FOUND`, …), or "".
+ *
+ * The body has to be read once; a non-JSON body (an HTML error page from a proxy) is not
+ * an error in itself, it just adds nothing.
+ */
+async function ghostErrorCode(response) {
+  try {
+    const body = await response.json();
+    return body?.errors?.[0]?.code ?? "";
+  } catch {
+    return "";
+  }
+}
+
+/**
  * List published posts with the fields the backfill needs.
  *
  * `filter=status:published` is applied server-side; the locale test is client-side
@@ -37,7 +52,19 @@ async function listPosts(config, { fetchImpl = fetch, page = 1, limit = PAGE_LIM
     headers: { Authorization: `Ghost ${config.adminKey}`, Accept: "application/json" },
   });
   if (!response.ok) {
-    throw new Error(`listing posts failed: Ghost ${response.status} ${response.statusText}`);
+    // Keep Ghost's own error, and say which key failed when it is an auth failure.
+    // "Ghost 400 Bad Request" is what a revoked or wrong admin key looks like: the whole
+    // backfill dies on its first request and the runbook's debugging section is about
+    // buckets, so the message has to carry both facts.
+    const code = await ghostErrorCode(response);
+    const keyId = String(config.adminKey ?? "").split(":")[0] || "(unset)";
+    const hint =
+      code === "INVALID_JWT"
+        ? ` — the Admin API key was rejected (key id ${keyId}). Check that the integration ` +
+          `still exists in Ghost Admin → Integrations, regenerate its Admin API key, and ` +
+          `update the tts-audio Secret`
+        : "";
+    throw new Error(`listing posts failed: Ghost ${response.status}${code ? ` ${code}` : ""}${hint}`);
   }
   const payload = await response.json();
   return { posts: payload?.posts ?? [], pagination: payload?.meta?.pagination ?? { page, pages: 1 } };
@@ -78,7 +105,18 @@ export async function backfill({ config, log = () => {}, fetchImpl = fetch, dryR
   const totals = { scanned: 0, eligible: 0, created: 0, skipped: 0, ineligible: 0, failed: 0 };
 
   do {
-    const { posts, pagination } = await listPosts(config, { fetchImpl, page });
+    let posts;
+    let pagination;
+    try {
+      ({ posts, pagination } = await listPosts(config, { fetchImpl, page }));
+    } catch (err) {
+      // A listing failure is the whole run failing — most often a rejected Admin key. Log
+      // it the same way as a per-post failure and stop, instead of letting the exception
+      // escape with no structured line around it.
+      log(`listing page ${page} failed: ${err.message}`);
+      log(JSON.stringify({ result: "failed", ...totals, page }));
+      return 1;
+    }
     pages = pagination.pages ?? 1;
     log(`page ${page}/${pages}: ${posts.length} post(s)`);
 

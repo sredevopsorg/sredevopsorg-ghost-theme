@@ -57,11 +57,18 @@ function headers(adminKey) {
 async function fail(response) {
   let message = response.statusText;
   let body = null;
+  let code = "";
   try {
     body = await response.json();
     message = body?.errors?.[0]?.message ?? message;
+    code = body?.errors?.[0]?.code ?? "";
   } catch {
     // A non-JSON body adds nothing; the status is still reported.
+  }
+  // A rejected key is the most common first-run failure and the least self-explanatory:
+  // Ghost answers `INVALID_JWT` with a 400, which reads like a malformed request.
+  if (code === "INVALID_JWT") {
+    message += " (the Admin API key was rejected — regenerate it in Ghost Admin → Integrations and update the Secret)";
   }
   throw new GhostError(response.status, message, body);
 }
