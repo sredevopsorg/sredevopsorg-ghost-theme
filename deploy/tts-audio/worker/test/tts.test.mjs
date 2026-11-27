@@ -73,3 +73,31 @@ test("phonemize reports a missing espeak-ng instead of a cryptic spawn error", a
     process.env.PATH = original;
   }
 });
+
+test("the vocabulary comes from the public get_vocab(), not a library internal", async () => {
+  const { tokenizerVocabulary } = await import("../src/tts.mjs");
+
+  // The shape 4.x returns: a Map of symbol -> id, with a `null` placeholder for id 0
+  // that is not a phoneme.
+  const map = new Map([["e", 47], ["ɾ", 125], [null, 0], ["ˈ", 156]]);
+  assert.deepEqual([...tokenizerVocabulary({ get_vocab: () => map })], ["e", "ɾ", "ˈ"]);
+
+  // Some tokenizer releases hand back a plain object instead.
+  assert.deepEqual([...tokenizerVocabulary({ get_vocab: () => ({ a: 1, b: 2 }) })], ["a", "b"]);
+
+  // The failure that produced silent audio: 3.x had no `get_vocab()` and the old code
+  // read `tokenizer.model.tokens_to_ids`, which a major bump removed. It must say so
+  // rather than quietly yielding an empty vocabulary.
+  assert.throws(() => tokenizerVocabulary({ model: { tokens_to_ids: new Map([["e", 47]]) } }), /no get_vocab\(\)/);
+  assert.throws(() => tokenizerVocabulary(undefined), /no get_vocab\(\)/);
+});
+
+test("a full vocabulary keeps the Spanish phonemes and drops the joiner", async () => {
+  const { filterPhonemes } = await import("../src/tts.mjs");
+  // Measured from the real tokenizer: espeak emits a U+200D joiner that Kokoro's own
+  // vocabulary does not contain.
+  const vocab = new Set(["e", "l", "o", "ɾ", "k", "s", "t", "a", "ð", "ˈ", "ɪ", " "]);
+  const { ipa, dropped } = filterPhonemes("el ˌoɾkestaðˈoɾ a\u200dɪ", vocab);
+  assert.equal(ipa, "el oɾkestaðˈoɾ aɪ");
+  assert.deepEqual(dropped, ["ˌ", "\u200d"]);
+});

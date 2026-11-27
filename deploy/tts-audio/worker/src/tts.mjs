@@ -170,6 +170,33 @@ export function normaliseIpa(raw) {
 }
 
 /**
+ * The tokenizer's symbol set, through its public API.
+ *
+ * This used to read `tokenizer.model.tokens_to_ids` — a library internal. A
+ * `@huggingface/transformers` **major** bump removed it (`tokenizer.model` is gone in 4.x),
+ * and because every lookup then missed, the filter dropped *every* phoneme and synthesis
+ * produced no audio. `get_vocab()` is the supported equivalent: a `Map<symbol, id>`.
+ *
+ * It exists from 4.x onwards, so `package.json` pins that major deliberately. If the
+ * library changes again, this function is the one place to look, and `filterPhonemes`
+ * failing loudly (it returns an empty string, which the caller turns into a per-chunk
+ * error) is the symptom.
+ */
+export function tokenizerVocabulary(tokenizer) {
+  if (typeof tokenizer?.get_vocab !== "function") {
+    throw new Error(
+      "@huggingface/transformers tokenizer has no get_vocab(); this worker requires the " +
+        "4.x line (see deploy/tts-audio/worker/package.json)",
+    );
+  }
+  const vocab = tokenizer.get_vocab();
+  const symbols = vocab instanceof Map ? [...vocab.keys()] : Object.keys(vocab ?? {});
+  // `get_vocab()` includes a `null` placeholder for id 0 in some tokenizers; it is not a
+  // phoneme, and keeping it would let a stray null through to the model.
+  return new Set(symbols.filter((symbol) => typeof symbol === "string"));
+}
+
+/**
  * Filter a phoneme string to the symbols the tokenizer knows.
  *
  * Returns the filtered string and the dropped symbols so the caller can log them: a
@@ -208,9 +235,7 @@ export async function synthesizePcm(text, { voice, speed = 1, locale = "en", spe
   const { model, tokenizer, Tensor, dir } = await loadModel();
   const rawIpa = await phonemize(text, locale);
 
-  // `tokenizer.model.vocab` is keyed by *numeric id*; the symbol -> id map is
-  // `tokens_to_ids`. Using the wrong one silently drops every phoneme.
-  const vocab = new Set(tokenizer.model.tokens_to_ids.keys());
+  const vocab = tokenizerVocabulary(tokenizer);
   const { ipa, dropped } = filterPhonemes(rawIpa, vocab);
   if (dropped.length) {
     console.warn(`[tts] phonemes not in the vocabulary, dropped: ${dropped.join(" ")}`);

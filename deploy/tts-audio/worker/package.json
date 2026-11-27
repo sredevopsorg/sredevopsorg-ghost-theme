@@ -15,5 +15,6 @@
   "dependencies": {
     "@google-cloud/storage": "9.0.0",
     "@huggingface/transformers": "4.3.2"
-  }
+  },
+  "$comment": "Dependencies are exact on purpose: filterPhonemes reads the tokenizer vocabulary and the ONNX session, so a minor or major bump has to be verified by the image smoke test rather than merged automatically."
 }
