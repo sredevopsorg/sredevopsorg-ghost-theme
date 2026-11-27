@@ -35,21 +35,22 @@ FROM node:24-bookworm-slim AS model
 # editing the lock (and running the verify target), not this file. A lock entry still
 # saying `REPLACE_ME` fails the build: an unverified model is worse than no image.
 
+# The slim image has no downloader. `ca-certificates` is not optional either: without it
+# curl cannot validate the Hugging Face CDN certificate and the fetch fails at TLS.
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends curl ca-certificates; \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /models
 
+# The check and verify scripts are copied before the model so a lock problem fails in
+# seconds, before a ~90 MB download.
 COPY models.lock.json ./models.lock.json
+COPY scripts/check-model-lock.mjs ./scripts/check-model-lock.mjs
+COPY scripts/verify-model-files.mjs ./scripts/verify-model-files.mjs
 
-RUN set -eux; \
-    node -e '
-      const lock = require("./models.lock.json");
-      const unset = Object.entries(lock.files).filter(([, sha]) => sha === "REPLACE_ME");
-      if (unset.length) {
-        console.error("models.lock.json is not populated for:", unset.map(([f]) => f).join(", "));
-        console.error("run: node scripts/update-models.mjs  (needs the Hugging Face CDN)");
-        process.exit(1);
-      }
-      console.error(`model: ${lock.repo} @ ${lock.revision}, ${Object.keys(lock.files).length} files`);
-    '
+RUN node scripts/check-model-lock.mjs
 
 # One request per artefact, at the pinned revision. `?download=true` makes the CDN serve
 # the bytes rather than an HTML page for a moved file.
@@ -64,20 +65,7 @@ RUN set -eux; \
     done
 
 # Verify every file against the lock before it can reach the final image.
-RUN set -eux; \
-    cd /models; \
-    node -e '
-      const { createHash } = require("node:crypto");
-      const { readFileSync } = require("node:fs");
-      const lock = JSON.parse(readFileSync("models.lock.json", "utf8"));
-      let bad = 0;
-      for (const [file, expected] of Object.entries(lock.files)) {
-        const actual = createHash("sha256").update(readFileSync(file)).digest("hex");
-        if (actual !== expected) { console.error(`sha256 mismatch for ${file}: ${actual}`); bad = 1; }
-      }
-      if (bad) process.exit(1);
-      console.error("model: all files verified");
-    '
+RUN node scripts/verify-model-files.mjs
 
 # ── stage 3: runtime ───────────────────────────────────────────────────────────
 FROM node:24-bookworm-slim AS runtime
@@ -105,6 +93,11 @@ COPY test/smoke.mjs ./test/smoke.mjs
 COPY scripts/speak.mjs ./scripts/speak.mjs
 COPY scripts/update-models.mjs ./scripts/update-models.mjs
 COPY --from=model /models /models
+
+# Everything above is copied as root, which makes the app unreadable to the unprivileged
+# user this image runs as. `--chown` on each COPY would work too, but one chown here keeps
+# the intent obvious and covers the baked model as well.
+RUN chown -R node:node /app /models
 
 # The node image ships a `node` user (uid 1000); run everything as it. The Job mounts
 # no writable volume except an emptyDir at $TMPDIR for the encoder's temp files.

@@ -131,9 +131,14 @@ jobs:
 
       - name: Smoke-test the real model in the image
         run: |
-          # The only check that exercises the ONNX weights, the tokenizer and ffmpeg
-          # together. Fails on a silent buffer, a wrong duration, or a missing model.
-          docker run --rm "${IMAGE}:${{ steps.meta.outputs.tag }}" node test/smoke.mjs
+          # The only check that exercises the ONNX weights, the tokenizer, espeak-ng and
+          # ffmpeg together, in every locale. Fails on a silent buffer, a wrong duration,
+          # a missing model or a missing espeak-ng language pack.
+          #
+          # `--entrypoint node` is required: the image entrypoint is `node src/index.mjs`,
+          # so arguments after the image name would be treated as a post id for the job
+          # rather than a command to run.
+          docker run --rm --entrypoint node "${IMAGE}:${{ steps.meta.outputs.tag }}" test/smoke.mjs
 
       - name: The receiver answers /healthz
         run: |

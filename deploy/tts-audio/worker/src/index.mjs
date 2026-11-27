@@ -11,7 +11,7 @@
  * distinction the Job needs.
  */
 
-import { jobConfig } from "./config.mjs";
+import { jobConfig, receiverConfig } from "./config.mjs";
 import { runJob } from "./job.mjs";
 
 /** One line per event on stderr; stdout stays empty so nothing mixes with JSON logs. */
@@ -24,7 +24,10 @@ async function main(argv) {
 
   if (arg === "--serve") {
     const { serve } = await import("./receiver.mjs");
-    await serve({ log });
+    // `receiverConfig()` validates the webhook secret, Admin key and image at startup:
+    // a receiver that boots without them would accept deliveries and then fail to queue
+    // any work, which is worse than not starting.
+    await serve({ config: receiverConfig(), log });
     return 0;
   }
 
