@@ -222,6 +222,19 @@ On **Traefik CRDs** (no Gateway API), edit `overlay/kustomization.yaml` to list
 `route-traefik.yaml` instead of `route.yaml`, pass `TLS_MIDDLEWARE`/`TLS_SECRET`, and
 `WITH_GATEWAY=0`.
 
+After a release that **renames** a resource, run the prune check — `kubectl apply` is a
+create-or-update verb and never removes an object whose name changed. This has bitten the
+NetworkPolicies here once already (`allow-webhook-kubernetes-api` became
+`allow-kubernetes-api-egress`; the old object lingered, still permitting egress):
+
+```bash
+make prune TAG=<sha> TTS_HOST=... GATEWAY_NAME=... GATEWAY_NAMESPACE=...   # dry run
+make prune ... CONFIRM=1                                                  # delete
+```
+
+It only considers kinds this repository owns and only objects labelled
+`app.kubernetes.io/part-of=tts-audio`, so a Secret, a Job or anything foreign is untouched.
+
 Then point DNS for `TTS_HOST` at the Gateway as you do for any other service, and check:
 
 ```bash

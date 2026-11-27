@@ -89,6 +89,15 @@ tls-secret: ## Copy the wildcard *.sredevops.org cert into the Gateway's namespa
 	@echo "tls-secret: $(GATEWAY_NAMESPACE)/$(TLS_SECRET) <- $(TLS_SOURCE_NAMESPACE)/$(TLS_SOURCE_SECRET)"
 	@echo "tls-secret: this is a snapshot; re-run it when the wildcard certificate is renewed"
 
+.PHONY: prune
+prune: ## Delete objects this repo declared before but no longer does (e.g. after a rename)
+	@TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
+	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
+	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
+	 ./render.sh > .rendered.yaml
+	@./scripts/prune-stale.sh .rendered.yaml "$(NAMESPACE)" "$(GATEWAY_NAMESPACE)" $(if $(filter 1,$(CONFIRM)),--confirm,)
+	@rm -f .rendered.yaml
+
 .PHONY: secret
 secret: ## Create/refresh the Secret from ADMIN_KEY, WEBHOOK_SECRET, GCS_KEY=<path>
 	@: $${ADMIN_KEY:?set ADMIN_KEY to the Ghost Admin API key (id:secret)}
