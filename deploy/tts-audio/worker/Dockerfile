@@ -17,7 +17,7 @@
 # Build context: this directory (deploy/tts-audio/worker).
 
 # ── stage 1: dependencies ──────────────────────────────────────────────────────
-FROM node:24-bookworm-slim AS deps
+FROM node:25-bookworm-slim AS deps
 
 WORKDIR /app
 
@@ -26,7 +26,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 # ── stage 2: model ─────────────────────────────────────────────────────────────
-FROM node:24-bookworm-slim AS model
+FROM node:25-bookworm-slim AS model
 
 # The revision is a commit, not a tag: a tag can be moved, and the sha256 checks below
 # would then fail in a build that nobody can reproduce.
@@ -68,7 +68,7 @@ RUN set -eux; \
 RUN node scripts/verify-model-files.mjs
 
 # ── stage 3: runtime ───────────────────────────────────────────────────────────
-FROM node:24-bookworm-slim AS runtime
+FROM node:25-bookworm-slim AS runtime
 
 # ffmpeg (libmp3lame) for encoding; espeak-ng for text -> IPA in every locale.
 # `--no-install-recommends` and the cache purge keep the image under ~700 MB including
