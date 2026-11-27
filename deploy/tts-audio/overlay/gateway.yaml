@@ -1,0 +1,51 @@
+# The Gateway the webhook receiver is published through.
+#
+# This is the piece that was missing: `tts-audio.sredevops.org` returned Cloudflare 1016
+# because the HTTPRoute named a Gateway nobody had created.
+#
+# ## Why every field is what it is
+#
+# Measured against the cluster, not assumed:
+#
+# - **`kube-system`** — the tunnel routes to `traefik.kube-system.svc.cluster.local:443`,
+#   and every working Gateway on this cluster lives next to Traefik.
+# - **listener port 8443** — Traefik's `websecure` entrypoint listens on 8443 *inside* the
+#   container; the Service maps it to 443. The working `sredevops-gateway` declares 8443,
+#   and Gateway API's listener port is the container port, so 8443 is correct here too.
+# - **`allowedRoutes: All`** — the route lives in `tts-audio`, this Gateway in
+#   `kube-system`. Every other Gateway on the cluster uses `Same` because their routes sit
+#   beside them; copying that would silently leave the route unattached, which is the exact
+#   failure this file exists to fix. `All` is scoped by the hostname below.
+# - **`hostname: tts-audio.sredevops.org`** — pins the listener to one host, so `All` does
+#   not mean "any namespace may claim any hostname through this Gateway".
+# - **TLS from the wildcard secret** — `security-feed/security-feed-sredevops-tls` holds a
+#   Cloudflare Origin certificate for `*.sredevops.org` valid to Sep 2027. Reusing it avoids
+#   a secret that never existed under a new name.
+#
+# The secret is copied into `kube-system` because a Gateway can only reference a
+# certificate in its own namespace. `make deploy` does this (`make tls-secret`); the copy is
+# a snapshot, so re-run it when the wildcard certificate is renewed.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: ${GATEWAY_NAME}
+  namespace: ${GATEWAY_NAMESPACE}
+  labels:
+    app.kubernetes.io/name: tts-audio
+    app.kubernetes.io/component: gateway
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: web
+      port: 8443
+      protocol: HTTPS
+      hostname: ${TTS_HOST}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: ${TLS_SECRET}
+      allowedRoutes:
+        namespaces:
+          from: All

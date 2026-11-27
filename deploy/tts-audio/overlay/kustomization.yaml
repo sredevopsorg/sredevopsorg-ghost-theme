@@ -21,6 +21,12 @@ resources:
   - ../base
   - route.yaml
 
+# `gateway.yaml` is deliberately NOT a kustomize resource. The `namespace:` field below
+# rewrites every resource in this build to `tts-audio`, and the Gateway belongs in
+# `kube-system` (GATEWAY_NAMESPACE) beside Traefik. Kustomize has no per-resource namespace
+# override, so render.sh renders it as a second document with the placeholders substituted.
+
+
 # Left literal on purpose: a render that forgets `TAG` must produce `${TAG}` (and fail
 # `make test`) rather than pin every workload to `latest`.
 images:
