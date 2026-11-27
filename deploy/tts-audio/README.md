@@ -190,8 +190,37 @@ make deploy \
 still contains a placeholder it does not expect — the failure mode it prevents is a route
 pointing at `${GATEWAY_NAME}`.
 
-On **Traefik**, edit `overlay/kustomization.yaml` to list `route-traefik.yaml` instead of
-`route.yaml`, and pass `TLS_MIDDLEWARE` and `TLS_SECRET`.
+`make deploy` also creates the **Gateway** itself (`overlay/gateway.yaml`), because a
+`HTTPRoute` pointing at a Gateway that does not exist attaches to nothing — the route gets
+no `status` and the hostname returns Cloudflare **1016**. On this cluster each application
+owns its Gateway, next to Traefik in `kube-system`.
+
+Two values are easy to get wrong, and both are asserted by `make test`:
+
+| Field | Value | Why |
+|---|---|---|
+| listener `port` | **8443** | Traefik's `websecure` entrypoint port *inside* the container. The Service maps it to 443; the Gateway API port is the container port. |
+| `allowedRoutes` | **`All`** | The route lives in `tts-audio`, the Gateway in `kube-system`. Every other Gateway on the cluster uses `Same` because their routes sit beside them — copying that leaves the route unattached. The listener `hostname` pins it to one host regardless. |
+
+The Gateway needs a TLS certificate **in its own namespace**, so copy the wildcard cert
+first:
+
+```bash
+make tls-secret GATEWAY_NAMESPACE=kube-system
+```
+
+It copies `security-feed/security-feed-sredevops-tls` (a Cloudflare Origin certificate for
+`*.sredevops.org`) into `GATEWAY_NAMESPACE` under `TLS_SECRET` (default `tts-audio-tls`).
+Override `TLS_SOURCE_NAMESPACE` / `TLS_SOURCE_SECRET` if it moves. This is a **snapshot**:
+re-run it when the wildcard certificate is renewed.
+
+Set `WITH_GATEWAY=0` to skip creating one, when the cluster already publishes the receiver
+through an existing Gateway — in that case `GATEWAY_NAME`/`GATEWAY_NAMESPACE` name *that*
+Gateway.
+
+On **Traefik CRDs** (no Gateway API), edit `overlay/kustomization.yaml` to list
+`route-traefik.yaml` instead of `route.yaml`, pass `TLS_MIDDLEWARE`/`TLS_SECRET`, and
+`WITH_GATEWAY=0`.
 
 Then point DNS for `TTS_HOST` at the Gateway as you do for any other service, and check:
 
