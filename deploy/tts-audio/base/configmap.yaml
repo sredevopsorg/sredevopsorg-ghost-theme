@@ -19,7 +19,7 @@ metadata:
 data:
   GHOST_API_URL: "https://www.sredevops.org"
   SITE_URL: "https://www.sredevops.org"
-  GCS_BUCKET: "sredevops-audio"
+  GCS_BUCKET: "tts-sredevopsorg"
   AUDIO_BASE_URL: "https://audio.sredevops.org"
 
   # Kokoro-82M v1.0 voices. Same female timbre across locales, replacing Chirp 3: HD

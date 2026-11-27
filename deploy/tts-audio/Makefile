@@ -141,8 +141,8 @@ dev-synth: ## Build the image and speak TEXT=... in LOCALE=en|es|br to OUT (defa
 
 # ── GCP bootstrap ─────────────────────────────────────────────────────────────
 
-GCP_PROJECT  ?= sredevops-audio
-GCS_BUCKET   ?= sredevops-audio
+GCP_PROJECT  ?= sredevopsorg
+GCS_BUCKET   ?= tts-sredevopsorg
 GCP_LOCATION ?= us-central1
 GSA_NAME     ?= tts-audio-runner
 SITE_ORIGINS ?= https://www.sredevops.org,https://sredevops.org,http://localhost:2368
