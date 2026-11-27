@@ -16,12 +16,19 @@ updates:
     directory: /deploy/tts-audio/worker
     schedule:
       interval: weekly
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 5
     groups:
-      # ONNX runtime, the model loader and the GCS client move together; one PR per week
-      # is reviewable, twenty are not.
-      tts-audio:
+      # Patch/minor bumps of the runtime stack: routine, and the image smoke test is the
+      # real review.
+      #
+      # Majors are deliberately NOT grouped. A single grouped PR once carried
+      # `@huggingface/transformers` 3 -> 4, whose tokenizer dropped the attribute the
+      # worker read its vocabulary from; every phoneme was filtered out and synthesis
+      # went silent. A major here must arrive alone, with its own title, its own image
+      # smoke run, and a person deciding.
+      tts-audio-patch:
         patterns: ["*"]
+        update-types: ["minor", "patch"]
 
   - package-ecosystem: docker
     directory: /deploy/tts-audio/worker
