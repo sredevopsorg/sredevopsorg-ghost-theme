@@ -24,6 +24,10 @@ IMAGE     ?= ghcr.io/sredevopsorg/sredevopsorg-ghost-theme/tts-audio-runner
 
 TAG            ?=
 TTS_HOST       ?=
+# Node pool every pipeline pod is pinned to, as the value of NODE_POOL_LABEL. Required:
+# an empty selector matches no node, so `render.sh` refuses to render without it.
+NODE_POOL      ?=
+NODE_POOL_LABEL ?= dsh.sredevops.org/node-pool
 GATEWAY_NAME   ?=
 GATEWAY_NAMESPACE ?=
 GATEWAY_SECTION ?= web
@@ -56,6 +60,7 @@ render: ## Print the rendered manifests (requires TAG, TTS_HOST, and the gateway
 	@TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
 	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
 	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
+	 NODE_POOL="$(NODE_POOL)" \
 	 ./render.sh
 
 .PHONY: diff
@@ -63,6 +68,7 @@ diff: ## Server-side diff of what `make deploy` would change
 	@TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
 	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
 	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
+	 NODE_POOL="$(NODE_POOL)" \
 	 ./render.sh | $(KUBECTL) diff -f - || true
 
 # ── deployment ────────────────────────────────────────────────────────────────
@@ -72,6 +78,7 @@ apply: ## Render and apply (used by deploy and backfill; not usually called dire
 	@TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
 	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
 	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
+	 NODE_POOL="$(NODE_POOL)" \
 	 ./render.sh > .rendered.yaml
 	$(KUBECTL) apply -f .rendered.yaml
 	@rm -f .rendered.yaml
@@ -94,6 +101,7 @@ prune: ## Delete objects this repo declared before but no longer does (e.g. afte
 	@TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
 	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
 	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
+	 NODE_POOL="$(NODE_POOL)" \
 	 ./render.sh > .rendered.yaml
 	@./scripts/prune-stale.sh .rendered.yaml "$(NAMESPACE)" "$(GATEWAY_NAMESPACE)" $(if $(filter 1,$(CONFIRM)),--confirm,)
 	@rm -f .rendered.yaml

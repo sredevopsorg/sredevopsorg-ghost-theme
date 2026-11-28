@@ -93,6 +93,7 @@ data:
             "automountServiceAccountToken": false,
             "restartPolicy": "Never",
             "enableServiceLinks": false,
+            "nodeSelector": {},
             "securityContext": {
               "runAsNonRoot": true,
               "runAsUser": 1000,

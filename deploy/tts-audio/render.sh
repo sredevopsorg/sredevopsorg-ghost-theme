@@ -20,7 +20,19 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OVERLAY="${OVERLAY:-overlay}"
 
-required=(TAG TTS_HOST)
+# Defaults that match the Makefile. They are repeated here rather than only there because
+# these three are used whenever the Gateway is rendered, and an unset TLS_SECRET produces
+# `name: ` in the certificateRef — a Gateway that silently references no certificate, which
+# is exactly the failure that made the hostname unreachable before.
+#
+# `export` is load-bearing: `envsubst` reads only the *environment*, so a plain shell
+# variable assigned here would be invisible to it and the placeholder would render empty.
+: "${TLS_SECRET:=tts-audio-tls}"
+: "${NODE_POOL_LABEL:=dsh.sredevops.org/node-pool}"
+: "${GATEWAY_SECTION:=web}"
+export TLS_SECRET NODE_POOL_LABEL GATEWAY_SECTION
+
+required=(TAG TTS_HOST NODE_POOL)
 if grep -q "route.yaml" "$HERE/$OVERLAY/kustomization.yaml"; then
   required+=(GATEWAY_NAME GATEWAY_NAMESPACE)
 fi
@@ -46,7 +58,26 @@ fi
 # the Job template inside the ConfigMap and are filled by the receiver when it creates a
 # Job. Adding IMAGE here would blank the template's image field at render time, and the
 # receiver would queue Jobs with no image.
-VARS='${TAG} ${TTS_HOST} ${GATEWAY_NAME} ${GATEWAY_NAMESPACE} ${GATEWAY_SECTION} ${TLS_MIDDLEWARE} ${TLS_SECRET}'
+#
+# `NODE_POOL` is in VARS for the Deployment patch in overlay/node-pool-webhook.yaml. The
+# ConfigMap's job template carries no placeholder for it: the receiver sets the selector
+# itself from the NODE_POOL env var (worker/src/k8s.mjs), so nothing about this cluster's
+# pool is baked into a template every future Job is stamped from.
+#
+# That template is guarded below, not left to convention: a `${NODE_POOL}` there would be
+# substituted here and silently pin every Job to the deploying cluster's pool.
+VARS='${TAG} ${TTS_HOST} ${GATEWAY_NAME} ${GATEWAY_NAMESPACE} ${GATEWAY_SECTION} ${TLS_MIDDLEWARE} ${TLS_SECRET} ${NODE_POOL} ${NODE_POOL_LABEL}'
+
+# Scoped to the ConfigMap document: the Deployment legitimately carries `${NODE_POOL_LABEL}`
+# in its env, and a whole-stream grep would flag that instead of the template.
+template_pool="$(kubectl kustomize "$HERE/$OVERLAY" \
+  | awk 'BEGIN { RS = "\n---\n" } /kind: ConfigMap/ && /job-template\.json:/ { print; exit }' \
+  | grep -oE '\$\{(NODE_POOL|NODE_POOL_LABEL)\}' | sort -u || true)"
+if [ -n "$template_pool" ]; then
+  echo "render: the job template must not reference ${template_pool}" >&2
+  echo "render: the receiver fills the node selector from its own environment (worker/src/k8s.mjs)" >&2
+  exit 2
+fi
 
 rendered="$(kubectl kustomize "$HERE/$OVERLAY" | envsubst "$VARS")"
 
@@ -61,7 +92,7 @@ fi
 
 # Placeholders that are supposed to survive: the Job template inside the ConfigMap is
 # filled by the receiver when it creates a Job, not when this script runs.
-SURVIVORS='POST_ID|IMAGE|POD_NAMESPACE'
+SURVIVORS='POST_ID|IMAGE|POD_NAMESPACE|NODE_POOL'
 
 # Anything else left unexpanded means a value was not supplied. envsubst above only
 # substitutes the listed variables, so this catches a route whose Gateway or host is still

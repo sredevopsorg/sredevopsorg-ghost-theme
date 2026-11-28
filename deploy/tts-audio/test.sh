@@ -59,6 +59,7 @@ fi
 
 step "overlay renders and is coherent"
 export TAG=test-tag TTS_HOST=tts.example.org GATEWAY_NAME=gw GATEWAY_NAMESPACE=gw-ns GATEWAY_SECTION=web
+export NODE_POOL=dsh NODE_POOL_LABEL=dsh.sredevops.org/node-pool
 rendered="$(./render.sh)" || fail "overlay does not render with test values"
 
 if printf '%s' "$rendered" | grep -q '\${TAG}'; then fail "TAG was not substituted"; fi
@@ -77,6 +78,38 @@ for kind in Namespace ServiceAccount Role RoleBinding ConfigMap Deployment Servi
   printf '%s' "$rendered" | grep -q "^kind: ${kind}$" || fail "rendered output is missing a ${kind}"
 done
 
+step "no egress policy is declared"
+# Re-adding one is a deliberate act, not an accident. On this cluster any egress policy
+# selecting these pods takes the whole ClusterIP path down (measured: the API server
+# refuses with ECONNREFUSED even when the rule is `port: 443` with no `to:`), which is what
+# stopped the backfill from creating a single Job. See base/netpol.yaml for the evidence.
+if printf '%s' "$rendered" | grep -q 'policyTypes:.*Egress\|- Egress'; then
+  fail "an Egress NetworkPolicy is declared; read base/netpol.yaml before re-adding one"
+else
+  green "no egress policy (ingress-only, as documented)"
+fi
+# The two ingress policies must still be there: removing them would expose the receiver.
+printf '%s' "$rendered" | grep -q 'name: default-deny-ingress' || fail "default-deny-ingress is missing"
+printf '%s' "$rendered" | grep -q 'name: allow-webhook-ingress' || fail "allow-webhook-ingress is missing"
+
+step "node-pool placement"
+# Both workloads run where the dataplane behaviour is known, and the selector is a value.
+pool_webhook="$(printf '%s' "$rendered" | awk '/^kind: Deployment$/{d=1} d && /node-pool:/{print $2; exit}')"
+[ "$pool_webhook" = "dsh" ] || fail "the Deployment nodeSelector is '${pool_webhook}', expected the NODE_POOL value (dsh)"
+[ "$(printf '%s' "$rendered" | grep -c 'dsh.sredevops.org/node-pool: dsh')" -ge 2 ] \
+  || fail "the Deployment and the backfill Job must both carry the node-pool selector"
+# The job template the receiver stamps must NOT have the pool baked in: the receiver sets
+# it per Job from its own environment, so a template placeholder would pin every future
+# Job to whatever pool was current when `make deploy` ran. Asserted in the "job template"
+# step below, where the template has actually been extracted.
+# An unset NODE_POOL must be refused rather than rendering `node-pool: ""` (no node matches).
+if (unset NODE_POOL; ./render.sh >/dev/null 2>&1); then
+  fail "render.sh rendered without NODE_POOL, which would pin pods to no node at all"
+else
+  green "render refuses without NODE_POOL"
+fi
+green "node-pool placement ok"
+
 step "gateway"
 # Rendered outside the kustomization precisely so `namespace: tts-audio` cannot rewrite it;
 # a Gateway in the wrong namespace is the failure that produced Cloudflare 1016.
@@ -90,6 +123,14 @@ printf '%s' "$rendered" | grep -q 'port: 8443' || fail "Gateway listener is not 
 # allowedRoutes must not be the cluster's default `Same`: the route lives in tts-audio.
 printf '%s' "$rendered" | grep -q 'from: All' || fail "Gateway allowedRoutes must be All, or the route stays unattached"
 printf '%s' "$rendered" | grep -q "hostname: tts.example.org" || fail "Gateway hostname is not TTS_HOST"
+# The certificateRef must name a secret. An empty `name:` renders without error and
+# produces a Gateway that references no certificate, which is silent until the hostname
+# 404s — the same class of failure as the missing Gateway this file exists to prevent.
+if printf '%s' "$rendered" | grep -qE '^\s+name:\s*$'; then
+  fail "a rendered field has an empty value (an unset TLS_SECRET renders 'name: ' — see the export in render.sh)"
+fi
+printf '%s' "$rendered" | grep -q 'name: tts-audio-tls' \
+  || fail "the Gateway certificateRef does not name the default TLS_SECRET (tts-audio-tls)"
 green "gateway ok"
 
 step "job template"
@@ -131,6 +172,13 @@ else
   printf '%s' "$template" | grep -q '"ttlSecondsAfterFinished"' || fail "job template has no TTL"
   printf '%s' "$template" | grep -q '"readOnlyRootFilesystem": true' || fail "job template is not read-only"
   printf '%s' "$template" | grep -q '"runAsNonRoot": true' || fail "job template allows root"
+  # The pool is set by the receiver from its own env, never baked into the template — a
+  # placeholder here would pin every future Job to whatever pool was current at deploy
+  # time. The selector block must still be present so the field is visible and fillable.
+  printf '%s' "$template" | grep -q '"nodeSelector"' || fail "job template has no nodeSelector for the receiver to fill"
+  if printf '%s' "$template" | grep -q 'NODE_POOL'; then
+    fail "job template mentions NODE_POOL — the receiver fills this, not render.sh"
+  fi
   green "job template ok"
 fi
 

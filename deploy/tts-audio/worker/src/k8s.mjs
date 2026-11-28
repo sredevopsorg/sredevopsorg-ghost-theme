@@ -106,6 +106,24 @@ function fill(template, values) {
 }
 
 /**
+ * Apply the node-pool selector, or remove it when no pool is configured.
+ *
+ * The template always carries a `nodeSelector` block so the field is visible in the
+ * ConfigMap, but an empty value must not reach the API server: `node-pool: ""` is a
+ * selector that matches no node, and the Job would sit Pending forever instead of running
+ * wherever the scheduler sees fit.
+ */
+function applyNodeSelector(job, config) {
+  const spec = job.spec?.template?.spec;
+  if (!spec || !("nodeSelector" in spec)) return;
+  if (config.nodePool) {
+    spec.nodeSelector[config.nodePoolLabel] = config.nodePool;
+  } else {
+    delete spec.nodeSelector;
+  }
+}
+
+/**
  * Create the synthesis Job for a post, or report that the identical one already exists.
  *
  * The name is deterministic (`tts-<post>-<hash10>`), so Kubernetes enforces idempotency
@@ -131,7 +149,11 @@ export async function createPostJob(config, { postId, hash, template, requestImp
     POST_ID: postId,
     IMAGE: config.image,
     POD_NAMESPACE: namespace,
+    // Rendered empty here on purpose: `applyNodeSelector` either sets a real value or
+    // drops the block. Leaving the placeholder unset would throw before we get there.
+    NODE_POOL: "",
   });
+  applyNodeSelector(manifest, config);
 
   const path = `/apis/batch/v1/namespaces/${encodeURIComponent(namespace)}/jobs`;
   const response = await requestImpl("POST", path, { body: manifest });

@@ -21,6 +21,13 @@ resources:
   - ../base
   - route.yaml
 
+# Scheduling: pin both workloads to a node pool by label. Kept out of base/ because the
+# pool is a cluster fact and `base/` must render standalone. Rendered with `${NODE_POOL}`
+# like every other per-cluster value.
+patches:
+  - path: node-pool-webhook.yaml
+  - path: node-pool-backfill.yaml
+
 # `gateway.yaml` is deliberately NOT a kustomize resource. The `namespace:` field below
 # rewrites every resource in this build to `tts-audio`, and the Gateway belongs in
 # `kube-system` (GATEWAY_NAMESPACE) beside Traefik. Kustomize has no per-resource namespace

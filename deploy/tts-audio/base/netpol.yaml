@@ -1,12 +1,34 @@
-# Network policy: the two workloads may reach exactly what they need.
+# Network policy: deny ingress by default, then allow exactly the gateway.
 #
-# Default-deny ingress in the namespace, then one allow rule for the gateway. Egress is
-# restricted to DNS, HTTPS (Ghost + GCS) and, for the receiver, the Kubernetes API — the
-# Job it creates is the one thing that needs the API server.
+# ## Ingress only — egress is deliberately not restricted here
 #
-# The exporter ports are the egress proxy ports some GKE configurations route through;
-# removing this file restores the cluster default if your CNI is not enforcing it yet
-# (GKE Dataplane V2 enforces it, the older Calico plugin does too).
+# There is no egress NetworkPolicy in this file. There used to be two
+# (`egress-dns-and-https`, `allow-kubernetes-api-egress`), and on this cluster *any*
+# egress policy selecting these pods silently broke every in-cluster destination.
+#
+# Measured on `noviembresre-1` (k3s, 2026-11-27), probing from inside the receiver pod:
+#
+#   no egress policy      -> 10.43.0.1:443 (API) OPEN, own ClusterIP OPEN
+#   any egress policy     -> 10.43.0.1:443 ECONNREFUSED, own ClusterIP ECONNREFUSED
+#
+# "Any" is literal: a single policy whose only rule was `port: 443` with no `to:` was
+# enough to refuse the API, as was an explicit `to: ipBlock 10.43.0.0/16` (the service
+# range) and one widened to include `10.42.0.0/16` and the `100.64.0.0/10` node range.
+# Deleting the policies restored connectivity with no other change. Pod-to-pod on the pod
+# network kept working either way, and public hosts on 443 kept working, so the failure
+# was specifically the service/ClusterIP path.
+#
+# That is a CNI/dataplane defect, not something this file can express around: there is no
+# egress rule shape that both selects the pods and leaves the API server reachable. The
+# practical consequence of keeping the policies was the worst of both worlds — the
+# backfill could not create a single Job (221/221 `ECONNREFUSED`), while egress was not
+# meaningfully contained anyway (any destination on 443 was permitted, so there was no real
+# exfiltration boundary).
+#
+# So egress is left to the cluster default until the dataplane is fixed. If you re-add
+# egress policies, verify with the probe above *before* trusting them: on this cluster a
+# policy that reads correctly can still block the API. `test.sh` asserts that no egress
+# policy is declared here, so re-adding one is a deliberate act.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -34,7 +56,7 @@ spec:
   policyTypes:
     - Ingress
   ingress:
-    # Only the ingress controller / gateway. Namespaces are a value to fill in:
+    # Only the ingress controller / gateway. The namespace is a value to fill in:
     # `gke-gateway-infra`, `traefik`, `ingress-nginx` — whatever this cluster runs.
     - from:
         - namespaceSelector:
@@ -43,66 +65,3 @@ spec:
       ports:
         - protocol: TCP
           port: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: egress-dns-and-https
-  namespace: tts-audio
-  labels:
-    app.kubernetes.io/name: tts-audio
-spec:
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/name: tts-audio
-  policyTypes:
-    - Egress
-  egress:
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-      ports:
-        - protocol: UDP
-          port: 53
-        - protocol: TCP
-          port: 53
-    # Ghost Admin API and GCS both live on HTTPS; the IPs are the cluster's egress path
-    # and are not pinned, so the policy allows the port rather than the destination.
-    # Tighten it to ipBlock entries if your cluster has a fixed egress range.
-    - ports:
-        - protocol: TCP
-          port: 443
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-kubernetes-api-egress
-  namespace: tts-audio
-  labels:
-    app.kubernetes.io/name: tts-audio
-spec:
-  # Both workloads that *create* Jobs need API access: the receiver on every webhook, and
-  # the backfill once per post it queues. This used to select only `component=webhook`, so
-  # the backfill authenticated to Ghost, listed all 221 posts, and then failed to create a
-  # single Job with `connect ECONNREFUSED <apiserver>:443`.
-  #
-  # The worker is deliberately excluded even though it shares `name=tts-audio`: it runs
-  # with `automountServiceAccountToken: false` and has no business reaching the API server,
-  # so widening the selector to the shared label would quietly grant it egress it does not
-  # need. Two selectors, one per component that actually needs it.
-  podSelector:
-    matchExpressions:
-      - key: app.kubernetes.io/name
-        operator: In
-        values: ["tts-audio"]
-      - key: app.kubernetes.io/component
-        operator: In
-        values: ["webhook", "backfill"]
-  policyTypes:
-    - Egress
-  egress:
-    # The API server's ClusterIP; GKE answers on 443 and 443 only.
-    - ports:
-        - protocol: TCP
-          port: 443

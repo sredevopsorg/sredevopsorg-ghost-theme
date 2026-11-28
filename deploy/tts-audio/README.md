@@ -183,12 +183,59 @@ The route needs to know your Gateway. On a Gateway API cluster:
 make deploy \
   TAG=<12-char commit sha from the image build> \
   TTS_HOST=tts.sredevops.org \
+  NODE_POOL=<value of the node-pool label> \
   GATEWAY_NAME=<gateway> GATEWAY_NAMESPACE=<namespace> GATEWAY_SECTION=web
 ```
+
+`TAG` must be the **12-character** short SHA, which is how the workflow tags the image
+(`${{ github.sha }}` truncated to 12). A 7-character prefix is not a tag and the pod will
+fail with `ImagePullBackOff` / `manifest unknown`.
 
 `render.sh` refuses to render without those values, and refuses to emit a manifest that
 still contains a placeholder it does not expect — the failure mode it prevents is a route
 pointing at `${GATEWAY_NAME}`.
+
+### Node placement
+
+`NODE_POOL` pins every pipeline workload to a node carrying that label
+(`dsh.sredevops.org/node-pool`, overridable with `NODE_POOL_LABEL`). It is required, not
+optional, because an empty selector matches **no** node and the pods would sit `Pending`.
+
+On this cluster the value is `dsh` — the amd64 node. Two reasons it is pinned rather than
+left to the scheduler:
+
+- the image is built multi-arch, but the arm64 control-plane node is cordoned for a reason;
+- the amd64 node's dataplane has a defect with egress policy (see below), so *where* these
+  pods run is a decision with consequences, not an implementation detail.
+
+The Deployment and the backfill Job carry the selector in their manifests. Synthesis Jobs
+get it from the **receiver**, which reads `NODE_POOL` from its own environment and sets it
+on each Job (`worker/src/k8s.mjs`); the template in `tts-job-template` keeps an empty
+`nodeSelector` on purpose, so this cluster's pool is never baked into a template that every
+future Job is stamped from.
+
+### Egress policy is deliberately absent
+
+There are only **ingress** policies in `base/netpol.yaml`. There used to be two egress
+policies, and on this cluster any egress policy selecting these pods broke every in-cluster
+destination, measured from inside a receiver pod:
+
+| State | `10.43.0.1:443` (API) | own ClusterIP |
+|---|---|---|
+| no egress policy | OPEN | OPEN |
+| any egress policy | `ECONNREFUSED` | `ECONNREFUSED` |
+
+"Any" included a single policy whose only rule was `port: 443` with no `to:`, and one with
+an explicit `to: ipBlock` covering the service, pod and node ranges. Deleting them restored
+connectivity with no other change; public hosts on 443 and direct pod-to-pod traffic kept
+working throughout, so it was specifically the service path. That is a CNI defect, not
+something a manifest can express around — and the policies were not buying containment
+anyway, since any destination on 443 was permitted.
+
+The practical consequence was that the **backfill could not create a single Job**: it read
+all 221 posts and failed each one with `connect ECONNREFUSED <apiserver>:443`. If you
+re-add egress policies, verify with the probe above *before* trusting them, and expect
+`make test` to fail until you remove the assertion that guards this.
 
 `make deploy` also creates the **Gateway** itself (`overlay/gateway.yaml`), because a
 `HTTPRoute` pointing at a Gateway that does not exist attaches to nothing — the route gets
@@ -224,12 +271,13 @@ On **Traefik CRDs** (no Gateway API), edit `overlay/kustomization.yaml` to list
 
 After a release that **renames** a resource, run the prune check — `kubectl apply` is a
 create-or-update verb and never removes an object whose name changed. This has bitten the
-NetworkPolicies here once already (`allow-webhook-kubernetes-api` became
-`allow-kubernetes-api-egress`; the old object lingered, still permitting egress):
+NetworkPolicies here twice: `allow-webhook-kubernetes-api` became
+`allow-kubernetes-api-egress`, and both egress policies were removed later for the reasons
+above. In each case the old object lingered on the cluster:
 
 ```bash
-make prune TAG=<sha> TTS_HOST=... GATEWAY_NAME=... GATEWAY_NAMESPACE=...   # dry run
-make prune ... CONFIRM=1                                                  # delete
+make prune TAG=<sha> TTS_HOST=... NODE_POOL=... GATEWAY_NAME=... GATEWAY_NAMESPACE=...  # dry run
+make prune ... CONFIRM=1                                                                # delete
 ```
 
 It only considers kinds this repository owns and only objects labelled

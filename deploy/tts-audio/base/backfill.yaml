@@ -62,6 +62,12 @@ spec:
                   fieldPath: metadata.namespace
             - name: WORKER_IMAGE
               value: "${IMAGE}"
+            # The backfill also stamps Jobs, so it needs the same placement values the
+            # receiver has, or its Jobs would land wherever the scheduler chose.
+            - name: NODE_POOL
+              value: "${NODE_POOL}"
+            - name: NODE_POOL_LABEL
+              value: "${NODE_POOL_LABEL}"
             - name: GHOST_ADMIN_API_KEY
               valueFrom:
                 secretKeyRef:
