@@ -124,7 +124,7 @@ secret: ## Create/refresh the Secret from ADMIN_KEY, WEBHOOK_SECRET, GCS_KEY=<pa
 	@echo "secret: restart the receiver to pick it up:  make restart"
 
 .PHONY: restart
-restart: ## Roll the receiver (needed after a Secret change)
+restart: ## Roll the receiver (needed after a Secret OR job-template change)
 	$(KUBECTL) -n $(NAMESPACE) rollout restart deployment/tts-webhook
 	$(KUBECTL) -n $(NAMESPACE) rollout status deployment/tts-webhook --timeout=120s
 

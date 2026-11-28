@@ -130,7 +130,11 @@ data:
                 "env": [
                   { "name": "POD_NAMESPACE", "value": "${POD_NAMESPACE}" },
                   { "name": "GOOGLE_APPLICATION_CREDENTIALS", "value": "/var/secrets/google/key.json" },
-                  { "name": "TMPDIR", "value": "/tmp" }
+                  { "name": "TMPDIR", "value": "/tmp" },
+                  {
+                    "name": "GHOST_ADMIN_API_KEY",
+                    "valueFrom": { "secretKeyRef": { "name": "tts-audio", "key": "admin-api-key" } }
+                  }
                 ],
                 "resources": {
                   "requests": { "cpu": "0", "memory": "256Mi" },

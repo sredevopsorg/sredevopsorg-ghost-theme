@@ -221,6 +221,22 @@ else
   printf '%s' "$template" | grep -q '"ttlSecondsAfterFinished"' || fail "job template has no TTL"
   printf '%s' "$template" | grep -q '"readOnlyRootFilesystem": true' || fail "job template is not read-only"
   printf '%s' "$template" | grep -q '"runAsNonRoot": true' || fail "job template allows root"
+  # The Secret's keys are `admin-api-key`, `webhook-secret`, `gcs-key.json`. `envFrom` turns
+  # `admin-api-key` into ADMIN_API_KEY, but the worker reads GHOST_ADMIN_API_KEY — so the
+  # mapping has to be explicit. Without it every synthesis Job died at startup with
+  # "missing configuration: adminKey", after the image pull succeeded and the pod was
+  # Running, which is exactly the kind of failure that looks like a build problem.
+  node -e '
+    const t = JSON.parse(require("fs").readFileSync(0, "utf8"));
+    const c = t.spec.template.spec.containers[0];
+    const e = (c.env ?? []).find((x) => x.name === "GHOST_ADMIN_API_KEY");
+    if (!e) { console.log("no GHOST_ADMIN_API_KEY in the job template"); process.exit(1); }
+    const ref = e.valueFrom?.secretKeyRef;
+    if (ref?.name !== "tts-audio" || ref?.key !== "admin-api-key") {
+      console.log(`GHOST_ADMIN_API_KEY <- ${JSON.stringify(ref)} (want tts-audio/admin-api-key)`);
+      process.exit(1);
+    }
+  ' <<< "$template" || fail "the job template does not map the Admin key to GHOST_ADMIN_API_KEY"
   # The pool is set by the receiver from its own env, never baked into the template — a
   # placeholder here would pin every future Job to whatever pool was current at deploy
   # time. The selector block must still be present so the field is visible and fillable.
