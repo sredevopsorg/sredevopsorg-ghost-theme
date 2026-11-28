@@ -74,7 +74,7 @@ fi
 docs="$(printf '%s' "$rendered" | grep -c '^apiVersion:')"
 kinds="$(printf '%s' "$rendered" | grep -c '^kind:')"
 [ "$docs" -eq "$kinds" ] || fail "every apiVersion needs exactly one kind (${docs} vs ${kinds})"
-for kind in Namespace ServiceAccount Role RoleBinding ConfigMap Deployment Service Job HTTPRoute NetworkPolicy PodDisruptionBudget HorizontalPodAutoscaler Gateway; do
+for kind in Namespace ServiceAccount Role RoleBinding ConfigMap Deployment Service HTTPRoute NetworkPolicy PodDisruptionBudget HorizontalPodAutoscaler Gateway; do
   printf '%s' "$rendered" | grep -q "^kind: ${kind}$" || fail "rendered output is missing a ${kind}"
 done
 
@@ -96,8 +96,9 @@ step "node-pool placement"
 # Both workloads run where the dataplane behaviour is known, and the selector is a value.
 pool_webhook="$(printf '%s' "$rendered" | awk '/^kind: Deployment$/{d=1} d && /node-pool:/{print $2; exit}')"
 [ "$pool_webhook" = "dsh" ] || fail "the Deployment nodeSelector is '${pool_webhook}', expected the NODE_POOL value (dsh)"
-[ "$(printf '%s' "$rendered" | grep -c 'dsh.sredevops.org/node-pool: dsh')" -ge 2 ] \
-  || fail "the Deployment and the backfill Job must both carry the node-pool selector"
+# The backfill Job is rendered only under WITH_BACKFILL=1, so it is checked there, below.
+printf '%s' "$rendered" | grep -q 'dsh.sredevops.org/node-pool: dsh' \
+  || fail "the Deployment does not carry the node-pool selector"
 # The job template the receiver stamps must NOT have the pool baked in: the receiver sets
 # it per Job from its own environment, so a template placeholder would pin every future
 # Job to whatever pool was current when `make deploy` ran. Asserted in the "job template"
@@ -109,6 +110,29 @@ else
   green "render refuses without NODE_POOL"
 fi
 green "node-pool placement ok"
+
+step "the backfill is a separate, opt-in step"
+# `kubectl apply` is create-or-update: while the backfill Job was a kustomize resource, every
+# `make deploy` recreated it, so shipping an unrelated ConfigMap change started a full
+# archive backfill. That flooded the cluster with 221 Jobs, twice. The Job is now rendered
+# only when WITH_BACKFILL=1, which only `make backfill` sets.
+if printf '%s' "$rendered" | grep -q '^kind: Job$'; then
+  fail "the default render contains a Job — make deploy must never start a backfill"
+else
+  green "deploy renders no Job"
+fi
+backfill_rendered="$(WITH_BACKFILL=1 ./render.sh)" || fail "overlay does not render with WITH_BACKFILL=1"
+if printf '%s' "$backfill_rendered" | grep -q 'name: tts-backfill'; then
+  green "backfill renders the Job when asked"
+else
+  fail "WITH_BACKFILL=1 did not render the tts-backfill Job"
+fi
+# It must carry the same placement as the Deployment, or it lands on the wrong node.
+printf '%s' "$backfill_rendered" | awk '/name: tts-backfill/{f=1} f && /node-pool:/{print; exit}' \
+  | grep -q 'dsh' || fail "the backfill Job does not carry the node-pool selector"
+# And its image env must be a real reference, not the \${IMAGE} placeholder (InvalidImageName).
+printf '%s' "$backfill_rendered" | grep -A1 'name: WORKER_IMAGE' | grep -q 'tts-audio-runner:test-tag' \
+  || fail "the backfill Job's WORKER_IMAGE is not the full image:tag reference"
 
 step "gateway"
 # Rendered outside the kustomization precisely so `namespace: tts-audio` cannot rewrite it;

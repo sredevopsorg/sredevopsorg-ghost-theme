@@ -91,6 +91,16 @@ fi
 
 rendered="$(kubectl kustomize "$HERE/$OVERLAY" | envsubst "$VARS")"
 
+# The backfill Job is opt-in, mirroring WITH_GATEWAY. It is NOT a kustomize resource (see
+# base/kustomization.yaml): `kubectl apply` would recreate it on every deploy, so deploying
+# an unrelated ConfigMap change silently started a full archive backfill — a 221-Job flood,
+# twice. Only `make backfill` sets WITH_BACKFILL=1.
+if [ "${WITH_BACKFILL:-0}" = "1" ] && [ -f "$HERE/base/backfill.yaml" ]; then
+  rendered="${rendered}
+---
+$(envsubst "$VARS" < "$HERE/base/backfill.yaml")"
+fi
+
 # The Gateway is rendered on its own so it keeps its own namespace. It is optional: a
 # cluster that already publishes the receiver through an existing Gateway (or through a
 # Traefik IngressRoute) does not need one, and `GATEWAY_NAME` there names that Gateway.

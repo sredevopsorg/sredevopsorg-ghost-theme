@@ -45,7 +45,18 @@ SUDO    ?= sudo
 help: ## Show this help
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
 
+# `WITH_BACKFILL` is only set by the `backfill` target. Everything else renders the
+# long-lived objects and nothing else, so `apply` can never start an archive backfill as a
+# side effect of deploying a ConfigMap change.
+RENDER_ENV = @TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
+	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
+	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
+	 NODE_POOL="$(NODE_POOL)" NODE_POOL_LABEL="$(NODE_POOL_LABEL)" \
+	 WITH_BACKFILL="$(WITH_BACKFILL)"
+
 # ── verification ──────────────────────────────────────────────────────────────
+
+
 
 .PHONY: test
 test: ## Render, validate and unit-test everything offline
@@ -56,35 +67,26 @@ test-worker: ## Worker unit tests only (needs Node 24)
 	cd worker && npm test
 
 .PHONY: render
-render: ## Print the rendered manifests (requires TAG, TTS_HOST, and the gateway values)
-	@TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
-	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
-	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
-	 NODE_POOL="$(NODE_POOL)" \
-	 ./render.sh
+render: ## Print the rendered manifests (requires TAG, TTS_HOST, NODE_POOL, gateway values)
+	@$(RENDER_ENV) ./render.sh
 
 .PHONY: diff
 diff: ## Server-side diff of what `make deploy` would change
-	@TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
-	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
-	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
-	 NODE_POOL="$(NODE_POOL)" \
-	 ./render.sh | $(KUBECTL) diff -f - || true
+	@$(RENDER_ENV) ./render.sh | $(KUBECTL) diff -f - || true
 
 # ── deployment ────────────────────────────────────────────────────────────────
 
 .PHONY: apply
 apply: ## Render and apply (used by deploy and backfill; not usually called directly)
-	@TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
-	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
-	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
-	 NODE_POOL="$(NODE_POOL)" \
-	 ./render.sh > .rendered.yaml
+	$(RENDER_ENV) ./render.sh > .rendered.yaml
 	$(KUBECTL) apply -f .rendered.yaml
 	@rm -f .rendered.yaml
 
 .PHONY: deploy
-deploy: apply ## Apply the rendered manifests (TAG is required; see render.sh)
+deploy: ## Apply the long-lived manifests (TAG is required; see render.sh)
+	# The backfill Job is excluded on purpose: it is a one-shot, and `kubectl apply`
+	# recreating it on every deploy is what flooded the cluster with 221 Jobs.
+	@$(MAKE) --no-print-directory apply WITH_BACKFILL=0
 
 .PHONY: tls-secret
 tls-secret: ## Copy the wildcard *.sredevops.org cert into the Gateway's namespace
@@ -140,13 +142,12 @@ logs: ## Tail the receiver logs
 
 .PHONY: backfill
 backfill: ## Queue audio for every post missing it (DRY_RUN=1 prints the plan only)
-	@$(MAKE) apply TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
-	  GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" >/dev/null
-	# The apply above also created the backfill Job; recreate it so a previous, finished
-	# run does not make `wait` return against stale status.
+	# The backfill is the ONLY target that creates the Job. A finished Job cannot be
+	# patched (its pod template is immutable), so delete the previous run first and let
+	# the apply create a fresh one; `wait` then tracks the run we just started rather than
+	# a completed one from last week.
 	$(KUBECTL) -n $(NAMESPACE) delete job tts-backfill --ignore-not-found
-	@$(MAKE) apply TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)" \
-	  GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" >/dev/null
+	$(MAKE) --no-print-directory apply WITH_BACKFILL=1
 	@if [ "$(DRY_RUN)" = "1" ]; then \
 	  $(KUBECTL) -n $(NAMESPACE) set env job/tts-backfill DRY_RUN=1 >/dev/null; \
 	  echo "backfill: dry run — no Jobs will be created"; \

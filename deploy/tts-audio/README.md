@@ -313,12 +313,29 @@ make backfill-plan      # DRY RUN: how many posts, no Jobs created
 make backfill           # queue them
 ```
 
+**The backfill is a separate step from `make deploy`, on purpose.** Its Job is not part of
+the kustomization: `kubectl apply` creates-or-updates whatever it is handed, so while the
+Job was a resource, deploying an unrelated ConfigMap change recreated it and started a full
+archive backfill. That flooded the cluster with 221 Jobs — twice. `make deploy` now renders
+long-lived objects only; `render.sh` emits the Job solely under `WITH_BACKFILL=1`, which
+only `make backfill` sets. `test.sh` fails if a Job reappears in the default render.
+
+Because a Job's pod template is immutable, `make backfill` deletes the previous run before
+applying, so `wait` tracks the run you just started rather than a completed one.
+
 Each post is an independent Job (`tts-<id>-<hash>`), so the backfill is resumable: a post
 already up to date is skipped by the hash check, and a Job name that already exists is not
 created twice. Re-running is safe and cheap.
 
-Rough cost: a 9k-character article is ~8k chars/s of CPU, so **1–2 minutes per post** in a
-2-CPU Job. A hundred posts is a couple of hours of cluster time, not of anyone's attention.
+Jobs are **queued, not fanned out**: `MAX_CONCURRENT_JOBS=1` means the next Job is created
+only after the previous finishes, so wall-clock time is the sum of the articles rather than
+a divided share.
+
+Rough cost, from the measured **~8 characters of article per second of CPU**: a
+9k-character article is ~19 minutes of synthesis, plus ~10 s of model load. Queued one at a
+time, a hundred posts is **most of a day** of cluster time — not a couple of hours. Plan the
+first backfill accordingly, and run `make backfill-plan` to see the real count before
+committing to it.
 
 ---
 

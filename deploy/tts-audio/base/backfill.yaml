@@ -13,6 +13,17 @@
 #   make backfill                                                      # see the Makefile
 #
 # `DRY_RUN=1` prints the plan — how many posts would be queued — without creating Jobs.
+#
+# ## This file is not a kustomize resource, on purpose
+#
+# `base/kustomization.yaml` does not list it. It is a one-shot Job, and `kubectl apply`
+# creates or updates whatever it is given: as a resource, every `make deploy` recreated it,
+# so deploying an unrelated ConfigMap change silently started a full archive backfill (a
+# 221-Job flood, twice). A Job's pod template is also immutable once created, so an edited
+# one fails to apply rather than updating cleanly.
+#
+# `render.sh` emits this as a separate document and only `make backfill` applies it. To run
+# it by hand: `make backfill` or `make backfill-plan`.
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -38,6 +49,10 @@ spec:
       serviceAccountName: tts-webhook
       automountServiceAccountToken: true
       restartPolicy: Never
+      # Applied here rather than by a kustomize patch, because this document is rendered
+      # outside the kustomization (see the note above).
+      nodeSelector:
+        dsh.sredevops.org/node-pool: ${NODE_POOL}
       enableServiceLinks: false
       securityContext:
         runAsNonRoot: true
