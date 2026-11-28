@@ -52,7 +52,7 @@ RENDER_ENV = @TAG="$(TAG)" TTS_HOST="$(TTS_HOST)" GATEWAY_NAME="$(GATEWAY_NAME)"
 	 GATEWAY_NAMESPACE="$(GATEWAY_NAMESPACE)" GATEWAY_SECTION="$(GATEWAY_SECTION)" \
 	 TLS_MIDDLEWARE="$(TLS_MIDDLEWARE)" TLS_SECRET="$(TLS_SECRET)" \
 	 NODE_POOL="$(NODE_POOL)" NODE_POOL_LABEL="$(NODE_POOL_LABEL)" \
-	 WITH_BACKFILL="$(WITH_BACKFILL)"
+	 WITH_BACKFILL="$(WITH_BACKFILL)" DRY_RUN="$(DRY_RUN)"
 
 # ── verification ──────────────────────────────────────────────────────────────
 
@@ -148,10 +148,6 @@ backfill: ## Queue audio for every post missing it (DRY_RUN=1 prints the plan on
 	# a completed one from last week.
 	$(KUBECTL) -n $(NAMESPACE) delete job tts-backfill --ignore-not-found
 	$(MAKE) --no-print-directory apply WITH_BACKFILL=1
-	@if [ "$(DRY_RUN)" = "1" ]; then \
-	  $(KUBECTL) -n $(NAMESPACE) set env job/tts-backfill DRY_RUN=1 >/dev/null; \
-	  echo "backfill: dry run — no Jobs will be created"; \
-	fi
 	$(KUBECTL) -n $(NAMESPACE) wait --for=condition=complete --timeout=30m job/tts-backfill \
 	  || { $(KUBECTL) -n $(NAMESPACE) logs job/tts-backfill --tail=200; exit 1; }
 	@$(KUBECTL) -n $(NAMESPACE) logs job/tts-backfill --tail=50

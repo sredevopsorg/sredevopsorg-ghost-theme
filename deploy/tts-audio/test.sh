@@ -133,6 +133,21 @@ printf '%s' "$backfill_rendered" | awk '/name: tts-backfill/{f=1} f && /node-poo
 # And its image env must be a real reference, not the \${IMAGE} placeholder (InvalidImageName).
 printf '%s' "$backfill_rendered" | grep -A1 'name: WORKER_IMAGE' | grep -q 'tts-audio-runner:test-tag' \
   || fail "the backfill Job's WORKER_IMAGE is not the full image:tag reference"
+# The Job's own container image must be pinned too. Because this document is rendered
+# outside the kustomization, `images.newTag` never reaches it: left as `:latest` the first
+# real run died with ErrImagePull, since no such tag is published.
+printf '%s' "$backfill_rendered" | grep -q "image: .*tts-audio-runner:test-tag" \
+  || fail "the backfill container image is not pinned to TAG (would pull :latest)"
+if printf '%s' "$backfill_rendered" | grep -q "tts-audio-runner:latest"; then
+  fail "the backfill container image is :latest — kustomize images.newTag does not reach this file"
+fi
+# DRY_RUN must be settable at render time. `kubectl set env job/...` patches the pod
+# template, which is immutable, so the dry run failed instead of printing the plan.
+printf '%s' "$backfill_rendered" | grep -A1 'name: DRY_RUN' | grep -q 'value: "0"' \
+  || fail "DRY_RUN does not default to 0"
+dry_rendered="$(WITH_BACKFILL=1 DRY_RUN=1 ./render.sh)" || fail "overlay does not render with DRY_RUN=1"
+printf '%s' "$dry_rendered" | grep -A1 'name: DRY_RUN' | grep -q 'value: "1"' \
+  || fail "DRY_RUN=1 does not reach the backfill Job"
 
 step "gateway"
 # Rendered outside the kustomization precisely so `namespace: tts-audio` cannot rewrite it;

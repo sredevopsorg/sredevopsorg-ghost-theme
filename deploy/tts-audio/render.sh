@@ -30,8 +30,10 @@ OVERLAY="${OVERLAY:-overlay}"
 : "${TLS_SECRET:=tts-audio-tls}"
 : "${NODE_POOL_LABEL:=dsh.sredevops.org/node-pool}"
 : "${GATEWAY_SECTION:=web}"
+# Only the backfill Job reads this; "0" means a real backfill.
+: "${DRY_RUN:=0}"
 : "${IMAGE:=ghcr.io/sredevopsorg/sredevopsorg-ghost-theme/tts-audio-runner}"
-export TLS_SECRET NODE_POOL_LABEL GATEWAY_SECTION
+export TLS_SECRET NODE_POOL_LABEL GATEWAY_SECTION DRY_RUN
 
 required=(TAG TTS_HOST NODE_POOL)
 if grep -q "route.yaml" "$HERE/$OVERLAY/kustomization.yaml"; then
@@ -76,7 +78,7 @@ fi
 #
 # That template is guarded below, not left to convention: a `${NODE_POOL}` there would be
 # substituted here and silently pin every Job to the deploying cluster's pool.
-VARS='${TAG} ${TTS_HOST} ${GATEWAY_NAME} ${GATEWAY_NAMESPACE} ${GATEWAY_SECTION} ${TLS_MIDDLEWARE} ${TLS_SECRET} ${NODE_POOL} ${NODE_POOL_LABEL} ${WORKER_IMAGE}'
+VARS='${TAG} ${TTS_HOST} ${GATEWAY_NAME} ${GATEWAY_NAMESPACE} ${GATEWAY_SECTION} ${TLS_MIDDLEWARE} ${TLS_SECRET} ${NODE_POOL} ${NODE_POOL_LABEL} ${WORKER_IMAGE} ${DRY_RUN}'
 
 # Scoped to the ConfigMap document: the Deployment legitimately carries `${NODE_POOL_LABEL}`
 # in its env, and a whole-stream grep would flag that instead of the template.
