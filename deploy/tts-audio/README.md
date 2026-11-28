@@ -425,8 +425,22 @@ Measured on a 2-vCPU container, on real Spanish articles:
 | threading 1 → 2 threads | 4.5 → 4.9 chars/s (barely worth it) |
 | output | 24 kHz mono → 96 kbps MP3, ~1 MB per 90 s |
 
-So the job template asks for **4 CPUs** (roughly halving the numbers above) with a
-**1-hour** `activeDeadlineSeconds`. The knobs that actually move throughput:
+The job template therefore sets `requests.cpu: "0"` with a **cpu limit of 2** and a
+**1-hour** `activeDeadlineSeconds`. The request is 0 deliberately: the node it runs on has
+2 allocatable cores, and a 2-core request made every Job in a 221-post backfill unschedulable
+(`0/2 nodes are available: 1 Insufficient cpu`) — the archive simply never ran. Requests are
+what the scheduler books, limits are what the cgroup allows, so a 0 request plus a 2 limit
+means a Job always fits and still uses both cores when the node is otherwise idle.
+
+Because a 0 request cannot throttle anything, **concurrency is capped in code**:
+`MAX_CONCURRENT_JOBS=1` makes the backfill create the next Job only when the previous one
+has finished, so articles are synthesised one at a time. Nothing in `batch/v1` caps
+concurrency *across* Jobs (`parallelism` caps pods within one Job, and every post gets its
+own), so this lives in `worker/src/k8s.mjs`. `QUEUE_POLL_MS` sets how often it re-checks and
+`QUEUE_MAX_WAIT_MS` bounds the wait, so a Job that can never be scheduled fails the run
+instead of blocking it forever.
+
+The knobs that actually move throughput:
 
 - **CPU limit** — the dominant factor. Raising the Job's limit from 2 to 4 roughly halves
   the wall time; it is a `resources` edit in `base/configmap.yaml`.
@@ -436,42 +450,27 @@ So the job template asks for **4 CPUs** (roughly halving the numbers above) with
   `resources.limits.nvidia.com/gpu` in the job template, unchanged otherwise. Not worth it
   for a few posts a day; worth it for a large backfill.
 
-A backfill of N posts creates N Jobs, each of which the cluster schedules
-independently, so wall-clock time is roughly `total_characters / (8 * CPUs_available)`
-rather than a sum.
+With `MAX_CONCURRENT_JOBS=1` a backfill is a **queue, not a fan-out**: wall-clock time is
+the sum of the articles, not `total_characters / (8 * CPUs_available)`. For 221 posts
+averaging a few thousand characters that is hours, not minutes. Raise
+`MAX_CONCURRENT_JOBS` only when the node has spare cores — at 0 CPU requests extra
+concurrency does not add capacity, it only divides it.
 
-### Check the node fits a Job before backfilling
+### Why the request is 0
 
-That formula assumes `CPUs_available >= one Job's request`. On this cluster it does not,
-and the failure is silent in a misleading way: **221 Jobs queue and none run**.
+Measured on this cluster, and the reason the job template differs from the earlier
+throughput-optimal sizing:
 
-The node (`noviembresre-1`) has **2 allocatable CPUs**; the job template requests **2**.
-The webhooks already hold 100 m between them, so not one synthesis Job can be scheduled,
-and every one sits `Pending` with:
+| Job `requests.cpu` | What happened |
+|---|---|
+| `2` (original) | all 221 Jobs `Pending`: `0/2 nodes are available: 1 Insufficient cpu` |
+| `1` | one Job at a time fits; verified a Job scheduled and completed |
+| `0` (current) | always schedulable; `MAX_CONCURRENT_JOBS` does the throttling instead |
 
-```
-0/2 nodes are available: 1 Insufficient cpu, 1 node(s) were unschedulable.
-```
-
-The rpi node is 4 CPU but cordoned and arm64. Before running a backfill, size it:
-
-```bash
-kubectl get node -o custom-columns=\
-NAME:.metadata.name,CPU:.status.allocatable.cpu,SCHEDULABLE:.spec.unschedulable
-kubectl describe node <node> | grep -A4 "Allocated resources"
-```
-
-Two ways forward, both a value edit rather than a code change:
-
-- lower the Job's CPU **request** so it fits (`requests.cpu` in `base/configmap.yaml`).
-  The limit can stay at 4 so a Job still bursts when the node is otherwise idle —
-  requests are what the scheduler books, limits are what the cgroup allows. Verified on
-  this cluster: with the free CPU at ~1.1 cores, a Job asking for 2 never schedules, and
-  one asking for 1 completes;
-- add capacity, or make the node pool more than one machine.
-
-The node also caps pods at **110**, so even with enough CPU a 221-Job backfill cannot be
-fully resident at once; it drains as Jobs finish, but the first wave is limited by that.
+A request of 0 books no CPU, so the scheduler will admit every Job at once. That is safe
+only because the queue keeps one active — which is why the two settings ship together and
+`test.sh` fails if either is changed alone. The node still caps pods at **110**, so even
+with spare cores a 221-Job backfill drains rather than running in parallel.
 
 ## The model lock
 

@@ -77,7 +77,7 @@ spec:
             # The image a created Job runs: the same digest this Deployment runs, so a
             # receiver can never queue Jobs on an image it was not built with.
             - name: WORKER_IMAGE
-              value: "${IMAGE}"
+              value: "${WORKER_IMAGE}"
             # Where the Jobs this receiver creates are allowed to run. Filled by the
             # renderer, not the ConfigMap, so the same value pins this Deployment (see
             # overlay/node-pool-webhook.yaml) and every Job it stamps.

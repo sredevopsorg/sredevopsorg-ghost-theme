@@ -185,6 +185,73 @@ export async function deletePostJob(config, postId, { requestImpl = api } = {}) 
   throw new Error(`deleting jobs failed: ${response.status}`);
 }
 
+/**
+ * How many synthesis Jobs are running or runnable right now.
+ *
+ * Counts Jobs that are `active`, which is the only state that occupies the node: a Job
+ * whose pod has not finished (pending or running) reports `status.active >= 1`. Completed
+ * and failed Jobs have `succeeded`/`failed` instead and are not counted.
+ *
+ * `labelSelector` keeps this to this pipeline's Jobs, so an unrelated Job in the same
+ * namespace cannot stall the queue.
+ */
+export async function countActiveJobs(config, { requestImpl = api, labelSelector = "app.kubernetes.io/name=tts-audio,app.kubernetes.io/component=worker" } = {}) {
+  const path =
+    `/apis/batch/v1/namespaces/${encodeURIComponent(config.namespace)}/jobs` +
+    `?labelSelector=${encodeURIComponent(labelSelector)}`;
+  const response = await requestImpl("GET", path);
+  if (response.status !== 200) {
+    throw new Error(`listing jobs failed: ${response.status} ${JSON.stringify(response.body?.message ?? response.body)}`);
+  }
+  const items = response.body?.items ?? [];
+  return items.filter((job) => (job?.status?.active ?? 0) > 0).length;
+}
+
+/**
+ * Wait until fewer than `limit` Jobs are active, so the queue runs one at a time.
+ *
+ * Why a poll and not `parallelism`: `parallelism` caps pods *within* one Job, and every
+ * post gets its own Job, so it does nothing here. Nothing in batch/v1 caps concurrency
+ * *across* Jobs, so the limiter has to live in whoever creates them.
+ *
+ * Because a synthesis Job's CPU request is 0, the scheduler will happily admit all of them
+ * at once and let them contend for the node until each crawls. Serialising them keeps wall
+ * time per article predictable and stops a backfill from starving the receiver.
+ *
+ * `waitFor` is injectable so tests do not sleep.
+ */
+export async function waitForSlot(
+  config,
+  {
+    limit = Number(process.env.MAX_CONCURRENT_JOBS ?? 1),
+    requestImpl = api,
+    waitFor = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    pollMs = Number(process.env.QUEUE_POLL_MS ?? 15000),
+    maxWaitMs = Number(process.env.QUEUE_MAX_WAIT_MS ?? 3600000),
+    onWait = () => {},
+  } = {},
+) {
+  if (!(limit > 0)) return;
+  let waited = 0;
+  let warned = false;
+  for (;;) {
+    const active = await countActiveJobs(config, { requestImpl });
+    if (active < limit) return;
+    if (waited >= maxWaitMs) {
+      throw new Error(
+        `queue stalled: ${active} Job(s) still active after ${Math.round(maxWaitMs / 1000)}s ` +
+          `(MAX_CONCURRENT_JOBS=${limit}); check for Pending Jobs that cannot be scheduled`,
+      );
+    }
+    if (!warned) {
+      onWait(active, limit);
+      warned = true;
+    }
+    await waitFor(pollMs);
+    waited += pollMs;
+  }
+}
+
 /** The Job template lives in the ConfigMap (`job-template.json`), not in this image. */
 let cachedTemplate = null;
 

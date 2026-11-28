@@ -147,10 +147,21 @@ receiver. Placement became a decision with consequences — the pool a pod lands
 determines the dataplane behaviour above — so it is explicit rather than left to the
 scheduler.
 
-**Job sizing assumes CPU that this node does not have.** The 4-CPU request was chosen on a
-throughput measurement, not against cluster capacity. The node has **2 allocatable CPUs**
-and the webhooks hold part of them, so a 221-Job backfill queues every Job `Pending`:
-`0/2 nodes are available: 1 Insufficient cpu`. Verified that lowering the request to 1 lets
-a Job complete. The limit can stay high — requests are what the scheduler books. This is a
-capacity finding, not a code defect, and it is documented in the runbook rather than
-silently tuned here.
+**Job sizing is dictated by the node, not by throughput.** The original 4-CPU request was
+chosen for speed, not against capacity. The node has **2 allocatable CPUs** and the webhooks
+hold part of them, so a 221-Job backfill queued every Job `Pending`
+(`0/2 nodes are available: 1 Insufficient cpu`) and nothing ran. Measured on the cluster: a
+request of 2 never schedules, 1 fits, and the template now asks for **0 CPU and 256Mi** with
+a 2-CPU limit. Requests are what the scheduler books; limits are what the cgroup allows, so
+a Job always fits and still uses both cores when the node is idle.
+
+A 0 request cannot throttle anything, so **concurrency moved into the code**:
+`MAX_CONCURRENT_JOBS=1` makes the backfill create the next Job only after the previous one
+finishes. Nothing in `batch/v1` caps concurrency *across* Jobs — `parallelism` caps pods
+within one Job, and every post gets its own — so the queue lives in `worker/src/k8s.mjs`,
+with `QUEUE_POLL_MS` and `QUEUE_MAX_WAIT_MS` bounding it so an unschedulable Job fails the
+run rather than blocking it forever.
+
+The trade this accepts: a backfill is now a queue, so 221 posts take the sum of their
+synthesis time (hours), not a divided share. That is deliberate — with 0 CPU requests extra
+concurrency divides a fixed amount of capacity rather than adding any.

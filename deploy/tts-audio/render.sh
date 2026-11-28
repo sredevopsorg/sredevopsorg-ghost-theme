@@ -30,6 +30,7 @@ OVERLAY="${OVERLAY:-overlay}"
 : "${TLS_SECRET:=tts-audio-tls}"
 : "${NODE_POOL_LABEL:=dsh.sredevops.org/node-pool}"
 : "${GATEWAY_SECTION:=web}"
+: "${IMAGE:=ghcr.io/sredevopsorg/sredevopsorg-ghost-theme/tts-audio-runner}"
 export TLS_SECRET NODE_POOL_LABEL GATEWAY_SECTION
 
 required=(TAG TTS_HOST NODE_POOL)
@@ -46,6 +47,15 @@ if [ "${#missing[@]}" -gt 0 ]; then
   echo "render: see deploy/tts-audio/README.md §Deploy" >&2
   exit 2
 fi
+
+# The image a created Job runs, as a fully qualified reference. It used to be written as
+# `value: "${IMAGE}"` in webhook.yaml/backfill.yaml, but `${IMAGE}` is one of the
+# placeholders envsubst is told *not* to touch (it belongs to the Job template inside the
+# ConfigMap), so the literal string `${IMAGE}` reached the cluster as WORKER_IMAGE. The
+# receiver then stamped Jobs with `image: ${IMAGE}`, every one of which failed with
+# InvalidImageName. Resolved here instead, from the same two values kustomize uses.
+WORKER_IMAGE="${IMAGE}:${TAG}"
+export WORKER_IMAGE
 
 if ! command -v envsubst >/dev/null 2>&1; then
   echo "render: envsubst is required (Debian: gettext-base; macOS: brew install gettext)" >&2
@@ -66,7 +76,7 @@ fi
 #
 # That template is guarded below, not left to convention: a `${NODE_POOL}` there would be
 # substituted here and silently pin every Job to the deploying cluster's pool.
-VARS='${TAG} ${TTS_HOST} ${GATEWAY_NAME} ${GATEWAY_NAMESPACE} ${GATEWAY_SECTION} ${TLS_MIDDLEWARE} ${TLS_SECRET} ${NODE_POOL} ${NODE_POOL_LABEL}'
+VARS='${TAG} ${TTS_HOST} ${GATEWAY_NAME} ${GATEWAY_NAMESPACE} ${GATEWAY_SECTION} ${TLS_MIDDLEWARE} ${TLS_SECRET} ${NODE_POOL} ${NODE_POOL_LABEL} ${WORKER_IMAGE}'
 
 # Scoped to the ConfigMap document: the Deployment legitimately carries `${NODE_POOL_LABEL}`
 # in its env, and a whole-stream grep would flag that instead of the template.

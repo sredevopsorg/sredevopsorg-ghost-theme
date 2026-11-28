@@ -388,6 +388,8 @@ test("a backfill whose Jobs cannot be created reports failed, not ok", async () 
     config,
     log: (line) => lines.push(line),
     fetchImpl: async () => listOk,
+    // The real queue polls the API server; this test is about the failure after it.
+    queue: async () => {},
     createJob: async () => {
       throw new Error("connect ECONNREFUSED 10.43.0.1:443");
     },

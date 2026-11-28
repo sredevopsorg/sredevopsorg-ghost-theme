@@ -169,6 +169,16 @@ else
   # The workloads, by contrast, must carry the rendered tag, not the placeholder.
   [ "$(printf '%s' "$rendered" | grep -c 'tts-audio-runner:test-tag')" -ge 2 ] \
     || fail "the Deployment and the Job do not both run the rendered image tag"
+  # WORKER_IMAGE is what the receiver stamps into every Job's `image`. It must be a real
+  # reference, not the literal `${IMAGE}`: that placeholder is deliberately skipped by
+  # envsubst, so the string reached the cluster verbatim and every Job the receiver created
+  # failed with InvalidImageName. Observed in production — 66 Jobs with `image: ${IMAGE}`.
+  worker_images="$(printf '%s' "$rendered" | grep -A1 'name: WORKER_IMAGE' | grep 'value:' || true)"
+  if printf '%s' "$worker_images" | grep -q '\${IMAGE}'; then
+    fail "WORKER_IMAGE is the literal \${IMAGE} placeholder — Jobs would fail with InvalidImageName"
+  fi
+  printf '%s' "$worker_images" | grep -q 'tts-audio-runner:test-tag' \
+    || fail "WORKER_IMAGE is not the full image:tag reference (got: ${worker_images:-none})"
   printf '%s' "$template" | grep -q '"ttlSecondsAfterFinished"' || fail "job template has no TTL"
   printf '%s' "$template" | grep -q '"readOnlyRootFilesystem": true' || fail "job template is not read-only"
   printf '%s' "$template" | grep -q '"runAsNonRoot": true' || fail "job template allows root"
@@ -179,6 +189,22 @@ else
   if printf '%s' "$template" | grep -q 'NODE_POOL'; then
     fail "job template mentions NODE_POOL — the receiver fills this, not render.sh"
   fi
+  # Sizing. The CPU request is 0 on purpose: the node has 2 allocatable cores and a
+  # 2-core request meant a 221-Job backfill queued every Job Pending and none ever ran. 0
+  # lets the scheduler admit them; MAX_CONCURRENT_JOBS is what keeps only one running.
+  # Memory is bounded, and the limits stay high so a Job can still use the node when free.
+  node -e '
+    const t = JSON.parse(require("fs").readFileSync(0, "utf8"));
+    const r = t.spec.template.spec.containers[0].resources;
+    const bad = [];
+    if (r.requests?.cpu !== "0") bad.push(`requests.cpu=${r.requests?.cpu} (want 0)`);
+    if (r.requests?.memory !== "256Mi") bad.push(`requests.memory=${r.requests?.memory} (want 256Mi)`);
+    if (!r.limits?.cpu) bad.push("no cpu limit");
+    if (bad.length) { console.log(bad.join("; ")); process.exit(1); }
+  ' <<< "$template" || fail "job template sizing is not requests{cpu:0, memory:256Mi} with a cpu limit"
+  # The queue is what makes a 0-CPU request safe, so the switch must exist and default to 1.
+  printf '%s' "$rendered" | grep -q 'MAX_CONCURRENT_JOBS: "1"' \
+    || fail "MAX_CONCURRENT_JOBS is not 1 — with a 0 CPU request that lets Jobs contend instead of queuing"
   green "job template ok"
 fi
 
