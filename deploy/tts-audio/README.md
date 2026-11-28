@@ -357,6 +357,23 @@ hash includes the voice, so every post is regenerated on its next edit or backfi
 
 ## Operating it
 
+### Editing the Job template requires a receiver restart
+
+The receiver reads `job-template.json` from the `tts-job-template` ConfigMap **once** and
+keeps it in memory for its lifetime (`cachedTemplate` in `worker/src/k8s.mjs`). Applying a
+ConfigMap change therefore has no effect on the Jobs a running receiver creates:
+
+```bash
+kubectl apply -f <manifest>          # updates the ConfigMap
+kubectl rollout restart deploy/tts-webhook -n tts-audio   # REQUIRED, or nothing changes
+```
+
+This bites in a very specific way: you apply a template fix, re-run the backfill, and get
+**exactly the old failure**, which looks like the fix never worked. It did; it had not been
+loaded. Changing `resources`, `env`, a volume or an image in that template all need this.
+
+`make restart` does the rollout restart.
+
 ### Is the Admin key actually valid?
 
 Two traps, in the order they cost the most time.
