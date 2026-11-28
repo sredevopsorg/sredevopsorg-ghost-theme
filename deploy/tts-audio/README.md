@@ -440,6 +440,39 @@ A backfill of N posts creates N Jobs, each of which the cluster schedules
 independently, so wall-clock time is roughly `total_characters / (8 * CPUs_available)`
 rather than a sum.
 
+### Check the node fits a Job before backfilling
+
+That formula assumes `CPUs_available >= one Job's request`. On this cluster it does not,
+and the failure is silent in a misleading way: **221 Jobs queue and none run**.
+
+The node (`noviembresre-1`) has **2 allocatable CPUs**; the job template requests **2**.
+The webhooks already hold 100 m between them, so not one synthesis Job can be scheduled,
+and every one sits `Pending` with:
+
+```
+0/2 nodes are available: 1 Insufficient cpu, 1 node(s) were unschedulable.
+```
+
+The rpi node is 4 CPU but cordoned and arm64. Before running a backfill, size it:
+
+```bash
+kubectl get node -o custom-columns=\
+NAME:.metadata.name,CPU:.status.allocatable.cpu,SCHEDULABLE:.spec.unschedulable
+kubectl describe node <node> | grep -A4 "Allocated resources"
+```
+
+Two ways forward, both a value edit rather than a code change:
+
+- lower the Job's CPU **request** so it fits (`requests.cpu` in `base/configmap.yaml`).
+  The limit can stay at 4 so a Job still bursts when the node is otherwise idle —
+  requests are what the scheduler books, limits are what the cgroup allows. Verified on
+  this cluster: with the free CPU at ~1.1 cores, a Job asking for 2 never schedules, and
+  one asking for 1 completes;
+- add capacity, or make the node pool more than one machine.
+
+The node also caps pods at **110**, so even with enough CPU a 221-Job backfill cannot be
+fully resident at once; it drains as Jobs finish, but the first wave is limited by that.
+
 ## The model lock
 
 The image bakes Kokoro's weights and verifies every file against

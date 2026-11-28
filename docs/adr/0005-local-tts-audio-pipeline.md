@@ -123,3 +123,34 @@ object, so an object removed by the lifecycle rule forces regeneration.
   metric for speech is worse than one person listening to a sample per locale.
 - The Admin integration holds Administrator rights. It is used only in the `tts-audio`
   namespace, and the scope is recorded in the runbook.
+
+## Amendments (measured against the production cluster)
+
+**Egress policy is not usable on this cluster, so it is not declared.** `base/netpol.yaml`
+carries ingress policies only. This is not a relaxation of a preference — it is the
+observed behaviour. Probing from inside a receiver pod, *any* egress NetworkPolicy
+selecting these pods took the service path down, including the pod's own ClusterIP: the
+API server went from OPEN to `ECONNREFUSED`, and so did `tts-webhook` itself. That held for
+a single policy whose only rule was `port: 443` with no `to:`, and for one with an explicit
+`to: ipBlock` covering the service, pod and node ranges; deleting the policies restored
+connectivity with no other change. Public destinations on 443 and direct pod-to-pod traffic
+worked throughout. There is therefore no rule shape that both selects these pods and leaves
+the API reachable, which makes it a dataplane defect rather than a configuration mistake.
+The cost of keeping them was concrete: the backfill created **0 of 221** Jobs, failing each
+with `ECONNREFUSED`. The benefit was nil, since any destination on 443 was already
+permitted. Re-adding egress control requires fixing the CNI first, and the probe above to
+confirm it.
+
+**Pods are pinned to a node pool.** `dsh.sredevops.org/node-pool` (value from
+`NODE_POOL`) is set on the Deployment and backfill, and on each synthesis Job by the
+receiver. Placement became a decision with consequences — the pool a pod lands in
+determines the dataplane behaviour above — so it is explicit rather than left to the
+scheduler.
+
+**Job sizing assumes CPU that this node does not have.** The 4-CPU request was chosen on a
+throughput measurement, not against cluster capacity. The node has **2 allocatable CPUs**
+and the webhooks hold part of them, so a 221-Job backfill queues every Job `Pending`:
+`0/2 nodes are available: 1 Insufficient cpu`. Verified that lowering the request to 1 lets
+a Job complete. The limit can stay high — requests are what the scheduler books. This is a
+capacity finding, not a code defect, and it is documented in the runbook rather than
+silently tuned here.
