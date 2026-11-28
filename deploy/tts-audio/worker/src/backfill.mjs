@@ -16,7 +16,7 @@ import { ghostHeaders, localeOf, markerIsCurrent } from "./ghost.mjs";
 import { markerOf } from "./markers.mjs";
 import { contentHash } from "./hash.mjs";
 import { postText } from "./job.mjs";
-import { createPostJob } from "./k8s.mjs";
+import { createPostJob, waitForSlot } from "./k8s.mjs";
 
 const PAGE_LIMIT = 50;
 
@@ -106,6 +106,10 @@ export async function backfill({
   // Injectable so a test can drive the "the API server is unreachable" path, which is
   // exactly what a NetworkPolicy blocking the backfill looks like.
   createJob = createPostJob,
+  // Queue: create the next Job only when fewer than this many are already active, so the
+  // archive synthesises one article at a time instead of all 221 contending at once.
+  // Injected in tests; defaults to the cluster-facing poller.
+  queue = (cfg) => waitForSlot(cfg, { onWait: (active, limit) => log(`queue: ${active} Job(s) active, waiting for a free slot (MAX_CONCURRENT_JOBS=${limit})`) }),
 }) {
   let page = 1;
   let pages = 1;
@@ -145,6 +149,9 @@ export async function backfill({
           totals.created += 1;
           continue;
         }
+        // Wait for a free slot *before* creating, so at most `MAX_CONCURRENT_JOBS` are
+        // active. A dry run never queues, so it does not wait either.
+        await queue(config);
         const result = await createJob(config, { postId: post.id, hash: plan.hash });
         // `exists` is a success: a previous run already queued this exact article.
         if (result === "exists") {

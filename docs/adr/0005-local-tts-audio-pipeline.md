@@ -123,3 +123,45 @@ object, so an object removed by the lifecycle rule forces regeneration.
   metric for speech is worse than one person listening to a sample per locale.
 - The Admin integration holds Administrator rights. It is used only in the `tts-audio`
   namespace, and the scope is recorded in the runbook.
+
+## Amendments (measured against the production cluster)
+
+**Egress policy is not usable on this cluster, so it is not declared.** `base/netpol.yaml`
+carries ingress policies only. This is not a relaxation of a preference — it is the
+observed behaviour. Probing from inside a receiver pod, *any* egress NetworkPolicy
+selecting these pods took the service path down, including the pod's own ClusterIP: the
+API server went from OPEN to `ECONNREFUSED`, and so did `tts-webhook` itself. That held for
+a single policy whose only rule was `port: 443` with no `to:`, and for one with an explicit
+`to: ipBlock` covering the service, pod and node ranges; deleting the policies restored
+connectivity with no other change. Public destinations on 443 and direct pod-to-pod traffic
+worked throughout. There is therefore no rule shape that both selects these pods and leaves
+the API reachable, which makes it a dataplane defect rather than a configuration mistake.
+The cost of keeping them was concrete: the backfill created **0 of 221** Jobs, failing each
+with `ECONNREFUSED`. The benefit was nil, since any destination on 443 was already
+permitted. Re-adding egress control requires fixing the CNI first, and the probe above to
+confirm it.
+
+**Pods are pinned to a node pool.** `dsh.sredevops.org/node-pool` (value from
+`NODE_POOL`) is set on the Deployment and backfill, and on each synthesis Job by the
+receiver. Placement became a decision with consequences — the pool a pod lands in
+determines the dataplane behaviour above — so it is explicit rather than left to the
+scheduler.
+
+**Job sizing is dictated by the node, not by throughput.** The original 4-CPU request was
+chosen for speed, not against capacity. The node has **2 allocatable CPUs** and the webhooks
+hold part of them, so a 221-Job backfill queued every Job `Pending`
+(`0/2 nodes are available: 1 Insufficient cpu`) and nothing ran. Measured on the cluster: a
+request of 2 never schedules, 1 fits, and the template now asks for **0 CPU and 256Mi** with
+a 2-CPU limit. Requests are what the scheduler books; limits are what the cgroup allows, so
+a Job always fits and still uses both cores when the node is idle.
+
+A 0 request cannot throttle anything, so **concurrency moved into the code**:
+`MAX_CONCURRENT_JOBS=1` makes the backfill create the next Job only after the previous one
+finishes. Nothing in `batch/v1` caps concurrency *across* Jobs — `parallelism` caps pods
+within one Job, and every post gets its own — so the queue lives in `worker/src/k8s.mjs`,
+with `QUEUE_POLL_MS` and `QUEUE_MAX_WAIT_MS` bounding it so an unschedulable Job fails the
+run rather than blocking it forever.
+
+The trade this accepts: a backfill is now a queue, so 221 posts take the sum of their
+synthesis time (hours), not a divided share. That is deliberate — with 0 CPU requests extra
+concurrency divides a fixed amount of capacity rather than adding any.

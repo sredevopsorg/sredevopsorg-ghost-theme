@@ -1,0 +1,25 @@
+# Pin the pipeline's pods to a node pool, by label.
+#
+# Why this exists: the node that runs these pods (k3s `noviembresre-1`, amd64) has a
+# dataplane defect where restricting pod egress takes the ClusterIP path down with it. That
+# is not fixed by editing manifests (see base/netpol.yaml), so the placement is made
+# explicit instead of being left to the scheduler.
+#
+# The selector is a *value*, not a literal, because "which pool" is a cluster fact. `make
+# deploy` passes `NODE_POOL`; the patch sets it on the Deployment, and the synthesis Jobs
+# get it from the receiver (base/configmap.yaml's job template + src/k8s.mjs). An empty
+# `NODE_POOL` renders `node-pool: ""`, which matches no node, so `make deploy` refuses to
+# proceed without it — see render.sh.
+#
+# This lives in the overlay, not base/, because `base/` must render standalone with no
+# cluster-specific values (`kubectl kustomize base`, which test.sh checks).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-webhook
+  namespace: tts-audio
+spec:
+  template:
+    spec:
+      nodeSelector:
+        dsh.sredevops.org/node-pool: ${NODE_POOL}

@@ -59,6 +59,7 @@ fi
 
 step "overlay renders and is coherent"
 export TAG=test-tag TTS_HOST=tts.example.org GATEWAY_NAME=gw GATEWAY_NAMESPACE=gw-ns GATEWAY_SECTION=web
+export NODE_POOL=dsh NODE_POOL_LABEL=dsh.sredevops.org/node-pool
 rendered="$(./render.sh)" || fail "overlay does not render with test values"
 
 if printf '%s' "$rendered" | grep -q '\${TAG}'; then fail "TAG was not substituted"; fi
@@ -73,9 +74,65 @@ fi
 docs="$(printf '%s' "$rendered" | grep -c '^apiVersion:')"
 kinds="$(printf '%s' "$rendered" | grep -c '^kind:')"
 [ "$docs" -eq "$kinds" ] || fail "every apiVersion needs exactly one kind (${docs} vs ${kinds})"
-for kind in Namespace ServiceAccount Role RoleBinding ConfigMap Deployment Service Job HTTPRoute NetworkPolicy PodDisruptionBudget HorizontalPodAutoscaler Gateway; do
+for kind in Namespace ServiceAccount Role RoleBinding ConfigMap Deployment Service HTTPRoute NetworkPolicy PodDisruptionBudget HorizontalPodAutoscaler Gateway; do
   printf '%s' "$rendered" | grep -q "^kind: ${kind}$" || fail "rendered output is missing a ${kind}"
 done
+
+step "no egress policy is declared"
+# Re-adding one is a deliberate act, not an accident. On this cluster any egress policy
+# selecting these pods takes the whole ClusterIP path down (measured: the API server
+# refuses with ECONNREFUSED even when the rule is `port: 443` with no `to:`), which is what
+# stopped the backfill from creating a single Job. See base/netpol.yaml for the evidence.
+if printf '%s' "$rendered" | grep -q 'policyTypes:.*Egress\|- Egress'; then
+  fail "an Egress NetworkPolicy is declared; read base/netpol.yaml before re-adding one"
+else
+  green "no egress policy (ingress-only, as documented)"
+fi
+# The two ingress policies must still be there: removing them would expose the receiver.
+printf '%s' "$rendered" | grep -q 'name: default-deny-ingress' || fail "default-deny-ingress is missing"
+printf '%s' "$rendered" | grep -q 'name: allow-webhook-ingress' || fail "allow-webhook-ingress is missing"
+
+step "node-pool placement"
+# Both workloads run where the dataplane behaviour is known, and the selector is a value.
+pool_webhook="$(printf '%s' "$rendered" | awk '/^kind: Deployment$/{d=1} d && /node-pool:/{print $2; exit}')"
+[ "$pool_webhook" = "dsh" ] || fail "the Deployment nodeSelector is '${pool_webhook}', expected the NODE_POOL value (dsh)"
+# The backfill Job is rendered only under WITH_BACKFILL=1, so it is checked there, below.
+printf '%s' "$rendered" | grep -q 'dsh.sredevops.org/node-pool: dsh' \
+  || fail "the Deployment does not carry the node-pool selector"
+# The job template the receiver stamps must NOT have the pool baked in: the receiver sets
+# it per Job from its own environment, so a template placeholder would pin every future
+# Job to whatever pool was current when `make deploy` ran. Asserted in the "job template"
+# step below, where the template has actually been extracted.
+# An unset NODE_POOL must be refused rather than rendering `node-pool: ""` (no node matches).
+if (unset NODE_POOL; ./render.sh >/dev/null 2>&1); then
+  fail "render.sh rendered without NODE_POOL, which would pin pods to no node at all"
+else
+  green "render refuses without NODE_POOL"
+fi
+green "node-pool placement ok"
+
+step "the backfill is a separate, opt-in step"
+# `kubectl apply` is create-or-update: while the backfill Job was a kustomize resource, every
+# `make deploy` recreated it, so shipping an unrelated ConfigMap change started a full
+# archive backfill. That flooded the cluster with 221 Jobs, twice. The Job is now rendered
+# only when WITH_BACKFILL=1, which only `make backfill` sets.
+if printf '%s' "$rendered" | grep -q '^kind: Job$'; then
+  fail "the default render contains a Job — make deploy must never start a backfill"
+else
+  green "deploy renders no Job"
+fi
+backfill_rendered="$(WITH_BACKFILL=1 ./render.sh)" || fail "overlay does not render with WITH_BACKFILL=1"
+if printf '%s' "$backfill_rendered" | grep -q 'name: tts-backfill'; then
+  green "backfill renders the Job when asked"
+else
+  fail "WITH_BACKFILL=1 did not render the tts-backfill Job"
+fi
+# It must carry the same placement as the Deployment, or it lands on the wrong node.
+printf '%s' "$backfill_rendered" | awk '/name: tts-backfill/{f=1} f && /node-pool:/{print; exit}' \
+  | grep -q 'dsh' || fail "the backfill Job does not carry the node-pool selector"
+# And its image env must be a real reference, not the \${IMAGE} placeholder (InvalidImageName).
+printf '%s' "$backfill_rendered" | grep -A1 'name: WORKER_IMAGE' | grep -q 'tts-audio-runner:test-tag' \
+  || fail "the backfill Job's WORKER_IMAGE is not the full image:tag reference"
 
 step "gateway"
 # Rendered outside the kustomization precisely so `namespace: tts-audio` cannot rewrite it;
@@ -90,6 +147,14 @@ printf '%s' "$rendered" | grep -q 'port: 8443' || fail "Gateway listener is not 
 # allowedRoutes must not be the cluster's default `Same`: the route lives in tts-audio.
 printf '%s' "$rendered" | grep -q 'from: All' || fail "Gateway allowedRoutes must be All, or the route stays unattached"
 printf '%s' "$rendered" | grep -q "hostname: tts.example.org" || fail "Gateway hostname is not TTS_HOST"
+# The certificateRef must name a secret. An empty `name:` renders without error and
+# produces a Gateway that references no certificate, which is silent until the hostname
+# 404s — the same class of failure as the missing Gateway this file exists to prevent.
+if printf '%s' "$rendered" | grep -qE '^\s+name:\s*$'; then
+  fail "a rendered field has an empty value (an unset TLS_SECRET renders 'name: ' — see the export in render.sh)"
+fi
+printf '%s' "$rendered" | grep -q 'name: tts-audio-tls' \
+  || fail "the Gateway certificateRef does not name the default TLS_SECRET (tts-audio-tls)"
 green "gateway ok"
 
 step "job template"
@@ -128,9 +193,42 @@ else
   # The workloads, by contrast, must carry the rendered tag, not the placeholder.
   [ "$(printf '%s' "$rendered" | grep -c 'tts-audio-runner:test-tag')" -ge 2 ] \
     || fail "the Deployment and the Job do not both run the rendered image tag"
+  # WORKER_IMAGE is what the receiver stamps into every Job's `image`. It must be a real
+  # reference, not the literal `${IMAGE}`: that placeholder is deliberately skipped by
+  # envsubst, so the string reached the cluster verbatim and every Job the receiver created
+  # failed with InvalidImageName. Observed in production — 66 Jobs with `image: ${IMAGE}`.
+  worker_images="$(printf '%s' "$rendered" | grep -A1 'name: WORKER_IMAGE' | grep 'value:' || true)"
+  if printf '%s' "$worker_images" | grep -q '\${IMAGE}'; then
+    fail "WORKER_IMAGE is the literal \${IMAGE} placeholder — Jobs would fail with InvalidImageName"
+  fi
+  printf '%s' "$worker_images" | grep -q 'tts-audio-runner:test-tag' \
+    || fail "WORKER_IMAGE is not the full image:tag reference (got: ${worker_images:-none})"
   printf '%s' "$template" | grep -q '"ttlSecondsAfterFinished"' || fail "job template has no TTL"
   printf '%s' "$template" | grep -q '"readOnlyRootFilesystem": true' || fail "job template is not read-only"
   printf '%s' "$template" | grep -q '"runAsNonRoot": true' || fail "job template allows root"
+  # The pool is set by the receiver from its own env, never baked into the template — a
+  # placeholder here would pin every future Job to whatever pool was current at deploy
+  # time. The selector block must still be present so the field is visible and fillable.
+  printf '%s' "$template" | grep -q '"nodeSelector"' || fail "job template has no nodeSelector for the receiver to fill"
+  if printf '%s' "$template" | grep -q 'NODE_POOL'; then
+    fail "job template mentions NODE_POOL — the receiver fills this, not render.sh"
+  fi
+  # Sizing. The CPU request is 0 on purpose: the node has 2 allocatable cores and a
+  # 2-core request meant a 221-Job backfill queued every Job Pending and none ever ran. 0
+  # lets the scheduler admit them; MAX_CONCURRENT_JOBS is what keeps only one running.
+  # Memory is bounded, and the limits stay high so a Job can still use the node when free.
+  node -e '
+    const t = JSON.parse(require("fs").readFileSync(0, "utf8"));
+    const r = t.spec.template.spec.containers[0].resources;
+    const bad = [];
+    if (r.requests?.cpu !== "0") bad.push(`requests.cpu=${r.requests?.cpu} (want 0)`);
+    if (r.requests?.memory !== "256Mi") bad.push(`requests.memory=${r.requests?.memory} (want 256Mi)`);
+    if (!r.limits?.cpu) bad.push("no cpu limit");
+    if (bad.length) { console.log(bad.join("; ")); process.exit(1); }
+  ' <<< "$template" || fail "job template sizing is not requests{cpu:0, memory:256Mi} with a cpu limit"
+  # The queue is what makes a 0-CPU request safe, so the switch must exist and default to 1.
+  printf '%s' "$rendered" | grep -q 'MAX_CONCURRENT_JOBS: "1"' \
+    || fail "MAX_CONCURRENT_JOBS is not 1 — with a 0 CPU request that lets Jobs contend instead of queuing"
   green "job template ok"
 fi
 

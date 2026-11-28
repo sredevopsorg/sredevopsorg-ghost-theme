@@ -183,12 +183,59 @@ The route needs to know your Gateway. On a Gateway API cluster:
 make deploy \
   TAG=<12-char commit sha from the image build> \
   TTS_HOST=tts.sredevops.org \
+  NODE_POOL=<value of the node-pool label> \
   GATEWAY_NAME=<gateway> GATEWAY_NAMESPACE=<namespace> GATEWAY_SECTION=web
 ```
+
+`TAG` must be the **12-character** short SHA, which is how the workflow tags the image
+(`${{ github.sha }}` truncated to 12). A 7-character prefix is not a tag and the pod will
+fail with `ImagePullBackOff` / `manifest unknown`.
 
 `render.sh` refuses to render without those values, and refuses to emit a manifest that
 still contains a placeholder it does not expect — the failure mode it prevents is a route
 pointing at `${GATEWAY_NAME}`.
+
+### Node placement
+
+`NODE_POOL` pins every pipeline workload to a node carrying that label
+(`dsh.sredevops.org/node-pool`, overridable with `NODE_POOL_LABEL`). It is required, not
+optional, because an empty selector matches **no** node and the pods would sit `Pending`.
+
+On this cluster the value is `dsh` — the amd64 node. Two reasons it is pinned rather than
+left to the scheduler:
+
+- the image is built multi-arch, but the arm64 control-plane node is cordoned for a reason;
+- the amd64 node's dataplane has a defect with egress policy (see below), so *where* these
+  pods run is a decision with consequences, not an implementation detail.
+
+The Deployment and the backfill Job carry the selector in their manifests. Synthesis Jobs
+get it from the **receiver**, which reads `NODE_POOL` from its own environment and sets it
+on each Job (`worker/src/k8s.mjs`); the template in `tts-job-template` keeps an empty
+`nodeSelector` on purpose, so this cluster's pool is never baked into a template that every
+future Job is stamped from.
+
+### Egress policy is deliberately absent
+
+There are only **ingress** policies in `base/netpol.yaml`. There used to be two egress
+policies, and on this cluster any egress policy selecting these pods broke every in-cluster
+destination, measured from inside a receiver pod:
+
+| State | `10.43.0.1:443` (API) | own ClusterIP |
+|---|---|---|
+| no egress policy | OPEN | OPEN |
+| any egress policy | `ECONNREFUSED` | `ECONNREFUSED` |
+
+"Any" included a single policy whose only rule was `port: 443` with no `to:`, and one with
+an explicit `to: ipBlock` covering the service, pod and node ranges. Deleting them restored
+connectivity with no other change; public hosts on 443 and direct pod-to-pod traffic kept
+working throughout, so it was specifically the service path. That is a CNI defect, not
+something a manifest can express around — and the policies were not buying containment
+anyway, since any destination on 443 was permitted.
+
+The practical consequence was that the **backfill could not create a single Job**: it read
+all 221 posts and failed each one with `connect ECONNREFUSED <apiserver>:443`. If you
+re-add egress policies, verify with the probe above *before* trusting them, and expect
+`make test` to fail until you remove the assertion that guards this.
 
 `make deploy` also creates the **Gateway** itself (`overlay/gateway.yaml`), because a
 `HTTPRoute` pointing at a Gateway that does not exist attaches to nothing — the route gets
@@ -224,12 +271,13 @@ On **Traefik CRDs** (no Gateway API), edit `overlay/kustomization.yaml` to list
 
 After a release that **renames** a resource, run the prune check — `kubectl apply` is a
 create-or-update verb and never removes an object whose name changed. This has bitten the
-NetworkPolicies here once already (`allow-webhook-kubernetes-api` became
-`allow-kubernetes-api-egress`; the old object lingered, still permitting egress):
+NetworkPolicies here twice: `allow-webhook-kubernetes-api` became
+`allow-kubernetes-api-egress`, and both egress policies were removed later for the reasons
+above. In each case the old object lingered on the cluster:
 
 ```bash
-make prune TAG=<sha> TTS_HOST=... GATEWAY_NAME=... GATEWAY_NAMESPACE=...   # dry run
-make prune ... CONFIRM=1                                                  # delete
+make prune TAG=<sha> TTS_HOST=... NODE_POOL=... GATEWAY_NAME=... GATEWAY_NAMESPACE=...  # dry run
+make prune ... CONFIRM=1                                                                # delete
 ```
 
 It only considers kinds this repository owns and only objects labelled
@@ -265,12 +313,29 @@ make backfill-plan      # DRY RUN: how many posts, no Jobs created
 make backfill           # queue them
 ```
 
+**The backfill is a separate step from `make deploy`, on purpose.** Its Job is not part of
+the kustomization: `kubectl apply` creates-or-updates whatever it is handed, so while the
+Job was a resource, deploying an unrelated ConfigMap change recreated it and started a full
+archive backfill. That flooded the cluster with 221 Jobs — twice. `make deploy` now renders
+long-lived objects only; `render.sh` emits the Job solely under `WITH_BACKFILL=1`, which
+only `make backfill` sets. `test.sh` fails if a Job reappears in the default render.
+
+Because a Job's pod template is immutable, `make backfill` deletes the previous run before
+applying, so `wait` tracks the run you just started rather than a completed one.
+
 Each post is an independent Job (`tts-<id>-<hash>`), so the backfill is resumable: a post
 already up to date is skipped by the hash check, and a Job name that already exists is not
 created twice. Re-running is safe and cheap.
 
-Rough cost: a 9k-character article is ~8k chars/s of CPU, so **1–2 minutes per post** in a
-2-CPU Job. A hundred posts is a couple of hours of cluster time, not of anyone's attention.
+Jobs are **queued, not fanned out**: `MAX_CONCURRENT_JOBS=1` means the next Job is created
+only after the previous finishes, so wall-clock time is the sum of the articles rather than
+a divided share.
+
+Rough cost, from the measured **~8 characters of article per second of CPU**: a
+9k-character article is ~19 minutes of synthesis, plus ~10 s of model load. Queued one at a
+time, a hundred posts is **most of a day** of cluster time — not a couple of hours. Plan the
+first backfill accordingly, and run `make backfill-plan` to see the real count before
+committing to it.
 
 ---
 
@@ -377,8 +442,22 @@ Measured on a 2-vCPU container, on real Spanish articles:
 | threading 1 → 2 threads | 4.5 → 4.9 chars/s (barely worth it) |
 | output | 24 kHz mono → 96 kbps MP3, ~1 MB per 90 s |
 
-So the job template asks for **4 CPUs** (roughly halving the numbers above) with a
-**1-hour** `activeDeadlineSeconds`. The knobs that actually move throughput:
+The job template therefore sets `requests.cpu: "0"` with a **cpu limit of 2** and a
+**1-hour** `activeDeadlineSeconds`. The request is 0 deliberately: the node it runs on has
+2 allocatable cores, and a 2-core request made every Job in a 221-post backfill unschedulable
+(`0/2 nodes are available: 1 Insufficient cpu`) — the archive simply never ran. Requests are
+what the scheduler books, limits are what the cgroup allows, so a 0 request plus a 2 limit
+means a Job always fits and still uses both cores when the node is otherwise idle.
+
+Because a 0 request cannot throttle anything, **concurrency is capped in code**:
+`MAX_CONCURRENT_JOBS=1` makes the backfill create the next Job only when the previous one
+has finished, so articles are synthesised one at a time. Nothing in `batch/v1` caps
+concurrency *across* Jobs (`parallelism` caps pods within one Job, and every post gets its
+own), so this lives in `worker/src/k8s.mjs`. `QUEUE_POLL_MS` sets how often it re-checks and
+`QUEUE_MAX_WAIT_MS` bounds the wait, so a Job that can never be scheduled fails the run
+instead of blocking it forever.
+
+The knobs that actually move throughput:
 
 - **CPU limit** — the dominant factor. Raising the Job's limit from 2 to 4 roughly halves
   the wall time; it is a `resources` edit in `base/configmap.yaml`.
@@ -388,9 +467,27 @@ So the job template asks for **4 CPUs** (roughly halving the numbers above) with
   `resources.limits.nvidia.com/gpu` in the job template, unchanged otherwise. Not worth it
   for a few posts a day; worth it for a large backfill.
 
-A backfill of N posts creates N Jobs, each of which the cluster schedules
-independently, so wall-clock time is roughly `total_characters / (8 * CPUs_available)`
-rather than a sum.
+With `MAX_CONCURRENT_JOBS=1` a backfill is a **queue, not a fan-out**: wall-clock time is
+the sum of the articles, not `total_characters / (8 * CPUs_available)`. For 221 posts
+averaging a few thousand characters that is hours, not minutes. Raise
+`MAX_CONCURRENT_JOBS` only when the node has spare cores — at 0 CPU requests extra
+concurrency does not add capacity, it only divides it.
+
+### Why the request is 0
+
+Measured on this cluster, and the reason the job template differs from the earlier
+throughput-optimal sizing:
+
+| Job `requests.cpu` | What happened |
+|---|---|
+| `2` (original) | all 221 Jobs `Pending`: `0/2 nodes are available: 1 Insufficient cpu` |
+| `1` | one Job at a time fits; verified a Job scheduled and completed |
+| `0` (current) | always schedulable; `MAX_CONCURRENT_JOBS` does the throttling instead |
+
+A request of 0 books no CPU, so the scheduler will admit every Job at once. That is safe
+only because the queue keeps one active — which is why the two settings ship together and
+`test.sh` fails if either is changed alone. The node still caps pods at **110**, so even
+with spare cores a 221-Job backfill drains rather than running in parallel.
 
 ## The model lock
 

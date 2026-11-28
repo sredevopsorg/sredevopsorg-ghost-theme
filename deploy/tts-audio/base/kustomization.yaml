@@ -18,8 +18,19 @@ resources:
   - rbac.yaml
   - configmap.yaml
   - webhook.yaml
-  - backfill.yaml
   - netpol.yaml
+
+# `backfill.yaml` is deliberately NOT a resource.
+#
+# It is a one-shot Job, and `kubectl apply` is a create-or-update verb: as a resource it
+# was (re)created by every `make deploy`, `make diff` and `make backfill`, so deploying an
+# unrelated ConfigMap change silently started a full archive backfill. That is how a
+# 221-Job flood happened in production — twice.
+#
+# A Job is also immutable once created, so applying an edited one fails outright rather
+# than updating it; see the note in backfill.yaml.
+#
+# render.sh emits it as a separate document instead, and only `make backfill` applies it.
 
 # Drop the namespace from generated names/selectors: every object declares its namespace
 # explicitly, and adding `namespace: tts-audio` here would also rewrite the Namespace

@@ -43,6 +43,22 @@ data:
   # left at onnxruntime's default rather than tuned.
   KOKORO_DTYPE: "q8"
 
+  # ── The synthesis queue ──────────────────────────────────────────────────────────
+  #
+  # Synthesis Jobs request 0 CPU, so the scheduler admits all of them at once and they
+  # contend for the node until each crawls. Nothing in batch/v1 caps concurrency *across*
+  # Jobs (`parallelism` caps pods inside one Job, and every post gets its own), so the
+  # backfill creates the next Job only when fewer than MAX_CONCURRENT_JOBS are active.
+  #
+  # 1 = one article at a time, end to end. Raise it only if the node has spare cores: at 0
+  # CPU requests, extra concurrency buys nothing but slower Jobs.
+  MAX_CONCURRENT_JOBS: "1"
+  # How often the queue re-checks for a free slot.
+  QUEUE_POLL_MS: "15000"
+  # Give up rather than wait forever behind Jobs that can never be scheduled (Pending with
+  # an impossible request). One hour, matching the backfill's own activeDeadlineSeconds.
+  QUEUE_MAX_WAIT_MS: "3600000"
+
 ---
 # The Job manifest the receiver stamps for each post.
 #
@@ -93,6 +109,7 @@ data:
             "automountServiceAccountToken": false,
             "restartPolicy": "Never",
             "enableServiceLinks": false,
+            "nodeSelector": {},
             "securityContext": {
               "runAsNonRoot": true,
               "runAsUser": 1000,
@@ -116,8 +133,8 @@ data:
                   { "name": "TMPDIR", "value": "/tmp" }
                 ],
                 "resources": {
-                  "requests": { "cpu": "2", "memory": "1500Mi" },
-                  "limits": { "cpu": "4", "memory": "3Gi" }
+                  "requests": { "cpu": "0", "memory": "256Mi" },
+                  "limits": { "cpu": "2", "memory": "3Gi" }
                 },
                 "securityContext": {
                   "allowPrivilegeEscalation": false,

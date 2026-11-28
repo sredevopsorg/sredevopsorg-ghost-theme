@@ -252,6 +252,17 @@ Build outputs and ignored paths: `assets/built/`, `dist/`, `node_modules/`,
    workflow. A voice or speed change is a ConfigMap edit, not a code change.
 6. Never apply the pipeline from a theme release, and never let `deploy/` ship. The theme
    and the pipeline ship independently.
+7. **`make deploy` must never create a Job.** `kubectl apply` is create-or-update, so a Job
+   in the kustomization is recreated by every deploy — shipping an unrelated ConfigMap
+   change started a full archive backfill and flooded the cluster with 221 Jobs, twice.
+   `base/backfill.yaml` is deliberately absent from `base/kustomization.yaml`; `render.sh`
+   emits it only under `WITH_BACKFILL=1`, which only `make backfill` sets. Add any new
+   one-shot workload the same way, and keep the assertion in `test.sh` that fails when the
+   default render contains a `Job`.
+8. The synthesis Job requests **0 CPU** with a cap of 2, and `MAX_CONCURRENT_JOBS=1` makes
+   the backfill queue instead of fanning out. The two ship together: a 0 request throttles
+   nothing, so without the queue every Job contends for a 2-core node. `test.sh` asserts
+   both, so neither can be changed alone.
 
 **Template or partial change**
 

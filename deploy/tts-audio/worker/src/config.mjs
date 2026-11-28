@@ -59,6 +59,10 @@ export function baseConfig() {
     audioBaseUrl: env("AUDIO_BASE_URL").replace(/\/+$/, ""),
     namespace: env("POD_NAMESPACE", "tts-audio"),
     image: env("WORKER_IMAGE"),
+    // Node-pool value for the Jobs this receiver creates; empty means "no selector", so a
+    // cluster without pools is unaffected. See deploy/tts-audio/overlay/node-pool.yaml.
+    nodePool: env("NODE_POOL"),
+    nodePoolLabel: env("NODE_POOL_LABEL", "dsh.sredevops.org/node-pool"),
     voices: { ...DEFAULT_VOICES, ...jsonEnv("TTS_VOICES", {}) },
     chunkChars: Number(env("TTS_CHUNK_CHARS", "350")),
     gapMs: Number(env("TTS_SENTENCE_GAP_MS", "240")),
